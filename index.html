@@ -94,15 +94,45 @@
 
   /* ---------- modes ---------- */
   #stage,#picker,#quiz,#animal,#passport{display:none}
-  body.m-learn #stage,body.m-hunt #stage{display:grid}
+  body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage{display:grid}
   body.m-learn #picker{display:block}
   body.m-quiz #quiz{display:block}
   body.m-animal #animal{display:block}
   body.m-passport #passport{display:block}
-  #card,#huntPanel{display:none}
+  #card,#huntPanel,#civPanel{display:none}
   body.m-learn #card{display:block}
   body.m-hunt #huntPanel{display:block}
-  body.m-hunt #findBtn{display:none}
+  body.m-civ #civPanel{display:block}
+  body.m-hunt #findBtn,body.m-civ #findBtn,body.m-civ #homeBtn{display:none}
+
+  /* ---------- ancient civilisations ---------- */
+  .civIntro{background:linear-gradient(90deg,#fff3d6,#eaf7ff);border-radius:16px;padding:10px 14px;
+    font-size:15px;line-height:1.4;display:flex;gap:9px;align-items:flex-start}
+  .civIntro .emo{font-size:22px;flex:none}
+  .civSel{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .civSel .btn{font-size:15px;padding:7px 13px}
+  .civSel .btn.on{background:var(--yellow);border-color:#e0a93c;color:#5a3c0c}
+  .civTop{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .civArt{width:118px;height:118px;flex:none;background:#fbfaf5;border-radius:16px;border:3px solid #efe6d2}
+  .civMeta{font-size:15px;color:var(--ink2);margin-top:5px;line-height:1.35}
+  .civMeta b{color:#1a6fc4}
+  .civNow{margin-top:12px;background:#f2f8ff;border-radius:16px;padding:10px 14px;font-size:15px;
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .civNow svg{width:46px;height:31px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.2);flex:none}
+  .civTime{margin-top:16px;padding:6px 10px 4px}
+  .civTime .lab{font-size:13px;color:var(--ink2);text-align:center;margin-bottom:20px}
+  .civTime .rail{position:relative;height:6px;border-radius:999px;
+    background:linear-gradient(90deg,#e0a93c,#ffd54a,#8ed0f0)}
+  .civTime .tk{position:absolute;top:-7px;transform:translateX(-50%);cursor:pointer}
+  .civTime .tk i{display:block;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid #e0a93c}
+  .civTime .tk.on i{background:#ffd54a;border-color:#b9761a;transform:scale(1.18)}
+  .civTime .tk .en{display:none}
+  body.only-en .civTime .tk .en{display:inline}
+  body.only-en .civTime .tk .zh{display:none}
+  .civTime .tk span{position:absolute;top:24px;left:50%;transform:translateX(-50%);white-space:nowrap;
+    font-size:11.5px;font-weight:bold;color:var(--ink2);text-align:center;line-height:1.2}
+  .civTime .tk.on span{color:#b9761a}
+  .civTime .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-top:44px}
   .navbar{display:flex;gap:6px;flex-wrap:wrap}
   .navbar .btn.on{background:var(--orange);border-color:#e07f1f;color:#fff}
   #ppCount{background:rgba(255,255,255,.7);border-radius:999px;padding:1px 7px;font-size:13px;margin-left:2px}
@@ -244,6 +274,7 @@
   </div>
   <div class="navbar" id="modeNav">
     <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
+    <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
     <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
     <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
     <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
@@ -273,6 +304,7 @@
     <div id="daily"></div>
     <div id="card"></div>
     <div id="huntPanel"></div>
+    <div id="civPanel"></div>
   </section>
 </main>
 
@@ -1173,6 +1205,71 @@ var DETAIL={
 };
 
 /* ============================================================
+   2d. THE FOUR ANCIENT RIVER CIVILISATIONS
+   ============================================================ */
+var CIVART={
+ civEg:'<circle cx="50" cy="10" r="5" fill="#ffcf5c"/>'+
+   '<rect x="0" y="40" width="60" height="4" fill="#e8d29a"/><rect x="0" y="44" width="60" height="12" fill="#5fb8d8"/>'+
+   '<path d="M5,41 L17,19 L29,41 Z" fill="#e6cf8e"/><path d="M17,19 L29,41 H17 Z" fill="#d5bb76"/>'+
+   '<path d="M30,41 L39,26 L48,41 Z" fill="#dcc484"/><path d="M39,26 L48,41 H39 Z" fill="#cbb06d"/>'+
+   '<path d="M20,49 h17 l-3.5,4 h-10 z" fill="#c9a05a"/><path d="M28.5,48 V39 l6.5,7 z" fill="#f7f1e2"/>',
+ civBb:'<rect x="0" y="45" width="60" height="11" fill="#7bbfd8"/><rect x="0" y="41" width="60" height="5" fill="#dcc9a0"/>'+
+   '<rect x="7" y="33" width="46" height="9" fill="#bb9d70"/><rect x="12" y="25" width="36" height="8" fill="#c8ab7d"/>'+
+   '<rect x="17" y="17" width="26" height="8" fill="#d5b88a"/><rect x="23" y="10" width="14" height="7" fill="#e0c497"/>'+
+   '<rect x="27.5" y="17" width="5" height="25" fill="#a3854f"/>'+
+   '<g fill="#a3854f"><rect x="10" y="30" width="40" height="1.4"/><rect x="15" y="22" width="30" height="1.4"/></g>',
+ civIn:'<rect x="0" y="47" width="60" height="9" fill="#cbb894"/>'+
+   '<rect x="4" y="26" width="15" height="21" fill="#c98f6a"/><rect x="41" y="24" width="15" height="23" fill="#c98f6a"/>'+
+   '<rect x="21" y="18" width="18" height="12" fill="#d69b74"/>'+
+   '<g fill="#b57d5c"><rect x="4" y="31" width="15" height="1.3"/><rect x="4" y="36" width="15" height="1.3"/>'+
+   '<rect x="41" y="30" width="15" height="1.3"/><rect x="41" y="35" width="15" height="1.3"/>'+
+   '<rect x="21" y="23" width="18" height="1.3"/></g>'+
+   '<rect x="20" y="32" width="20" height="15" fill="#a98a6a"/><rect x="22.5" y="34.5" width="15" height="10" fill="#61bcd8"/>'+
+   '<path d="M22.5,36 h15 M22.5,39 h15" stroke="#8ad2e8" stroke-width="0.9"/>',
+ civCn:'<rect x="0" y="46" width="60" height="10" fill="#dcbe80"/>'+
+   '<path d="M19,15 q-1,-7 4,-7 M41,15 q1,-7 -4,-7" stroke="#8a6b3c" stroke-width="2.6" fill="none"/>'+
+   '<rect x="13" y="14" width="34" height="6" rx="1.5" fill="#9c7b45"/>'+
+   '<path d="M16.5,20 h27 l-2.5,13 q-11,5 -22,0 z" fill="#ac8b50"/>'+
+   '<rect x="18.5" y="22" width="23" height="3.4" fill="#c6a370"/>'+
+   '<rect x="19" y="33" width="4.5" height="12" fill="#8a6b3c"/><rect x="27.8" y="35" width="4.5" height="11" fill="#7d6035"/>'+
+   '<rect x="36.5" y="33" width="4.5" height="12" fill="#8a6b3c"/>'
+};
+function civSVG(k){ return '<svg viewBox="0 0 60 60" class="civArt" xmlns="http://www.w3.org/2000/svg">'+CIVART[k]+'</svg>'; }
+
+/* the great rivers, as lon/lat paths drawn on the globe */
+var RIVERS={
+ nile:[[[32.5,12],[32.5,15.6],[32.6,18.6],[31.4,22],[32.7,25.6],[31.3,28.8],[31.1,30.4],[30.9,31.5]]],
+ mesop:[[[38.3,37.2],[39.6,36],[41.2,34.8],[42.8,33.6],[44.3,32.4],[46,31.2],[47.6,30.4]],
+        [[41.4,37.3],[42.6,35.6],[43.9,34],[44.6,33],[45.8,32],[46.8,31.2],[47.6,30.4]]],
+ indus:[[[80.5,32],[78,33.5],[76.5,34.5],[74.3,32.5],[72.5,31.3],[71.4,29.5],[70.5,27.8],[68.8,25.8],[67.9,24.2]]],
+ huanghe:[[[96.5,35],[100,35.3],[102.7,36.1],[103.8,36.1],[106.2,37.4],[107.5,39.3],[109.5,40.3],[111.2,40.3],
+           [111.3,38.5],[110.4,36.5],[110.3,34.9],[112.5,34.8],[114.5,35.1],[116.5,35.8],[118.9,37.6]]]
+};
+/* ago = years before now, used to place them on the little timeline */
+var CIVS=[
+ {id:'eg',zh:'古埃及',en:'Ancient Egypt',art:'civEg',river:'nile',lat:26,lon:32.5,ago:5100,
+  rvZh:'尼罗河',rvEn:'the Nile',nowZh:'埃及',nowEn:'Egypt',now:'eg',shZh:'埃及',shEn:'Egypt',
+  f:[['🔺','建了巨大的金字塔，给国王当坟墓','Built giant pyramids as tombs for their kings'],
+     ['✍️','写的字是一个个小图画，叫象形文字','Their writing was little pictures called hieroglyphs'],
+     ['📜','把水草压平做成纸，叫纸莎草纸','They pressed river reeds flat to make paper — papyrus']]},
+ {id:'bb',zh:'古巴比伦',en:'Ancient Babylon',art:'civBb',river:'mesop',lat:32.54,lon:44.42,ago:5500,
+  rvZh:'幼发拉底河和底格里斯河',rvEn:'the Tigris and Euphrates',nowZh:'伊拉克',nowEn:'Iraq',now:null,shZh:'巴比伦',shEn:'Babylon',
+  f:[['🏛️','盖了一层一层的高塔庙','They built tall temples stacked in steps'],
+     ['✍️','用小棍在泥板上按出楔形文字','They pressed wedge marks into clay to write'],
+     ['🛞','最早的轮子就是这里想出来的','The very first wheels were thought up here']]},
+ {id:'in',zh:'古印度',en:'Ancient India',art:'civIn',river:'indus',lat:27.32,lon:68.14,ago:4600,
+  rvZh:'印度河',rvEn:'the Indus',nowZh:'巴基斯坦和印度',nowEn:'Pakistan and India',now:'in',shZh:'印度',shEn:'India',
+  f:[['🧱','砖头一样大，街道排得整整齐齐','Bricks all the same size, streets in neat straight lines'],
+     ['🚿','四千多年前就有下水道和大澡堂','They had drains and a great bath over 4,000 years ago'],
+     ['🐂','印章上刻着牛，还有没人看得懂的字','Their stamps show bulls — and writing nobody can read yet']]},
+ {id:'cn',zh:'古中国',en:'Ancient China',art:'civCn',river:'huanghe',lat:34.7,lon:112.7,ago:4000,
+  rvZh:'黄河',rvEn:'the Yellow River',nowZh:'中国',nowEn:'China',now:'cn',shZh:'中国',shEn:'China',
+  f:[['🐢','把字刻在龟壳和兽骨上，叫甲骨文','They carved words onto turtle shells and bones'],
+     ['🥘','用青铜铸出又大又重的鼎','They cast huge heavy cauldrons out of bronze'],
+     ['🧵','最早养蚕，织出滑滑的丝绸','The first to raise silkworms and weave silk']]}
+];
+
+/* ============================================================
    3. SIMPLE WORLD MAP (coarse outlines, lon/lat)
    ============================================================ */
 var LAND=[
@@ -1422,6 +1519,7 @@ function draw(){
 
   // country dots
   dots=[];
+  if(MODE==='civ'){ drawCivLayer(); return; }
   COUNTRIES.forEach(function(c){
     var p=project(c.lon,c.lat);
     if(!p.vis) return;
@@ -1449,6 +1547,49 @@ function draw(){
     ctx.fillStyle='rgba(255,255,255,.95)';
     roundRect(pp.x-tw/2-8, y-46, tw+16, 24, 12); ctx.fill();
     ctx.fillStyle='#1f3b57'; ctx.textAlign='center'; ctx.fillText(label, pp.x, y-29);
+    ctx.textAlign='start';
+  }
+}
+/* rivers + the four birthplaces, shown instead of the country dots in civ mode */
+var civDots=[], civIdx=0;
+function drawCivLayer(){
+  civDots=[];
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  CIVS.forEach(function(v,i){
+    var sel=i===civIdx;
+    RIVERS[v.river].forEach(function(line){
+      ctx.beginPath(); var st=false;
+      line.forEach(function(pt){
+        var p=project(pt[0],pt[1]);
+        if(p.vis){ st?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); st=true; } else st=false;
+      });
+      ctx.lineWidth=sel?3.4:1.8;
+      ctx.strokeStyle=sel?'rgba(90,225,255,.95)':'rgba(160,230,255,.45)';
+      ctx.stroke();
+    });
+  });
+  ctx.lineCap='butt';
+  CIVS.forEach(function(v,i){
+    var p=project(v.lon,v.lat); if(!p.vis) return;
+    civDots.push({x:p.x,y:p.y,i:i});
+    var sel=i===civIdx;
+    if(sel){
+      var pulse=6.5+Math.sin(Date.now()/300)*1.6;
+      ctx.beginPath(); ctx.arc(p.x,p.y,pulse+5,0,7);
+      ctx.fillStyle='rgba(255,213,74,.28)'; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(p.x,p.y,sel?7:4.6,0,7);
+    ctx.fillStyle=sel?'#ffd54a':'rgba(255,232,170,.92)'; ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle='rgba(120,72,20,.8)'; ctx.stroke();
+  });
+  var sp=project(CIVS[civIdx].lon,CIVS[civIdx].lat);
+  if(sp.vis){
+    var label=document.body.classList.contains('only-en')?CIVS[civIdx].en:CIVS[civIdx].zh;
+    ctx.font='bold 15px "Segoe UI","PingFang SC",sans-serif';
+    var tw=ctx.measureText(label).width;
+    ctx.fillStyle='rgba(255,255,255,.95)';
+    roundRect(sp.x-tw/2-8, sp.y-40, tw+16, 24, 12); ctx.fill();
+    ctx.fillStyle='#7a4b12'; ctx.textAlign='center'; ctx.fillText(label, sp.x, sp.y-23);
     ctx.textAlign='start';
   }
 }
@@ -1523,6 +1664,12 @@ cv.addEventListener('pointerup',function(e){
   dragging=false;
   if(cv._moved<6){
     var r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+    if(MODE==='civ'){
+      var bc=null, bcd=26;
+      civDots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bcd){bcd=dd;bc=d.i;} });
+      if(bc!==null) pickCiv(bc,true);
+      return;
+    }
     var best=null,bd=24;
     dots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bd){bd=dd;best=d.c;} });
     if(best){ if(MODE==='hunt') huntPick(best); else select(best.id,true); return; }
@@ -1655,7 +1802,8 @@ function stepPlanes(dt){
 /* drawn before the night shading, so a plane over the dark side dims like everything else */
 function drawPlanes(){
   planeLights.length=0; planeHits.length=0;
-  if(!planesOn) return;
+  /* civ mode keeps the globe clean — amber night-lights would read as civilisation markers */
+  if(!planesOn || MODE==='civ') return;
   var N=12;
   for(var k=0;k<PLANES.length;k++){
     var pl=PLANES[k], head=Math.min(1,pl.t), tail=Math.max(0,pl.t-pl.tail);
@@ -1984,7 +2132,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
     cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
-var MODES=['learn','hunt','animal','quiz','passport'];
+var MODES=['learn','civ','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
@@ -1995,6 +2143,7 @@ function setMode(m){
     b.classList.toggle('on', b.dataset.m===m);
   });
   if(m==='learn') renderDaily();
+  if(m==='civ'){ renderCiv(); flyTo(CIVS[civIdx]); sayCiv(); }
   if(m==='hunt') startHunt();
   if(m==='quiz') startQuiz();
   if(m==='animal') startAnimal();
@@ -2091,6 +2240,61 @@ function renderQuiz(){
   });
 }
 function exitQuiz(){ setMode('learn'); }
+
+/* ============================================================
+   6a. THE FOUR ANCIENT CIVILISATIONS
+   ============================================================ */
+var TSPAN=[6000,3500];                       // years ago, left edge → right edge of the timeline
+function tPos(ago){ return (TSPAN[0]-ago)/(TSPAN[0]-TSPAN[1])*100; }
+function renderCiv(){
+  var v=CIVS[civIdx];
+  var h='<div class="civIntro"><span class="emo">🌊</span><span class="stack">'+
+    T('最早的四个大文明，都是在<b>大河边上</b>长大的 —— 有水才能种庄稼，才能住下很多很多人。',
+      'The four oldest civilisations all grew up <b>beside a great river</b> — water meant crops, and crops meant lots of people.')+
+    '</span></div>';
+  h+='<div class="civSel">'+CIVS.map(function(c,i){
+      return '<button class="btn'+(i===civIdx?' on':'')+'" data-i="'+i+'">🏺 '+T(c.zh,c.en)+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="civTop">'+civSVG(v.art)+'<div><div class="cName stack">'+T(v.zh,v.en)+'</div>'+
+     '<div class="civMeta stack">'+T('🌊 靠着 <b>'+v.rvZh+'</b>','🌊 beside <b>'+v.rvEn+'</b>')+'</div>'+
+     '<div class="civMeta stack">'+T('⏳ 大约 <b>'+v.ago.toLocaleString()+'</b> 年前开始',
+                                     '⏳ began about <b>'+v.ago.toLocaleString()+'</b> years ago')+'</div></div></div>';
+  h+='<ul class="facts">'+v.f.map(function(f){
+      return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
+    }).join('')+'</ul>';
+  h+='<div class="civNow">'+(v.now?flagSVG(v.now):'<span class="emo">📍</span>')+
+     '<span class="grow stack">'+T('现在这块地方是 <b>'+v.nowZh+'</b>','Today this land is <b>'+v.nowEn+'</b>')+'</span>'+
+     (v.now?'<button class="btn" id="civGo">'+T('去看看','Visit')+'</button>':'')+'</div>';
+  h+='<div class="civTime"><div class="lab stack">'+T('看看谁最老 ⏳','Which one is the oldest? ⏳')+'</div>'+
+     '<div class="rail">'+CIVS.map(function(c,i){
+       return '<button class="tk'+(i===civIdx?' on':'')+'" data-i="'+i+'" style="left:'+tPos(c.ago).toFixed(1)+'%">'+
+              '<i></i><span><b class="zh">'+c.shZh+'</b><b class="en">'+c.shEn+'</b><br>'+c.ago.toLocaleString()+'</span></button>';
+     }).join('')+'</div>'+
+     '<div class="ends"><span class="stack">'+T('6000 年前','6,000 years ago')+'</span>'+
+     '<span class="stack">'+T('3500 年前','3,500 years ago')+'</span></div></div>';
+  h+='<div class="navRow"><button class="btn" id="civPrev">⬅️ '+T('上一个','Back')+'</button>'+
+     '<button class="btn" id="civSay">🔊 '+T('读给我听','Say it')+'</button>'+
+     '<button class="btn" id="civNext">'+T('下一个','Next')+' ➡️</button></div>';
+  document.getElementById('civPanel').innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll('#civPanel [data-i]'),function(b){
+    b.onclick=function(){ pickCiv(+b.dataset.i, true); };
+  });
+  document.getElementById('civPrev').onclick=function(){ pickCiv((civIdx+CIVS.length-1)%CIVS.length,true); };
+  document.getElementById('civNext').onclick=function(){ pickCiv((civIdx+1)%CIVS.length,true); };
+  document.getElementById('civSay').onclick=function(){ sayCiv(true); };
+  var go=document.getElementById('civGo');
+  if(go) go.onclick=function(){ setMode('learn'); select(v.now,true); };
+}
+function sayCiv(force){
+  var v=CIVS[civIdx];
+  sayList([[v.zh+'，在'+v.rvZh+'边上', v.en+', beside '+v.rvEn]].concat(
+    v.f.map(function(f){ return [f[1],f[2]]; })), force);
+}
+function pickCiv(i,user){
+  civIdx=i; renderCiv();
+  flyTo(CIVS[i]);
+  if(user) sayCiv();
+}
 
 /* ============================================================
    6b. CONFETTI
