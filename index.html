@@ -66,6 +66,14 @@
   .hello{margin-top:12px;background:linear-gradient(90deg,#fff3d6,#ffe9f4);border-radius:16px;padding:12px 14px;font-size:18px}
   .hello b{font-size:22px}
   .navRow{display:flex;gap:10px;margin-top:14px;align-items:center;flex-wrap:wrap}
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .trio button{background:#f7fbff;border:3px solid #e3eefb;border-radius:18px;padding:10px 6px;transition:transform .12s}
+  .trio button:hover{transform:translateY(-3px);border-color:var(--blue)}
+  .trio .pic{width:100%;max-width:78px;margin:0 auto;display:block}
+  .trio .emo{font-size:46px;line-height:1.35;text-align:center}
+  .trio .lbl{font-size:11px;color:var(--ink2);font-weight:bold;text-align:center}
+  .trio .nm{font-size:14px;font-weight:bold;line-height:1.2;margin-top:3px;text-align:center}
+  .trio .nm .en{font-size:11.5px;color:var(--ink2)}
 
   /* ---------- picker ---------- */
   .picker{max-width:1180px;margin:16px auto 0}
@@ -78,10 +86,63 @@
   .cbtn span{display:block;font-size:14px;font-weight:bold;margin-top:6px;line-height:1.25}
   .cbtn .en{font-size:12px;color:var(--ink2)}
 
+  /* ---------- modes ---------- */
+  #stage,#picker,#quiz,#animal,#passport{display:none}
+  body.m-learn #stage,body.m-hunt #stage{display:grid}
+  body.m-learn #picker{display:block}
+  body.m-quiz #quiz{display:block}
+  body.m-animal #animal{display:block}
+  body.m-passport #passport{display:block}
+  #card,#huntPanel{display:none}
+  body.m-learn #card{display:block}
+  body.m-hunt #huntPanel{display:block}
+  body.m-hunt #findBtn{display:none}
+  .navbar{display:flex;gap:6px;flex-wrap:wrap}
+  .navbar .btn.on{background:var(--orange);border-color:#e07f1f;color:#fff}
+  #ppCount{background:rgba(255,255,255,.7);border-radius:999px;padding:1px 7px;font-size:13px;margin-left:2px}
+
+  /* ---------- hunt ---------- */
+  .huntQ{font-size:24px;font-weight:bold;text-align:center;line-height:1.25}
+  .huntQ .en{font-size:19px;color:var(--ink2)}
+  .huntFlag{width:120px;margin:12px auto;display:block;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+  .hintBox{background:#fff7e6;border-radius:16px;padding:14px;margin-top:12px;font-size:17px;min-height:56px;text-align:center;line-height:1.4}
+  .hintBox.good{background:#eefbf2}
+
+  /* ---------- animal match ---------- */
+  .matchWrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .col{display:flex;flex-direction:column;gap:10px}
+  .mcard{background:#fff;border:4px solid #e6eefb;border-radius:18px;padding:10px;box-shadow:0 3px 0 rgba(31,59,87,.08);display:flex;align-items:center;gap:10px;justify-content:center;min-height:66px;transition:transform .12s,opacity .3s}
+  .mcard:hover{transform:translateY(-2px)}
+  .mcard.sel{border-color:var(--blue);background:#eef5ff}
+  .mcard.done{opacity:.3;pointer-events:none;border-color:var(--green)}
+  .mcard.shake{animation:shake .4s}
+  @keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  .mcard .ani{font-size:36px;line-height:1}
+  .mcard svg{width:54px;height:36px;border-radius:4px;flex:none;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+  .mcard span{font-size:14px;font-weight:bold;line-height:1.2}
+
+  /* ---------- passport ---------- */
+  .pp{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px;margin-top:14px}
+  .slot{border:3px dashed #d5e3f5;border-radius:16px;padding:10px;text-align:center;min-height:126px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fbfdff}
+  .slot.got{border-style:solid;border-color:#f0c98a;background:#fffaf0}
+  .slot .q{font-size:36px;color:#cddcee}
+  .stampImg{position:relative;width:76px;height:76px;display:flex;align-items:center;justify-content:center}
+  .stampImg .ring{position:absolute;inset:0;border:3px solid #d2544e;border-radius:50%;transform:rotate(-12deg);opacity:.8}
+  .stampImg svg{width:44px;height:30px;border-radius:3px;transform:rotate(-12deg)}
+  .slot .nm{font-size:13px;font-weight:bold;line-height:1.25}
+  .bar{height:18px;background:#eaf1fb;border-radius:999px;overflow:hidden;margin-top:10px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--yellow));transition:width .5s}
+  .cert{margin-top:14px;border:5px double #e0a93c;border-radius:18px;background:linear-gradient(180deg,#fffdf5,#fff6e0);padding:18px;text-align:center}
+  .cert .big{font-size:40px}
+  .cert .t{font-size:22px;font-weight:bold;margin-top:6px}
+  #stampFx{position:fixed;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;z-index:70}
+  #stampFx.show{display:flex}
+  #stampFx .big{width:206px;height:206px;border-radius:50%;border:6px solid #d2544e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.95);box-shadow:0 10px 30px rgba(0,0,0,.28);animation:thump .8s ease-out}
+  #stampFx .big svg{width:90px;height:60px;border-radius:5px}
+  #stampFx .big .t{color:#d2544e;font-weight:bold;font-size:17px;text-align:center;padding:0 14px;line-height:1.2}
+  @keyframes thump{0%{transform:scale(3.2) rotate(-28deg);opacity:0}55%{transform:scale(.94) rotate(-12deg);opacity:1}72%{transform:scale(1.07) rotate(-12deg)}100%{transform:scale(1) rotate(-12deg);opacity:1}}
+
   /* ---------- quiz ---------- */
-  #quiz{display:none}
-  body.quizMode #quiz{display:block}
-  body.quizMode #learn{display:none}
   .qHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .qTitle{font-size:24px;font-weight:bold}
   .qOpts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:10px}
@@ -92,7 +153,7 @@
   .qOpt.wrong{border-color:#ff6b6b;background:#fff0f0;opacity:.7}
   .score{font-size:20px;font-weight:bold}
   .bigMsg{font-size:22px;text-align:center;padding:20px}
-  #confetti{position:fixed;inset:0;pointer-events:none;display:none}
+  #confetti{position:fixed;inset:0;pointer-events:none;display:none;z-index:65}
   footer{max-width:1180px;margin:18px auto 6px;text-align:center;color:var(--ink2);font-size:14px}
 </style>
 </head>
@@ -108,11 +169,17 @@
     <button class="btn" data-lang="zh">中文</button>
     <button class="btn" data-lang="en">English</button>
   </div>
-  <button class="btn big" id="quizBtn"><span class="zh">🎮 玩游戏</span><span class="en">🎮 Play Quiz</span></button>
+  <div class="navbar" id="modeNav">
+    <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
+    <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
+    <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
+    <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
+    <button class="btn" data-m="passport">🛂 <span class="zh">护照</span><span class="en">Passport</span><b id="ppCount">0/24</b></button>
+    <button class="btn on" id="spkBtn">🔊 <span class="zh">朗读</span><span class="en">Voice</span></button>
+  </div>
 </header>
 
-<div id="learn">
-<main>
+<main id="stage">
   <section class="panel" id="globeWrap">
     <canvas id="globe"></canvas>
     <div class="globeTools">
@@ -125,16 +192,23 @@
     </p>
   </section>
 
-  <section class="panel" id="card"></section>
+  <section class="panel">
+    <div id="card"></div>
+    <div id="huntPanel"></div>
+  </section>
 </main>
 
-<section class="picker panel">
+<section class="picker panel" id="picker">
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
 </section>
-</div>
 
 <div id="quiz" class="picker panel"></div>
+<div id="animal" class="picker panel"></div>
+<div id="passport" class="picker panel"></div>
+
+<canvas id="confetti"></canvas>
+<div id="stampFx"></div>
 
 <footer class="stack">
   <span class="zh">一年级小朋友的世界地理小课堂 · 24 个国家 · 一起认识地球上的朋友吧！</span>
@@ -370,6 +444,163 @@ var COUNTRIES=[
 ];
 
 /* ============================================================
+   2b. EACH COUNTRY'S THREE TREASURES — landmark / animal / flower
+   ============================================================ */
+function shade(hex,pct){
+  var n=parseInt(hex.slice(1),16), r=n>>16, g=(n>>8)&255, b=n&255;
+  r=Math.round(r+(255-r)*pct/100); g=Math.round(g+(255-g)*pct/100); b=Math.round(b+(255-b)*pct/100);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+var MAPLE='<path d="M30,6 l2.3,4.8 4.7,-1 -1.4,4.6 5.4,-1.7 -1.7,3.2 4.8,3.5 -1.7,1 1,3.5 -5.6,-1.1 -0.6,2.3 -4.5,-4.8 1,8.2 -2.7,-1.2 -0.5,-2 -0.5,2 -2.7,1.2 1,-8.2 -4.5,4.8 -0.6,-2.3 -5.6,1.1 1,-3.5 -1.7,-1 4.8,-3.5 -1.7,-3.2 5.4,1.7 -1.4,-4.6 4.7,1 z"';
+/* spec = "shape,petals,petalColour,centreColour" */
+function flower(spec){
+  var p=spec.split(','), shape=p[0], n=+p[1], pc=p[2], cc=p[3], s='', i, a, cx, cy;
+  if(shape==='maple') return '<g transform="translate(30,32) scale(1.55) translate(-30,-18)">'+MAPLE+' fill="'+pc+'"/></g>';
+  if(shape==='puff'){
+    for(i=0;i<12;i++){ a=i*30*Math.PI/180; var rr=(i%2?9:13);
+      s+='<circle cx="'+(30+rr*Math.cos(a)).toFixed(1)+'" cy="'+(30+rr*Math.sin(a)).toFixed(1)+'" r="4.3" fill="'+pc+'"/>'; }
+    return s+'<circle cx="30" cy="30" r="7" fill="'+cc+'"/>';
+  }
+  if(shape==='many'){
+    [[17,pc],[11.5,shade(pc,16)],[6.5,shade(pc,32)]].forEach(function(ring,ri){
+      for(var k=0;k<n;k++){
+        var ang=(k*360/n)+(ri*18), rd=(ang-90)*Math.PI/180;
+        cx=30+ring[0]*0.60*Math.cos(rd); cy=30+ring[0]*0.60*Math.sin(rd);
+        s+='<ellipse cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" rx="'+(ring[0]*0.52).toFixed(1)+'" ry="'+(ring[0]*0.40).toFixed(1)+
+           '" fill="'+ring[1]+'" transform="rotate('+ang.toFixed(0)+' '+cx.toFixed(1)+' '+cy.toFixed(1)+')"/>';
+      }
+    });
+    return s+'<circle cx="30" cy="30" r="4.6" fill="'+cc+'"/>';
+  }
+  for(i=0;i<n;i++){
+    a=i*360/n; var rad=(a-90)*Math.PI/180;
+    cx=30+13*Math.cos(rad); cy=30+13*Math.sin(rad);
+    s+='<ellipse cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" rx="'+(shape==='point'?5:7.2)+'" ry="'+(shape==='point'?11:8.4)+
+       '" fill="'+pc+'" transform="rotate('+a+' '+cx.toFixed(1)+' '+cy.toFixed(1)+')"/>';
+  }
+  return s+'<circle cx="30" cy="30" r="6" fill="'+cc+'"/>';
+}
+/* landmark drawings, viewBox 0 0 60 60 */
+var LM={
+ gwall:'<rect x="0" y="49" width="60" height="8" fill="#84c07a"/><rect x="2" y="36" width="56" height="14" fill="#c3b294"/>'+
+   '<rect x="2" y="31" width="7" height="6" fill="#c3b294"/><rect x="14" y="31" width="7" height="6" fill="#c3b294"/><rect x="39" y="31" width="7" height="6" fill="#c3b294"/><rect x="51" y="31" width="7" height="6" fill="#c3b294"/>'+
+   '<rect x="22" y="18" width="16" height="20" fill="#ad9970"/><rect x="19" y="13" width="22" height="6" fill="#8d7a58"/><rect x="27" y="27" width="6" height="11" rx="3" fill="#6f5f45"/>',
+ fuji:'<circle cx="46" cy="15" r="6" fill="#ff9d9d"/><path d="M3,50 L30,13 L57,50 Z" fill="#6f90c8"/>'+
+   '<path d="M19,29 L30,13 L41,29 Q35,25 30,28 Q25,25 19,29 Z" fill="#fff"/><rect x="0" y="50" width="60" height="6" fill="#8fc9e8"/>',
+ twin:'<rect x="17" y="2" width="2" height="7" fill="#7d94aa"/><rect x="41" y="2" width="2" height="7" fill="#7d94aa"/>'+
+   '<path d="M18,7 L23,15 H13 Z" fill="#7d94aa"/><path d="M42,7 L47,15 H37 Z" fill="#7d94aa"/>'+
+   '<rect x="13" y="15" width="10" height="35" fill="#a8bdd1"/><rect x="37" y="15" width="10" height="35" fill="#a8bdd1"/>'+
+   '<rect x="23" y="29" width="14" height="4" fill="#cbd9e5"/><rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ mbs:'<rect x="10" y="24" width="8" height="26" fill="#bccbd8"/><rect x="26" y="24" width="8" height="26" fill="#bccbd8"/><rect x="42" y="24" width="8" height="26" fill="#bccbd8"/>'+
+   '<path d="M5,24 Q30,11 55,20 L55,25 L5,29 Z" fill="#93a9bd"/><ellipse cx="46" cy="17" rx="7" ry="2.4" fill="#6f8ba3"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#7cc0e0"/>',
+ taj:'<rect x="6" y="27" width="4" height="23" fill="#e6e0d4"/><rect x="50" y="27" width="4" height="23" fill="#e6e0d4"/>'+
+   '<circle cx="8" cy="25" r="3" fill="#d9d2c4"/><circle cx="52" cy="25" r="3" fill="#d9d2c4"/>'+
+   '<rect x="15" y="34" width="30" height="16" fill="#f2ede3"/><path d="M19,35 Q30,11 41,35 Z" fill="#f9f5ec"/>'+
+   '<circle cx="30" cy="14" r="2.4" fill="#e0d8c8"/><path d="M25,50 V41 Q30,34 35,41 V50 Z" fill="#cbc1ab"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#a9d6e8"/>',
+ hanok:'<path d="M5,25 Q30,12 55,25 L48,28 Q30,20 12,28 Z" fill="#2f5fa8"/>'+
+   '<path d="M1,37 Q30,22 59,37 L52,40 Q30,30 8,40 Z" fill="#3a72c4"/>'+
+   '<rect x="14" y="39" width="32" height="11" fill="#dcbd90"/><rect x="26" y="41" width="8" height="9" fill="#8c5a3c"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ wat:'<path d="M30,3 L34,20 L38,27 L42,35 L47,45 H13 L18,35 L22,27 L26,20 Z" fill="#f2b52e"/>'+
+   '<rect x="9" y="45" width="42" height="5" fill="#dfa11d"/><rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ boro:'<rect x="5" y="42" width="50" height="8" fill="#959086"/><rect x="11" y="34" width="38" height="8" fill="#a29c91"/>'+
+   '<rect x="17" y="26" width="26" height="8" fill="#afa89c"/><path d="M30,9 L36,26 H24 Z" fill="#bbb4a7"/>'+
+   '<circle cx="21" cy="23" r="2.6" fill="#bbb4a7"/><circle cx="39" cy="23" r="2.6" fill="#bbb4a7"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ basil:'<rect x="11" y="31" width="11" height="19" fill="#eee8dc"/><rect x="38" y="31" width="11" height="19" fill="#eee8dc"/>'+
+   '<rect x="23" y="25" width="14" height="25" fill="#f6f0e4"/>'+
+   '<path d="M16.5,31 Q9,22 16.5,13 Q24,22 16.5,31" fill="#d9534f"/>'+
+   '<path d="M43.5,31 Q36,22 43.5,13 Q51,22 43.5,31" fill="#2f8f4e"/>'+
+   '<path d="M30,25 Q21,14 30,5 Q39,14 30,25" fill="#f0b429"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#c9d6e2"/>',
+ bigben:'<rect x="17" y="44" width="26" height="6" fill="#b39355"/><rect x="24" y="15" width="12" height="30" fill="#cbaa6c"/>'+
+   '<path d="M23,15 L30,4 L37,15 Z" fill="#8c7440"/>'+
+   '<circle cx="30" cy="22" r="4.6" fill="#fff8e0" stroke="#8c7440" stroke-width="1"/>'+
+   '<path d="M30,19 V22 H32.4" stroke="#8c7440" stroke-width="1.2" fill="none"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ eiffel:'<path d="M28,5 h4 l8,45 h-6 l-4,-21 l-4,21 h-6 z" fill="#8b7d6b"/>'+
+   '<rect x="23" y="29" width="14" height="3" fill="#8b7d6b"/><rect x="19" y="41" width="22" height="3" fill="#8b7d6b"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ castle:'<rect x="14" y="28" width="32" height="22" fill="#f2eee6"/>'+
+   '<rect x="9" y="22" width="10" height="28" fill="#faf7f1"/><rect x="41" y="22" width="10" height="28" fill="#faf7f1"/>'+
+   '<path d="M9,22 L14,9 L19,22 Z" fill="#4a7fc1"/><path d="M41,22 L46,9 L51,22 Z" fill="#4a7fc1"/>'+
+   '<path d="M19,28 L30,15 L41,28 Z" fill="#4a7fc1"/><rect x="27" y="38" width="6" height="12" rx="3" fill="#7a6a55"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#8ec98a"/>',
+ pisa:'<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/><g transform="rotate(-9 30 50)">'+
+   '<rect x="23" y="8" width="14" height="42" fill="#f0ebde"/>'+
+   '<rect x="21" y="14" width="18" height="2.6" fill="#d8cfba"/><rect x="21" y="22" width="18" height="2.6" fill="#d8cfba"/>'+
+   '<rect x="21" y="30" width="18" height="2.6" fill="#d8cfba"/><rect x="21" y="38" width="18" height="2.6" fill="#d8cfba"/>'+
+   '<rect x="21" y="5" width="18" height="5" rx="1.5" fill="#e4dcc8"/></g>',
+ sagrada:'<rect x="9" y="44" width="42" height="6" fill="#c8b795"/>'+
+   '<path d="M13,45 L16.5,19 L20,45 Z" fill="#d9c9a8"/><path d="M21,45 L25.5,10 L30,45 Z" fill="#e6d7b6"/>'+
+   '<path d="M31,45 L35.5,15 L40,45 Z" fill="#ddccab"/><path d="M41,45 L44,23 L47,45 Z" fill="#d3c2a0"/>'+
+   '<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/>',
+ pyramid:'<circle cx="49" cy="13" r="5.5" fill="#ffcf5c"/><path d="M28,48 L41,27 L54,48 Z" fill="#d7bd79"/>'+
+   '<path d="M4,48 L21,17 L38,48 Z" fill="#e6cf8e"/><path d="M21,17 L38,48 H21 Z" fill="#d9c07d"/>'+
+   '<rect x="0" y="48" width="60" height="8" fill="#f2e2b0"/>',
+ acacia:'<rect x="0" y="48" width="60" height="8" fill="#ebcc72"/><rect x="28" y="29" width="4" height="20" fill="#8a6b4a"/>'+
+   '<path d="M28,34 L20,28 M32,34 L40,28" stroke="#8a6b4a" stroke-width="2.4"/>'+
+   '<ellipse cx="30" cy="25" rx="23" ry="6.5" fill="#63b56a"/><ellipse cx="22" cy="21" rx="11" ry="4.5" fill="#74c47a"/>'+
+   '<ellipse cx="39" cy="22" rx="9" ry="4" fill="#74c47a"/>',
+ table:'<rect x="0" y="47" width="60" height="9" fill="#6aa9d8"/><path d="M4,48 L11,26 H49 L56,48 Z" fill="#8d9179"/>'+
+   '<path d="M11,26 H49 L45,21 H15 Z" fill="#a0a48c"/><ellipse cx="30" cy="20" rx="20" ry="4" fill="#f0f4f8"/>',
+ liberty:'<rect x="0" y="50" width="60" height="6" fill="#6aa9d8"/><rect x="21" y="43" width="18" height="8" fill="#b3a88f"/>'+
+   '<path d="M26,43 L27.5,23 H32.5 L34,43 Z" fill="#79c2ae"/><circle cx="30" cy="19" r="4.2" fill="#79c2ae"/>'+
+   '<path d="M25.6,16 l1.1,-4.4 l1.6,3.2 l1.7,-4.2 l1.7,4.2 l1.6,-3.2 l1.1,4.4 z" fill="#79c2ae"/>'+
+   '<rect x="36" y="12" width="2.6" height="15" fill="#79c2ae" transform="rotate(10 37 19)"/>'+
+   '<path d="M38.5,13 l2.8,-6 l2.8,6 z" fill="#ffd85c"/>',
+ cntower:'<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/><rect x="15" y="47" width="30" height="4" fill="#a8aeb6"/>'+
+   '<path d="M27,48 L28.6,21 h2.8 L33,48 Z" fill="#c7ccd3"/><ellipse cx="30" cy="19" rx="9" ry="4.2" fill="#98a1ab"/>'+
+   '<rect x="27" y="5" width="6" height="12" fill="#b6bcc4"/><rect x="29" y="0" width="2" height="7" fill="#8d949c"/>',
+ chichen:'<rect x="0" y="49" width="60" height="7" fill="#9fd3a8"/><path d="M7,48 L18,20 H42 L53,48 Z" fill="#cbb68f"/>'+
+   '<rect x="9" y="41" width="42" height="3" fill="#b9a47d"/><rect x="12" y="34" width="36" height="3" fill="#b9a47d"/>'+
+   '<rect x="15" y="27" width="30" height="3" fill="#b9a47d"/><path d="M26,48 V24 h8 v24 z" fill="#e0cfa8"/>'+
+   '<rect x="23" y="12" width="14" height="9" fill="#d6c39c"/>',
+ christ:'<rect x="0" y="50" width="60" height="6" fill="#8ec98a"/><path d="M19,52 h22 l-5,4 h-12 z" fill="#7f9a6c"/>'+
+   '<rect x="25" y="41" width="10" height="11" fill="#a9a9a9"/><path d="M27.5,41 V22 h5 v19 z" fill="#d2d2d2"/>'+
+   '<rect x="13" y="22" width="34" height="4.4" rx="2.2" fill="#d2d2d2"/><circle cx="30" cy="17" r="4.2" fill="#dedede"/>',
+ obelisk:'<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/><rect x="21" y="49" width="18" height="5" fill="#cfcabd"/>'+
+   '<path d="M26.5,50 L27.6,12 L30,5 L32.4,12 L33.5,50 Z" fill="#ece8de"/>',
+ opera:'<rect x="0" y="45" width="60" height="11" fill="#7cc0e0"/><path d="M4,46 Q13,19 29,46 Z" fill="#eeeee8"/>'+
+   '<path d="M17,46 Q28,14 45,46 Z" fill="#fbfbf7"/><path d="M32,46 Q43,23 55,46 Z" fill="#e6e6e0"/>'+
+   '<rect x="2" y="45" width="56" height="3" fill="#c9c4b6"/>',
+ skytower:'<rect x="0" y="50" width="60" height="6" fill="#9fd3a8"/><rect x="17" y="47" width="26" height="4" fill="#aab2bb"/>'+
+   '<path d="M27.5,48 L28.6,25 h2.8 L32.5,48 Z" fill="#cbd0d6"/><path d="M21,25 h18 l-3.5,-7 h-11 z" fill="#9ba3ac"/>'+
+   '<ellipse cx="30" cy="18" rx="8.5" ry="3.6" fill="#adb5be"/><rect x="29" y="1" width="2" height="15" fill="#8d949c"/>'
+};
+function lmSVG(k){ return '<svg viewBox="0 0 60 60" class="pic" xmlns="http://www.w3.org/2000/svg">'+LM[k]+'</svg>'; }
+function flSVG(spec){ return '<svg viewBox="0 0 60 60" class="pic" xmlns="http://www.w3.org/2000/svg">'+flower(spec)+'</svg>'; }
+
+var EXTRA={
+ cn:{lm:['gwall','长城','The Great Wall'],   an:['🐼','大熊猫','Giant Panda'],  fl:['many,7,#f06fa8,#ffd84d','牡丹','Peony']},
+ jp:{lm:['fuji','富士山','Mount Fuji'],      an:['🦌','梅花鹿','Sika Deer'],    fl:['round,5,#ffb3d1,#ffe066','樱花','Cherry Blossom']},
+ my:{lm:['twin','双子塔','Petronas Towers'], an:['🦧','红毛猩猩','Orangutan'],  fl:['round,5,#e8323c,#ffd84d','大红花','Hibiscus']},
+ sg:{lm:['mbs','滨海湾金沙','Marina Bay Sands'], an:['🦁','狮子','Lion'],       fl:['point,5,#a86fd0,#f2e2a8','卓锦万代兰','Vanda Orchid']},
+ in:{lm:['taj','泰姬陵','Taj Mahal'],        an:['🐅','孟加拉虎','Bengal Tiger'], fl:['many,8,#ff9ec4,#ffe066','莲花','Lotus']},
+ kr:{lm:['hanok','景福宫','Gyeongbokgung Palace'], an:['🐕','珍岛犬','Jindo Dog'], fl:['round,5,#e59ad6,#e0405a','木槿花','Rose of Sharon']},
+ th:{lm:['wat','金色佛塔','Golden Temple'],  an:['🐘','大象','Elephant'],       fl:['point,6,#f5c518,#e8a000','金链花','Golden Shower']},
+ id:{lm:['boro','婆罗浮屠','Borobudur'],     an:['🦎','科莫多龙','Komodo Dragon'], fl:['round,5,#ffffff,#ffe066','茉莉花','Jasmine']},
+ ru:{lm:['basil','圣瓦西里教堂','St Basil\'s Cathedral'], an:['🐻','棕熊','Brown Bear'], fl:['point,10,#ffffff,#ffd400','洋甘菊','Chamomile']},
+ gb:{lm:['bigben','大本钟','Big Ben'],       an:['🦢','天鹅','Swan'],           fl:['many,7,#d92b3c,#ffd84d','玫瑰','Rose']},
+ fr:{lm:['eiffel','埃菲尔铁塔','Eiffel Tower'], an:['🐓','高卢雄鸡','Gallic Rooster'], fl:['point,5,#7a5fd0,#ffd84d','鸢尾花','Iris']},
+ de:{lm:['castle','新天鹅堡','Neuschwanstein Castle'], an:['🐗','野猪','Wild Boar'], fl:['point,7,#4f7fe0,#2a4fa0','矢车菊','Cornflower']},
+ it:{lm:['pisa','比萨斜塔','Leaning Tower of Pisa'], an:['🐺','母狼','She-Wolf'], fl:['round,8,#ffffff,#ffd400','雏菊','Daisy']},
+ es:{lm:['sagrada','圣家堂','Sagrada Família'], an:['🐂','公牛','Bull'],        fl:['many,6,#e8324f,#ffb3c0','康乃馨','Carnation']},
+ eg:{lm:['pyramid','金字塔','The Pyramids'], an:['🐈','猫','Cat'],              fl:['point,8,#6fa8dc,#ffe066','蓝睡莲','Blue Water Lily']},
+ ke:{lm:['acacia','草原金合欢树','Savanna Acacia'], an:['🦒','长颈鹿','Giraffe'], fl:['point,10,#ff8c3c,#f2d16b','非洲菊','Gerbera Daisy']},
+ za:{lm:['table','桌山','Table Mountain'],   an:['🦓','斑马','Zebra'],          fl:['point,12,#f2809f,#f5d76e','帝王花','King Protea']},
+ us:{lm:['liberty','自由女神像','Statue of Liberty'], an:['🦅','白头鹰','Bald Eagle'], fl:['many,7,#d92b3c,#ffd84d','玫瑰','Rose']},
+ ca:{lm:['cntower','加拿大国家电视塔','CN Tower'], an:['🦫','河狸','Beaver'],   fl:['maple,0,#d52b1e,#d52b1e','枫叶','Maple Leaf']},
+ mx:{lm:['chichen','奇琴伊察金字塔','Chichén Itzá'], an:['🐆','美洲豹','Jaguar'], fl:['many,8,#e0447a,#ffd84d','大丽花','Dahlia']},
+ br:{lm:['christ','救世基督像','Christ the Redeemer'], an:['🦜','金刚鹦鹉','Macaw'], fl:['round,5,#ffd21f,#e09a00','黄花风铃木','Golden Trumpet Tree']},
+ ar:{lm:['obelisk','方尖碑','The Obelisk'],  an:['🦙','原驼','Guanaco'],        fl:['point,6,#e8323c,#ffcf5c','塞波花','Ceibo Flower']},
+ au:{lm:['opera','悉尼歌剧院','Sydney Opera House'], an:['🦘','袋鼠','Kangaroo'], fl:['puff,0,#f2c230,#e0a020','金合欢','Golden Wattle']},
+ nz:{lm:['skytower','天空塔','Sky Tower'],   an:['🐦','奇异鸟','Kiwi Bird'],    fl:['puff,0,#e8384f,#f2c230','圣诞红花','Pōhutukawa']}
+};
+
+/* ============================================================
    3. SIMPLE WORLD MAP (coarse outlines, lon/lat)
    ============================================================ */
 var LAND=[
@@ -393,6 +624,7 @@ var LAND=[
    ============================================================ */
 var cv=document.getElementById('globe'), ctx=cv.getContext('2d');
 var rot={lon:100,lat:15}, target=null, spinning=true, dragging=false, last=null;
+var MODE='learn', huntReveal=false;
 var W=0,H=0,CX=0,CY=0,RR=0, dots=[];
 
 function resize(){
@@ -477,7 +709,7 @@ function draw(){
   });
   // selected pin
   var pp=project(current.lon,current.lat);
-  if(pp.vis){
+  if(pp.vis && (MODE!=='hunt' || huntReveal)){
     var bob=Math.sin(Date.now()/260)*3;
     var y=pp.y-4+bob;
     ctx.beginPath();
@@ -534,9 +766,9 @@ cv.addEventListener('pointerup',function(e){
   dragging=false;
   if(cv._moved<6){
     var r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
-    var best=null,bd=20;
+    var best=null,bd=24;
     dots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bd){bd=dd;best=d.c;} });
-    if(best){ select(best.id); }
+    if(best){ if(MODE==='hunt') huntPick(best); else select(best.id,true); }
   }
 });
 
@@ -558,6 +790,15 @@ function renderCard(){
     html+='<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
   });
   html+='</ul>';
+  var x=EXTRA[c.id];
+  html+='<div class="trio">'+
+    '<button data-s="lm"><div class="lbl stack">'+T('🏛️ 地标','🏛️ LANDMARK')+'</div>'+lmSVG(x.lm[0])+
+      '<div class="nm stack">'+T(x.lm[1],x.lm[2])+'</div></button>'+
+    '<button data-s="an"><div class="lbl stack">'+T('🐾 代表动物','🐾 ANIMAL')+'</div><div class="emo">'+x.an[0]+'</div>'+
+      '<div class="nm stack">'+T(x.an[1],x.an[2])+'</div></button>'+
+    '<button data-s="fl"><div class="lbl stack">'+T('🌸 国花','🌸 FLOWER')+'</div>'+flSVG(x.fl[0])+
+      '<div class="nm stack">'+T(x.fl[1],x.fl[2])+'</div></button>'+
+    '</div>';
   html+='<div class="hello stack">'+T('打招呼要说：<b>'+c.hi+'</b>（'+c.hiR+'）','Say hello: <b>'+c.hi+'</b> ('+c.hiR+')')+'</div>';
   html+='<div class="navRow">'+
     '<button class="btn" id="prevB">⬅️ '+T('上一个','Back')+'</button>'+
@@ -567,22 +808,33 @@ function renderCard(){
   document.getElementById('prevB').onclick=function(){ step(-1); };
   document.getElementById('nextB').onclick=function(){ step(1); };
   document.getElementById('sayB').onclick=speak;
+  Array.prototype.forEach.call(document.querySelectorAll('.trio button'),function(b){
+    b.onclick=function(){ var d=EXTRA[current.id][b.dataset.s]; say(d[1],d[2],true); };
+  });
 }
 function step(d){
   var i=COUNTRIES.indexOf(current);
-  select(COUNTRIES[(i+d+COUNTRIES.length)%COUNTRIES.length].id);
+  select(COUNTRIES[(i+d+COUNTRIES.length)%COUNTRIES.length].id, true);
 }
-function speak(){
+var autoSpeak=true;
+function say(zh,en,force){
   if(!window.speechSynthesis) return;
+  if(!autoSpeak && !force) return;
   speechSynthesis.cancel();
-  var mode=document.body.className;
-  function say(txt,lang){ var u=new SpeechSynthesisUtterance(txt); u.lang=lang; u.rate=.85; speechSynthesis.speak(u); }
-  if(mode.indexOf('only-en')<0) say(current.zh,'zh-CN');
-  if(mode.indexOf('only-zh')<0) say(current.en,'en-US');
+  var cl=document.body.className;
+  function utter(txt,lang){
+    if(!txt) return;
+    var u=new SpeechSynthesisUtterance(String(txt).replace(/<[^>]*>/g,''));
+    u.lang=lang; u.rate=0.85; speechSynthesis.speak(u);
+  }
+  if(cl.indexOf('only-en')<0) utter(zh,'zh-CN');
+  if(cl.indexOf('only-zh')<0) utter(en,'en-US');
 }
-function select(id){
+function speak(){ say(current.zh, current.en, true); }
+function select(id,user){
   current=COUNTRIES.filter(function(c){return c.id===id;})[0];
   renderCard(); flyTo(current); markGrid();
+  if(user){ addStamp(current.id); say(current.zh, current.en); }
 }
 function renderTabs(){
   document.getElementById('tabs').innerHTML=CONTINENTS.map(function(t){
@@ -598,7 +850,7 @@ function renderGrid(){
     return '<button class="cbtn" data-id="'+c.id+'">'+flagSVG(c.id)+'<span class="stack">'+T(c.zh,c.en)+'</span></button>';
   }).join('');
   Array.prototype.forEach.call(document.querySelectorAll('#grid .cbtn'),function(b){
-    b.onclick=function(){ select(b.dataset.id); };
+    b.onclick=function(){ select(b.dataset.id, true); };
   });
   markGrid();
 }
@@ -611,10 +863,34 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
   b.onclick=function(){
     Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function(x){x.classList.remove('on');});
     b.classList.add('on');
-    var m=b.dataset.lang;
-    document.body.className=(document.body.classList.contains('quizMode')?'quizMode ':'')+(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
+    var m=b.dataset.lang, cl=document.body.classList;
+    cl.remove('both','only-zh','only-en');
+    cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
+var MODES=['learn','hunt','animal','quiz','passport'];
+function setMode(m){
+  MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
+  document.body.classList.add('m-'+m);
+  MODE=m; huntReveal=false;
+  Array.prototype.forEach.call(document.querySelectorAll('#modeNav .btn'),function(b){
+    b.classList.toggle('on', b.dataset.m===m);
+  });
+  if(m==='hunt') startHunt();
+  if(m==='quiz') startQuiz();
+  if(m==='animal') startAnimal();
+  if(m==='passport') renderPassport();
+  setTimeout(resize,30);
+}
+Array.prototype.forEach.call(document.querySelectorAll('#modeNav .btn[data-m]'),function(b){
+  b.onclick=function(){ setMode(b.dataset.m); };
+});
+document.getElementById('spkBtn').onclick=function(){
+  autoSpeak=!autoSpeak;
+  this.classList.toggle('on',autoSpeak);
+  this.innerHTML=(autoSpeak?'🔊 ':'🔇 ')+T('朗读','Voice');
+  if(!autoSpeak && window.speechSynthesis) speechSynthesis.cancel();
+};
 document.getElementById('spinBtn').onclick=function(){
   spinning=!spinning;
   this.innerHTML=(spinning?'⏸ ':'▶️ ')+(spinning?T('暂停转动','Pause'):T('继续转动','Spin'));
@@ -662,6 +938,7 @@ function renderQuiz(){
       return '<button class="qOpt" data-id="'+o.id+'">'+flagSVG(o.id)+'<span class="stack">'+T(o.zh,o.en)+'</span></button>';
     }).join('')+'</div>';
   document.getElementById('backB').onclick=exitQuiz;
+  say('哪一面是'+q.ans.zh+'的国旗', 'Which flag belongs to '+q.ans.en);
   Array.prototype.forEach.call(box.querySelectorAll('.qOpt'),function(b){
     b.onclick=function(){
       if(box._locked) return; box._locked=true;
@@ -676,15 +953,244 @@ function renderQuiz(){
     };
   });
 }
-function exitQuiz(){ document.body.classList.remove('quizMode'); }
-document.getElementById('quizBtn').onclick=function(){
-  document.body.classList.add('quizMode'); startQuiz();
-};
+function exitQuiz(){ setMode('learn'); }
+
+/* ============================================================
+   6b. CONFETTI
+   ============================================================ */
+var cfC=document.getElementById('confetti'), cfX=cfC.getContext('2d'), parts=[], cfOn=false;
+function cfResize(){ cfC.width=window.innerWidth; cfC.height=window.innerHeight; }
+window.addEventListener('resize',cfResize); cfResize();
+function burst(n){
+  n=n||80;
+  var cols=['#ff7eb6','#ffc93c','#3ec46d','#3d8bfd','#ff9a3c'];
+  for(var i=0;i<n;i++) parts.push({
+    x:window.innerWidth/2+(Math.random()-.5)*300, y:window.innerHeight*0.34,
+    vx:(Math.random()-.5)*10, vy:-Math.random()*12-3, s:5+Math.random()*7,
+    c:cols[i%cols.length], r:Math.random()*6, vr:(Math.random()-.5)*.45});
+  if(!cfOn){ cfOn=true; cfC.style.display='block'; cfLoop(); }
+}
+function cfLoop(){
+  cfX.clearRect(0,0,cfC.width,cfC.height);
+  parts=parts.filter(function(p){ return p.y<cfC.height+40; });
+  parts.forEach(function(p){
+    p.vy+=0.32; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+    cfX.save(); cfX.translate(p.x,p.y); cfX.rotate(p.r);
+    cfX.fillStyle=p.c; cfX.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); cfX.restore();
+  });
+  if(parts.length) requestAnimationFrame(cfLoop);
+  else { cfOn=false; cfC.style.display='none'; }
+}
+
+/* ============================================================
+   6c. PASSPORT (stamp collection, saved in the browser)
+   ============================================================ */
+var PKEY='we_passport_v1', passport={};
+try{ passport=JSON.parse(localStorage.getItem(PKEY)||'{}')||{}; }catch(e){ passport={}; }
+function savePassport(){ try{ localStorage.setItem(PKEY,JSON.stringify(passport)); }catch(e){} }
+function stampCount(){ var n=0; for(var k in passport) if(passport[k]) n++; return n; }
+function updateBadge(){ document.getElementById('ppCount').textContent=stampCount()+'/'+COUNTRIES.length; }
+function addStamp(id){
+  if(passport[id]) return false;
+  passport[id]=1; savePassport(); updateBadge(); showStampFx(id);
+  if(document.body.classList.contains('m-passport')) renderPassport();
+  if(stampCount()===COUNTRIES.length) setTimeout(function(){ burst(180); }, 1000);
+  return true;
+}
+var fxTimer=null;
+function showStampFx(id){
+  var c=COUNTRIES.filter(function(x){return x.id===id;})[0], box=document.getElementById('stampFx');
+  box.innerHTML='<div class="big">'+flagSVG(id)+'<div class="t stack">'+T(c.zh+'<br>盖章成功！',c.en+'<br>Stamped!')+'</div></div>';
+  box.classList.add('show');
+  clearTimeout(fxTimer);
+  fxTimer=setTimeout(function(){ box.classList.remove('show'); }, 1300);
+}
+function renderPassport(){
+  var n=stampCount(), tot=COUNTRIES.length, box=document.getElementById('passport');
+  var h='<div class="qHead"><div class="qTitle stack">'+T('🛂 我的环游世界护照','🛂 My World Passport')+
+        '</div><div class="grow"></div><div class="score">'+n+' / '+tot+'</div></div>'+
+        '<div class="bar"><i style="width:'+(n/tot*100)+'%"></i></div>'+
+        '<p class="hint stack">'+T('每认识一个新国家，护照上就会盖一个章！','Meet a new country and earn a stamp!')+'</p>';
+  if(n===tot) h+='<div class="cert"><div class="big">🏆</div><div class="t stack">'+
+      T('恭喜你！你已经环游世界一圈了！','Congratulations! You have travelled the whole world!')+'</div></div>';
+  h+='<div class="pp">'+COUNTRIES.map(function(c){
+      return passport[c.id]
+        ? '<div class="slot got"><div class="stampImg"><div class="ring"></div>'+flagSVG(c.id)+'</div><div class="nm stack">'+T(c.zh,c.en)+'</div></div>'
+        : '<div class="slot"><div class="q">?</div><div class="nm stack">'+T('还没去过','Not yet')+'</div></div>';
+    }).join('')+'</div>';
+  h+='<div style="text-align:center;margin-top:16px"><button class="btn" id="ppReset">🧹 '+T('清空重来','Clear all stamps')+'</button></div>';
+  box.innerHTML=h;
+  document.getElementById('ppReset').onclick=function(){
+    var ask=document.body.classList.contains('only-en')?'Clear all stamps and start over?':'确定要清空所有印章，重新开始吗？';
+    if(window.confirm(ask)){ passport={}; savePassport(); updateBadge(); renderPassport(); }
+  };
+}
+
+/* ============================================================
+   6d. GLOBE HUNT — "find Japan!"
+   ============================================================ */
+var hunt={target:null,tries:0,round:0,score:0,n:6,done:false};
+function startHunt(){ hunt.round=0; hunt.score=0; nextHunt(); }
+function nextHunt(){
+  hunt.round++;
+  if(hunt.round>hunt.n){ renderHuntEnd(); return; }
+  hunt.target=COUNTRIES[Math.floor(Math.random()*COUNTRIES.length)];
+  hunt.tries=0; hunt.done=false; huntReveal=false;
+  rot.lon=hunt.target.lon+110+Math.random()*140; rot.lat=8; target=null;
+  renderHunt('');
+  say('找到 '+hunt.target.zh, 'Find '+hunt.target.en);
+}
+function renderHunt(hintHtml, good){
+  var t=hunt.target;
+  document.getElementById('huntPanel').innerHTML=
+    '<div class="qHead"><div class="score">🎯 '+hunt.round+' / '+hunt.n+'</div><div class="grow"></div>'+
+      '<div class="score">⭐ '+hunt.score+'</div></div>'+
+    '<div class="huntQ stack">'+T('在地球上找到<br>'+t.zh+'！','Find <br>'+t.en+' on the globe!')+'</div>'+
+    flagSVG(t.id,'huntFlag')+
+    '<div class="hintBox stack'+(good?' good':'')+'">'+(hintHtml||T('转动地球，点一点你觉得对的小白点 👆','Spin the globe and tap the dot you think is right 👆'))+'</div>';
+}
+function huntPick(c){
+  if(hunt.done) return;
+  var t=hunt.target;
+  if(c.id===t.id){
+    hunt.done=true; hunt.score += (hunt.tries===0?2:1);
+    huntReveal=true; current=t; flyTo(t); burst(90); addStamp(t.id);
+    renderHunt(T('太棒了！找到'+t.zh+'了！ 🎉','Brilliant! You found '+t.en+'! 🎉'), true);
+    say('太棒了！这里是'+t.zh, 'Brilliant! This is '+t.en);
+    setTimeout(function(){ huntReveal=false; nextHunt(); }, 2400);
+    return;
+  }
+  hunt.tries++;
+  var cont=CONTINENTS.filter(function(x){return x.id===t.c;})[0];
+  var zh='不对哦～ 它在<b>'+cont.zh+'</b>', en='Not quite — it is in <b>'+cont.en+'</b>';
+  var dx=shortest(c.lon,t.lon), dy=t.lat-c.lat;
+  if(dx>15){ zh+='，往<b>东边（右边）</b>找'; en+=', look further <b>east (right)</b>'; }
+  else if(dx<-15){ zh+='，往<b>西边（左边）</b>找'; en+=', look further <b>west (left)</b>'; }
+  if(dy>15){ zh+='，再往<b>北</b>一点'; en+=', and further <b>north</b>'; }
+  else if(dy<-15){ zh+='，再往<b>南</b>一点'; en+=', and further <b>south</b>'; }
+  if(hunt.tries>=3){
+    hunt.done=true; zh+='。<br>看，它就在这里！'; en+='.<br>Look — here it is!';
+    huntReveal=true; current=t; flyTo(t);
+    renderHunt(T(zh,en));
+    say('看，这里就是'+t.zh, 'Look, here is '+t.en);
+    setTimeout(function(){ huntReveal=false; nextHunt(); }, 3000);
+    return;
+  }
+  renderHunt(T(zh,en));
+}
+function renderHuntEnd(){
+  var msg = hunt.score>=10 ? T('你是地球小博士！🏆','You are a globe expert! 🏆')
+          : hunt.score>=6  ? T('很棒！再来一次会更快！🌟','Great! Try again and be even faster! 🌟')
+          : T('地球好大呀，再玩一次就熟啦！💪','The Earth is big — play again! 💪');
+  if(hunt.score>=10) burst(140);
+  document.getElementById('huntPanel').innerHTML=
+    '<div class="bigMsg stack">'+msg+'</div><div class="bigMsg score">⭐ '+hunt.score+'</div>'+
+    '<div style="text-align:center"><button class="btn big" id="hAgain">🔁 '+T('再玩一次','Play again')+'</button> '+
+    '<button class="btn" id="hBack">📚 '+T('回去学习','Back')+'</button></div>';
+  document.getElementById('hAgain').onclick=startHunt;
+  document.getElementById('hBack').onclick=function(){ setMode('learn'); };
+}
+
+/* ============================================================
+   6e. ANIMAL MATCH — put each animal back in its home country
+   ============================================================ */
+var ANIMALS=[
+  {e:'🐼',zh:'大熊猫',en:'Panda',id:'cn'},
+  {e:'🦘',zh:'袋鼠',en:'Kangaroo',id:'au'},
+  {e:'🦁',zh:'狮子',en:'Lion',id:'ke'},
+  {e:'🐘',zh:'大象',en:'Elephant',id:'th'},
+  {e:'🦧',zh:'红毛猩猩',en:'Orangutan',id:'my'},
+  {e:'🐦',zh:'奇异鸟',en:'Kiwi bird',id:'nz'},
+  {e:'🦎',zh:'科莫多龙',en:'Komodo dragon',id:'id'},
+  {e:'🦅',zh:'白头鹰',en:'Bald eagle',id:'us'},
+  {e:'🐫',zh:'骆驼',en:'Camel',id:'eg'},
+  {e:'🐅',zh:'老虎',en:'Tiger',id:'in'},
+  {e:'🐻',zh:'棕熊',en:'Brown bear',id:'ru'},
+  {e:'🦫',zh:'河狸',en:'Beaver',id:'ca'}
+];
+var am={round:0,n:3,per:4,pool:[],pairs:[],selA:null,selC:null,left:0,score:0};
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function startAnimal(){ am.round=0; am.score=0; am.pool=shuffle(ANIMALS.slice()); nextAnimal(); }
+function nextAnimal(){
+  am.round++;
+  if(am.round>am.n){ renderAnimalEnd(); return; }
+  am.pairs=am.pool.slice((am.round-1)*am.per, am.round*am.per);
+  am.selA=null; am.selC=null; am.left=am.pairs.length;
+  renderAnimal('');
+}
+function renderAnimal(msg){
+  var animals=shuffle(am.pairs.slice()), homes=shuffle(am.pairs.slice());
+  var h='<div class="qHead"><div class="qTitle stack">'+T('🐾 帮小动物找到家','🐾 Take each animal home')+
+        '</div><div class="grow"></div><div class="score">'+am.round+' / '+am.n+'</div>'+
+        '<div class="score">⭐ '+am.score+'</div></div>'+
+        '<p class="hint stack">'+T('先点一只动物，再点它住的国家 👆','Tap an animal, then tap the country it lives in 👆')+'</p>'+
+        '<div class="hintBox stack" id="amMsg">'+(msg||T('它们迷路啦，快帮帮它们！','They are lost — please help them!'))+'</div>'+
+        '<div class="matchWrap"><div class="col">'+
+        animals.map(function(a){ return '<button class="mcard a" data-id="'+a.id+'"><span class="ani">'+a.e+
+          '</span><span class="stack">'+T(a.zh,a.en)+'</span></button>'; }).join('')+
+        '</div><div class="col">'+
+        homes.map(function(a){ var c=COUNTRIES.filter(function(x){return x.id===a.id;})[0];
+          return '<button class="mcard c" data-id="'+a.id+'">'+flagSVG(a.id)+'<span class="stack">'+T(c.zh,c.en)+'</span></button>'; }).join('')+
+        '</div></div>';
+  var box=document.getElementById('animal');
+  box.innerHTML=h;
+  Array.prototype.forEach.call(box.querySelectorAll('.mcard'),function(b){
+    b.onclick=function(){ pickCard(b, b.classList.contains('a')); };
+  });
+  am.matched={};
+}
+function pickCard(el, isAnimal){
+  var box=document.getElementById('animal');
+  if(isAnimal){
+    if(am.selA) am.selA.classList.remove('sel');
+    am.selA=el; el.classList.add('sel');
+  } else {
+    if(am.selC) am.selC.classList.remove('sel');
+    am.selC=el; el.classList.add('sel');
+  }
+  if(!am.selA || !am.selC) return;
+  var a=am.selA, c=am.selC;
+  if(a.dataset.id===c.dataset.id){
+    var an=ANIMALS.filter(function(x){return x.id===a.dataset.id;})[0];
+    var co=COUNTRIES.filter(function(x){return x.id===a.dataset.id;})[0];
+    a.classList.remove('sel'); c.classList.remove('sel');
+    a.classList.add('done'); c.classList.add('done');
+    am.selA=null; am.selC=null; am.score++; am.left--;
+    addStamp(co.id);
+    document.getElementById('amMsg').innerHTML=T(
+      an.e+' <b>'+an.zh+'</b> 住在 <b>'+co.zh+'</b>，回家啦！',
+      an.e+' The <b>'+an.en.toLowerCase()+'</b> lives in <b>'+co.en+'</b> — home at last!');
+    document.getElementById('amMsg').classList.add('good');
+    say(an.zh+'住在'+co.zh, 'The '+an.en.toLowerCase()+' lives in '+co.en);
+    if(am.left===0){ burst(80); setTimeout(nextAnimal, 1600); }
+  } else {
+    a.classList.add('shake'); c.classList.add('shake');
+    var aa=a, cc=c;
+    setTimeout(function(){
+      aa.classList.remove('shake','sel'); cc.classList.remove('shake','sel');
+    }, 420);
+    am.selA=null; am.selC=null;
+    var m=document.getElementById('amMsg');
+    m.classList.remove('good');
+    m.innerHTML=T('这不是它的家哦，再试试看 🤔','That is not its home — try again 🤔');
+  }
+}
+function renderAnimalEnd(){
+  burst(140);
+  document.getElementById('animal').innerHTML=
+    '<div class="bigMsg stack">'+T('全部小动物都回家啦！🎉','Every animal is home! 🎉')+'</div>'+
+    '<div class="bigMsg score">⭐ '+am.score+' / '+ANIMALS.length+'</div>'+
+    '<div style="text-align:center"><button class="btn big" id="aAgain">🔁 '+T('再玩一次','Play again')+'</button> '+
+    '<button class="btn" id="aBack">📚 '+T('回去学习','Back')+'</button></div>';
+  document.getElementById('aAgain').onclick=startAnimal;
+  document.getElementById('aBack').onclick=function(){ setMode('learn'); };
+}
 
 /* ============================================================
    7. GO
    ============================================================ */
-resize(); renderTabs(); renderGrid(); renderCard(); flyTo(current); tick();
+document.body.classList.add('m-learn');
+resize(); renderTabs(); renderGrid(); renderCard(); updateBadge(); flyTo(current); tick();
 setTimeout(resize, 60);
 </script>
 </body>
