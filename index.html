@@ -148,7 +148,8 @@
   .qOpts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:10px}
   .qOpt{background:#fff;border:4px solid #e6eefb;border-radius:18px;padding:10px;box-shadow:var(--shadow)}
   .qOpt svg{width:100%;height:auto;aspect-ratio:3/2;border-radius:8px;display:block}
-  .qOpt span{display:block;margin-top:8px;font-size:16px;font-weight:bold}
+  .qOpt .nm{display:none;margin-top:8px;font-size:16px;font-weight:bold}
+  .qOpts.revealed .qOpt .nm{display:block}
   .qOpt.right{border-color:var(--green);background:#eefbf2}
   .qOpt.wrong{border-color:#ff6b6b;background:#fff0f0;opacity:.7}
   .score{font-size:20px;font-weight:bold}
@@ -935,7 +936,7 @@ function renderQuiz(){
       '<div class="grow"></div><div class="score">⭐ '+qScore+'</div>'+
       '<button class="btn" id="backB">📚 '+T('回去学习','Back')+'</button></div>'+
     '<div class="qOpts">'+q.opts.map(function(o){
-      return '<button class="qOpt" data-id="'+o.id+'">'+flagSVG(o.id)+'<span class="stack">'+T(o.zh,o.en)+'</span></button>';
+      return '<button class="qOpt" data-id="'+o.id+'">'+flagSVG(o.id)+'<span class="nm stack">'+T(o.zh,o.en)+'</span></button>';
     }).join('')+'</div>';
   document.getElementById('backB').onclick=exitQuiz;
   say('哪一面是'+q.ans.zh+'的国旗', 'Which flag belongs to '+q.ans.en);
@@ -949,7 +950,10 @@ function renderQuiz(){
         var right=box.querySelector('.qOpt[data-id="'+q.ans.id+'"]');
         if(right) right.classList.add('right');
       }
-      setTimeout(function(){ box._locked=false; qIdx++; renderQuiz(); }, ok?700:1400);
+      box.querySelector('.qOpts').classList.add('revealed');
+      say(ok ? '对了！这是'+q.ans.zh+'的国旗' : '这面才是'+q.ans.zh+'的国旗',
+          ok ? 'Correct! This is the flag of '+q.ans.en : 'This one is the flag of '+q.ans.en);
+      setTimeout(function(){ box._locked=false; qIdx++; renderQuiz(); }, ok?1800:2600);
     };
   });
 }
