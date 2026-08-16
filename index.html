@@ -51,6 +51,12 @@
   canvas{width:100%;max-width:460px;aspect-ratio:1;touch-action:none;cursor:grab;border-radius:50%}
   canvas:active{cursor:grabbing}
   .hint{font-size:14px;color:var(--ink2);margin-top:8px;text-align:center}
+  #journey{display:none;margin-top:10px;background:linear-gradient(90deg,#e6f3ff,#eafaf0);border-radius:16px;
+    padding:10px 14px;font-size:16px;text-align:center;line-height:1.35;width:100%;box-sizing:border-box}
+  #journey.show{display:block;animation:pop .35s ease-out}
+  #journey .veh{font-size:26px;line-height:1.2}
+  #journey b{color:#1a6fc4}
+  @keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
   .globeTools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center}
 
   /* ---------- country card ---------- */
@@ -183,6 +189,7 @@
 <main id="stage">
   <section class="panel" id="globeWrap">
     <canvas id="globe"></canvas>
+    <div id="journey"></div>
     <div class="globeTools">
       <button class="btn" id="spinBtn">⏸ <span class="zh">暂停转动</span><span class="en">Pause</span></button>
       <button class="btn" id="findBtn">🎯 <span class="zh">飞到这个国家</span><span class="en">Fly there</span></button>
@@ -607,18 +614,116 @@ var EXTRA={
 var LAND=[
  [[-17,15],[-16,22],[-10,27],[-5,36],[10,37],[20,33],[32,31],[35,23],[39,15],[43,11],[51,12],[42,-1],[40,-10],[35,-20],[33,-26],[27,-34],[18,-34],[12,-18],[9,-1],[8,4],[-4,5],[-8,4],[-13,9],[-17,15]],
  [[-10,36],[-9,43],[-2,48],[2,51],[4,54],[8,57],[11,59],[18,60],[25,60],[30,60],[30,55],[28,50],[30,46],[28,44],[24,42],[20,40],[16,41],[12,38],[15,37],[13,45],[8,44],[3,42],[-2,43],[-9,39],[-10,36]],
- [[30,60],[40,66],[60,70],[75,73],[100,77],[130,72],[160,69],[178,66],[170,60],[160,57],[142,54],[135,48],[131,43],[129,40],[129,35],[126,34],[125,38],[122,40],[121,38],[120,34],[122,31],[118,24],[110,21],[107,17],[106,10],[105,9],[103,10],[104,2],[103,1],[100,6],[99,10],[98,14],[97,16],[92,21],[89,22],[81,16],[77,8],[73,20],[70,25],[62,25],[57,27],[50,30],[45,38],[40,40],[35,42],[30,45],[30,60]],
+ [[30,60],[40,66],[60,70],[75,73],[100,77],[130,72],[160,69],[178,66],[170,60],[160,57],[142,54],[135,48],[131,43],[129,40],[129,35],[126,34],[125,38],[122,40],[121,38],[120,34],[122,31],[118,24],[110,21],[107,17],[106,10],[105,9],[103,10],[104.5,2],[104,0.9],[100.8,3.2],[99.6,6],[99,10],[98,14],[97,16],[92,21],[89,22],[81,16],[77,8],[73,20],[70,25],[62,25],[57,27],[50,30],[45,38],[40,40],[35,42],[30,45],[30,60]],
  [[-168,66],[-160,71],[-140,70],[-125,70],[-100,69],[-85,70],[-75,68],[-60,58],[-55,52],[-65,45],[-70,42],[-75,36],[-81,26],[-90,29],[-97,26],[-105,20],[-95,15],[-84,10],[-79,8],[-83,15],[-92,18],[-105,30],[-115,32],[-124,40],[-125,49],[-135,58],[-150,60],[-168,66]],
  [[-80,9],[-70,11],[-60,8],[-52,5],[-45,-2],[-38,-6],[-35,-8],[-39,-16],[-48,-25],[-53,-34],[-58,-38],[-62,-42],[-65,-50],[-70,-55],[-73,-45],[-72,-35],[-71,-25],[-70,-18],[-79,-6],[-80,0],[-78,6],[-80,9]],
  [[113,-22],[114,-26],[118,-34],[128,-32],[136,-35],[141,-38],[147,-38],[150,-35],[153,-28],[145,-15],[142,-11],[135,-12],[130,-11],[125,-14],[118,-20],[113,-22]],
  [[-45,60],[-30,68],[-22,70],[-20,76],[-30,82],[-45,83],[-58,82],[-65,78],[-55,70],[-50,64],[-45,60]],
- [[-5,50],[-3,54],[-3,58],[-5,58],[-6,55],[-5,50]],
+ [[-5.5,50],[-1.5,50.6],[0.9,51.4],[1.2,52.8],[-0.5,54],[-1.2,55.5],[-3,57.7],[-5,58.6],[-5.5,56],[-4.5,53.5],[-5.5,50]],
+ [[-9.5,43],[-1.5,43.4],[0.5,40.5],[-0.3,38],[-2.2,36.7],[-5.8,36],[-8.9,37],[-9.5,39],[-9.5,43]],
+ [[7,44],[10,44.5],[13,45.7],[13.6,45.5],[12.4,44.2],[14,42],[16,41.5],[18.4,40.3],[17.9,39.9],[16,39],[15.9,38],[15.6,38],[12.5,41.4],[10.5,42.9],[8,43.9],[7,44]],
  [[129,32],[133,33],[137,34],[140,35],[143,39],[145,42],[146,45],[143,46],[140,42],[138,38],[135,36],[131,34],[129,32]],
  [[172,-34],[178,-37],[177,-40],[174,-42],[170,-45],[166,-46],[168,-43],[172,-40],[172,-34]],
  [[44,-16],[50,-15],[50,-25],[45,-25],[44,-16]],
- [[95,5],[105,-5],[115,-8],[130,-3],[140,-5],[135,1],[120,0],[110,2],[100,3],[95,5]],
+ [[95.3,5.6],[97.5,5.2],[100,2.5],[103,-1],[105.9,-5.9],[104.5,-5.9],[101.5,-2.5],[98.5,1.5],[95.3,3.5],[95.3,5.6]],
+ [[105,-5.9],[110,-6.4],[114,-8.3],[115,-8.7],[112,-8.2],[108,-7.5],[105,-6.9],[105,-5.9]],
+ [[109,2],[113,4.5],[117,4],[119,0],[117,-3.5],[113,-3.5],[110,-1],[108.8,1],[109,2]],
+ [[119,1],[123,1.5],[125,-2],[123,-5.5],[120.5,-3],[120,0],[119,1]],
+ [[131,-1],[136,-2],[141,-3],[141,-9],[137,-8],[133,-4],[131,-2],[131,-1]],
  [[112,7],[119,5],[125,7],[122,18],[120,14],[112,7]]
 ];
+
+/* ============================================================
+   3b. OCEANS & SEAS — labels on the globe + route detection
+   ============================================================ */
+var OCEANS=[
+ {id:'arctic', zh:'北冰洋', en:'Arctic',       zhF:'北冰洋', enF:'the Arctic Ocean',
+  lat:80, lon:10,  test:function(lo,la){ return la>66; }},
+ {id:'southern', zh:'南冰洋', en:'Southern',   zhF:'南冰洋', enF:'the Southern Ocean',
+  lat:-64, lon:100, test:function(lo,la){ return la<-60; }},
+ {id:'channel', zh:'英吉利海峡', en:'Eng. Channel', zhF:'英吉利海峡', enF:'the English Channel', small:true,
+  lat:50, lon:-2,  test:function(lo,la){ return lo>-6&&lo<2&&la>48.5&&la<51.3; }},
+ {id:'northsea', zh:'北海', en:'North Sea',    zhF:'北海', enF:'the North Sea', small:true,
+  lat:56, lon:3,   test:function(lo,la){ return lo>-2&&lo<9&&la>51.3&&la<61; }},
+ {id:'medit', zh:'地中海', en:'Mediterranean', zhF:'地中海', enF:'the Mediterranean Sea', small:true,
+  lat:35, lon:17,  test:function(lo,la){ return lo>-6&&lo<36&&la>30&&la<46; }},
+ {id:'schina', zh:'南海', en:'S. China Sea',   zhF:'南海', enF:'the South China Sea', small:true,
+  lat:14, lon:114, test:function(lo,la){ return lo>105&&lo<122&&la>0&&la<23; }},
+ {id:'echina', zh:'东海', en:'E. China Sea',   zhF:'东海', enF:'the East China Sea', small:true,
+  lat:31, lon:126, test:function(lo,la){ return lo>117&&lo<138&&la>23&&la<42; }},
+ {id:'java', zh:'爪哇海', en:'Java Sea',       zhF:'爪哇海', enF:'the Java Sea', small:true,
+  lat:-4, lon:110, test:function(lo,la){ return lo>103&&lo<118&&la>-8&&la<1; }},
+ {id:'bengal', zh:'孟加拉湾', en:'Bay of Bengal', zhF:'孟加拉湾', enF:'the Bay of Bengal', small:true,
+  lat:14, lon:89,  test:function(lo,la){ return lo>78&&lo<100&&la>3&&la<23; }},
+ {id:'carib', zh:'加勒比海', en:'Caribbean',   zhF:'加勒比海', enF:'the Caribbean Sea', small:true,
+  lat:15, lon:-74, test:function(lo,la){ return lo>-88&&lo<-59&&la>8&&la<23; }},
+ {id:'gulfmx', zh:'墨西哥湾', en:'Gulf of Mexico', zhF:'墨西哥湾', enF:'the Gulf of Mexico', small:true,
+  lat:25, lon:-90, test:function(lo,la){ return lo>-98&&lo<-81&&la>18&&la<31; }},
+ {id:'tasman', zh:'塔斯曼海', en:'Tasman Sea', zhF:'塔斯曼海', enF:'the Tasman Sea', small:true,
+  lat:-38, lon:162, test:function(lo,la){ return lo>148&&lo<176&&la>-48&&la<-29; }},
+ {id:'pacific', zh:'太平洋', en:'Pacific',     zhF:'太平洋', enF:'the Pacific Ocean',
+  lat:0, lon:-150, test:function(lo,la){ return lo>=120||lo<=-70; }},
+ {id:'atlantic', zh:'大西洋', en:'Atlantic',   zhF:'大西洋', enF:'the Atlantic Ocean',
+  lat:5, lon:-35,  test:function(lo,la){ return lo>-70&&lo<20; }},
+ {id:'indian', zh:'印度洋', en:'Indian',       zhF:'印度洋', enF:'the Indian Ocean',
+  lat:-25, lon:78, test:function(lo,la){ return lo>=20&&lo<120; }}
+];
+function oceanAt(lon,lat){
+  for(var i=0;i<OCEANS.length;i++) if(OCEANS[i].test(lon,lat)) return OCEANS[i];
+  return null;
+}
+/* ray casting against the coarse land outlines */
+function isLandPt(lon,lat){
+  for(var i=0;i<LAND.length;i++){
+    var poly=LAND[i], inside=false;
+    for(var j=0,k=poly.length-1;j<poly.length;k=j++){
+      var xi=poly[j][0], yi=poly[j][1], xj=poly[k][0], yj=poly[k][1];
+      if(((yi>lat)!==(yj>lat)) && (lon<(xj-xi)*(lat-yi)/(yj-yi)+xi)) inside=!inside;
+    }
+    if(inside) return true;
+  }
+  return false;
+}
+/* great-circle helpers */
+function toVec(lon,lat){ var p=lat*Math.PI/180, l=lon*Math.PI/180;
+  return [Math.cos(p)*Math.cos(l), Math.cos(p)*Math.sin(l), Math.sin(p)]; }
+function toLL(v){ return [Math.atan2(v[1],v[0])*180/Math.PI,
+  Math.asin(Math.max(-1,Math.min(1,v[2])))*180/Math.PI]; }
+function gcPoint(A,B,t){
+  var dot=Math.max(-1,Math.min(1,A[0]*B[0]+A[1]*B[1]+A[2]*B[2])), om=Math.acos(dot);
+  if(om<1e-6) return toLL(A);
+  var s=Math.sin(om), k1=Math.sin((1-t)*om)/s, k2=Math.sin(t*om)/s;
+  return toLL([A[0]*k1+B[0]*k2, A[1]*k1+B[1]*k2, A[2]*k1+B[2]*k2]);
+}
+function kmBetween(a,b){
+  var R=6371, dLa=(b.lat-a.lat)*Math.PI/180, dLo=(b.lon-a.lon)*Math.PI/180;
+  var la1=a.lat*Math.PI/180, la2=b.lat*Math.PI/180;
+  var h=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1)*Math.cos(la2)*Math.sin(dLo/2)*Math.sin(dLo/2);
+  return Math.round(2*R*Math.asin(Math.min(1,Math.sqrt(h))));
+}
+var VEHICLES={
+  train:{e:'🚄', zh:'坐火车',   en:'by train'},
+  ship: {e:'🚢', zh:'坐轮船',   en:'by ship'},
+  plane:{e:'✈️', zh:'坐飞机',   en:'by plane'}
+};
+/* which vehicle, and which water does the route cross? */
+function routeInfo(a,b){
+  var A=toVec(a.lon,a.lat), B=toVec(b.lon,b.lat), N=40, water=0, tally={};
+  for(var i=1;i<N;i++){
+    var ll=gcPoint(A,B,i/N);
+    if(!isLandPt(ll[0],ll[1])){
+      water++;
+      var o=oceanAt(ll[0],ll[1]);
+      if(o) tally[o.id]=(tally[o.id]||0)+1;
+    }
+  }
+  var frac=water/(N-1), dist=kmBetween(a,b), best=0, mainId=null;
+  for(var k in tally) if(tally[k]>best){ best=tally[k]; mainId=k; }
+  var ocean=mainId?OCEANS.filter(function(o){return o.id===mainId;})[0]:null;
+  var v = frac<0.08 ? 'train' : (dist<2500 ? 'ship' : 'plane');
+  if(v==='train') ocean=null;
+  return {frac:frac, dist:dist, ocean:ocean, v:v};
+}
 
 /* ============================================================
    4. GLOBE
@@ -697,6 +802,53 @@ function draw(){
   ctx.fillStyle=sh; ctx.fill();
   ctx.lineWidth=4; ctx.strokeStyle='#ffffff'; ctx.stroke();
 
+  // ocean & sea names
+  var onlyZh=document.body.classList.contains('only-zh'),
+      onlyEn=document.body.classList.contains('only-en');
+  OCEANS.forEach(function(o){
+    var p=project(o.lon,o.lat);
+    if(!p.vis) return;
+    var d=Math.hypot(p.x-CX,p.y-CY)/RR, alpha=1-Math.pow(d,3)*1.15;
+    if(alpha<0.1) return;
+    if(o.small && d>0.62) return;   // keep the small seas from cluttering the rim
+    var label = onlyEn ? o.en : (onlyZh ? o.zh : o.zh+' '+o.en);
+    var size = (o.small?9:11.5)*(RR/210+0.62);
+    ctx.font='italic bold '+size.toFixed(1)+'px "Segoe UI","PingFang SC",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.lineWidth=3; ctx.strokeStyle='rgba(10,60,110,'+(alpha*0.35)+')';
+    ctx.strokeText(label,p.x,p.y);
+    ctx.fillStyle='rgba(255,255,255,'+(alpha*0.92)+')';
+    ctx.fillText(label,p.x,p.y);
+    ctx.textAlign='start'; ctx.textBaseline='alphabetic';
+  });
+
+  // travel route + vehicle
+  if(journey){
+    var pts=[], t=journey.t;
+    for(var s=0;s<=48;s++){
+      var ll=gcPoint(journey.A,journey.B,s/48), q=project(ll[0],ll[1]);
+      pts.push({p:q, t:s/48});
+    }
+    ctx.setLineDash([5,5]); ctx.lineWidth=2.5; ctx.strokeStyle='rgba(255,255,255,.55)';
+    ctx.beginPath(); var st=false;
+    pts.forEach(function(o){ if(o.p.vis){ st?ctx.lineTo(o.p.x,o.p.y):ctx.moveTo(o.p.x,o.p.y); st=true; } else st=false; });
+    ctx.stroke();
+    ctx.setLineDash([]); ctx.lineWidth=3.5; ctx.strokeStyle='#ffd54a';
+    ctx.beginPath(); st=false;
+    pts.forEach(function(o){ if(o.t<=t && o.p.vis){ st?ctx.lineTo(o.p.x,o.p.y):ctx.moveTo(o.p.x,o.p.y); st=true; } else st=false; });
+    ctx.stroke();
+    var now=gcPoint(journey.A,journey.B,t), before=gcPoint(journey.A,journey.B,Math.max(0,t-0.02));
+    var vp=project(now[0],now[1]), bp=project(before[0],before[1]);
+    if(vp.vis){
+      ctx.save(); ctx.translate(vp.x,vp.y);
+      if(bp.vis && vp.x<bp.x) ctx.scale(-1,1);
+      ctx.font='24px "Segoe UI Emoji",serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(VEHICLES[journey.info.v].e,0,0);
+      ctx.restore();
+      ctx.textAlign='start'; ctx.textBaseline='alphabetic';
+    }
+  }
+
   // country dots
   dots=[];
   COUNTRIES.forEach(function(c){
@@ -737,7 +889,36 @@ function roundRect(x,y,w,h,r){
   ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
 }
 function shortest(a,b){ var d=(b-a)%360; if(d>180)d-=360; if(d<-180)d+=360; return d; }
+var journey=null;
+function startJourney(from,to){
+  if(!from||!to||from.id===to.id) return;
+  var info=routeInfo(from,to);
+  journey={ A:toVec(from.lon,from.lat), B:toVec(to.lon,to.lat), t:0,
+            start:null, dur:2000+Math.min(2200,info.dist/8), info:info, from:from, to:to };
+  showJourney(from,to,info);
+}
+function showJourney(from,to,info){
+  var box=document.getElementById('journey'), V=VEHICLES[info.v];
+  var zh='<span class="veh">'+V.e+'</span><br>从 <b>'+from.zh+'</b> '+V.zh+
+         (info.ocean?'，跨过 <b>'+info.ocean.zhF+'</b>':'')+'，到 <b>'+to.zh+'</b><br>'+
+         '<small>大约 '+info.dist.toLocaleString()+' 公里</small>';
+  var en='<span class="veh">'+V.e+'</span><br>From <b>'+from.en+'</b> '+V.en+
+         (info.ocean?', across <b>'+info.ocean.enF+'</b>':'')+', to <b>'+to.en+'</b><br>'+
+         '<small>about '+info.dist.toLocaleString()+' km</small>';
+  box.className='stack show';
+  box.innerHTML=T(zh,en);
+  say(from.zh+V.zh+(info.ocean?'，跨过'+info.ocean.zhF:'')+'，到'+to.zh,
+      'From '+from.en+' '+V.en+(info.ocean?', across '+info.ocean.enF:'')+', to '+to.en);
+}
 function tick(){
+  if(journey){
+    if(journey.start===null) journey.start=performance.now();
+    var e=(performance.now()-journey.start)/journey.dur;
+    journey.t=Math.min(1,e<0?0:(e<1?(e*e*(3-2*e)):1));   // ease in-out
+    var pos=gcPoint(journey.A,journey.B,journey.t);
+    target={lon:pos[0], lat:Math.max(-70,Math.min(70,pos[1]))};
+    if(journey.t>=1){ journey=null; flyTo(current); hideJourneyLater(); }
+  }
   if(target){
     rot.lon += shortest(rot.lon,target.lon)*0.09;
     rot.lat += (target.lat-rot.lat)*0.09;
@@ -833,9 +1014,21 @@ function say(zh,en,force){
 }
 function speak(){ say(current.zh, current.en, true); }
 function select(id,user){
+  var prev=current;
   current=COUNTRIES.filter(function(c){return c.id===id;})[0];
-  renderCard(); flyTo(current); markGrid();
-  if(user){ addStamp(current.id); say(current.zh, current.en); }
+  renderCard(); markGrid();
+  if(user) addStamp(current.id);
+  if(user && prev && prev.id!==current.id && MODE==='learn'){
+    startJourney(prev,current);
+  } else {
+    flyTo(current);
+    if(user) say(current.zh, current.en);
+  }
+}
+var jHideTimer=null;
+function hideJourneyLater(){
+  clearTimeout(jHideTimer);
+  jHideTimer=setTimeout(function(){ document.getElementById('journey').classList.remove('show'); }, 4500);
 }
 function renderTabs(){
   document.getElementById('tabs').innerHTML=CONTINENTS.map(function(t){
@@ -873,7 +1066,8 @@ var MODES=['learn','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
-  MODE=m; huntReveal=false;
+  MODE=m; huntReveal=false; journey=null;
+  document.getElementById('journey').classList.remove('show');
   Array.prototype.forEach.call(document.querySelectorAll('#modeNav .btn'),function(b){
     b.classList.toggle('on', b.dataset.m===m);
   });
