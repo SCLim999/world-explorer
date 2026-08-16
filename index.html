@@ -94,31 +94,44 @@
 
   /* ---------- modes ---------- */
   #stage,#picker,#quiz,#animal,#passport{display:none}
-  body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage{display:grid}
+  body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage,body.m-won #stage{display:grid}
   body.m-learn #picker{display:block}
   body.m-quiz #quiz{display:block}
   body.m-animal #animal{display:block}
   body.m-passport #passport{display:block}
-  #card,#huntPanel,#civPanel{display:none}
+  #card,#huntPanel,#civPanel,#wonPanel{display:none}
   body.m-learn #card{display:block}
   body.m-hunt #huntPanel{display:block}
   body.m-civ #civPanel{display:block}
-  body.m-hunt #findBtn,body.m-civ #findBtn,body.m-civ #homeBtn{display:none}
+  body.m-won #wonPanel{display:block}
+  body.m-hunt #findBtn,body.m-civ #findBtn,body.m-civ #homeBtn,
+  body.m-won #findBtn,body.m-won #homeBtn{display:none}
+  #histHint{display:none}
+  body.m-civ #globeHint,body.m-won #globeHint{display:none}
+  body.m-civ #histHint,body.m-won #histHint{display:block}
 
-  /* ---------- ancient civilisations ---------- */
-  .civIntro{background:linear-gradient(90deg,#fff3d6,#eaf7ff);border-radius:16px;padding:10px 14px;
+  /* ---------- ancient civilisations & the eight wonders ---------- */
+  .civIntro,.wonIntro{background:linear-gradient(90deg,#fff3d6,#eaf7ff);border-radius:16px;padding:10px 14px;
     font-size:15px;line-height:1.4;display:flex;gap:9px;align-items:flex-start}
-  .civIntro .emo{font-size:22px;flex:none}
-  .civSel{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .civIntro .emo,.wonIntro .emo{font-size:22px;flex:none}
+  .civSel,.wonSel{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
   .civSel .btn{font-size:15px;padding:7px 13px}
-  .civSel .btn.on{background:var(--yellow);border-color:#e0a93c;color:#5a3c0c}
-  .civTop{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-  .civArt{width:118px;height:118px;flex:none;background:#fbfaf5;border-radius:16px;border:3px solid #efe6d2}
-  .civMeta{font-size:15px;color:var(--ink2);margin-top:5px;line-height:1.35}
-  .civMeta b{color:#1a6fc4}
-  .civNow{margin-top:12px;background:#f2f8ff;border-radius:16px;padding:10px 14px;font-size:15px;
+  .wonSel .btn{font-size:13.5px;padding:6px 11px}
+  .civSel .btn.on,.wonSel .btn.on{background:var(--yellow);border-color:#e0a93c;color:#5a3c0c}
+  .wonSel .btn.gone{opacity:.72}
+  .civTop,.wonTop{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .civArt,.wonArt{width:118px;height:118px;flex:none;background:#fbfaf5;border-radius:16px;border:3px solid #efe6d2}
+  .civMeta,.wonMeta{font-size:15px;color:var(--ink2);margin-top:5px;line-height:1.35}
+  .civMeta b,.wonMeta b{color:#1a6fc4}
+  .civNow,.wonNow{margin-top:12px;background:#f2f8ff;border-radius:16px;padding:10px 14px;font-size:15px;
     display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .civNow svg{width:46px;height:31px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.2);flex:none}
+  .civNow svg,.wonNow svg{width:46px;height:31px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.2);flex:none}
+  .wonBadge{display:inline-block;border-radius:999px;padding:5px 15px;font-size:15px;font-weight:bold;margin-top:8px}
+  .wonBadge.here{background:#e7f8ec;color:#1a7038;border:2px solid #9ad9b0}
+  .wonBadge.gone{background:#f1eff7;color:#645b7c;border:2px solid #cfc9de}
+  .wonFate{margin-top:12px;background:#fff5ef;border-radius:16px;padding:10px 14px;font-size:15px;
+    line-height:1.4;display:flex;gap:9px;align-items:flex-start}
+  .wonFate .emo{font-size:22px;flex:none}
   .civTime{margin-top:16px;padding:6px 10px 4px}
   .civTime .lab{font-size:13px;color:var(--ink2);text-align:center;margin-bottom:20px}
   .civTime .rail{position:relative;height:6px;border-radius:999px;
@@ -275,6 +288,7 @@
   <div class="navbar" id="modeNav">
     <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
     <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
+    <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
     <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
     <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
     <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
@@ -294,9 +308,13 @@
       <button class="btn on" id="planeBtn">✈️ <span class="zh">飞机</span><span class="en">Planes</span></button>
       <button class="btn" id="homeBtn">🏠 <span class="zh">回家看看</span><span class="en">Go home</span></button>
     </div>
-    <p class="hint stack">
+    <p class="hint stack" id="globeHint">
       <span class="zh">拖动地球转一转！点亮的小圆点就是国家，点一点飞过的小飞机，看看它要飞去哪里。</span>
       <span class="en">Drag the globe to spin it! Tap a glowing dot to visit a country, or tap a passing plane to see where it is going.</span>
+    </p>
+    <p class="hint stack" id="histHint">
+      <span class="zh">拖动地球转一转！点一点地球上的小圆点，看看那里有什么。</span>
+      <span class="en">Drag the globe to spin it! Tap a dot on the globe to see what was there.</span>
     </p>
   </section>
 
@@ -305,6 +323,7 @@
     <div id="card"></div>
     <div id="huntPanel"></div>
     <div id="civPanel"></div>
+    <div id="wonPanel"></div>
   </section>
 </main>
 
@@ -1270,6 +1289,118 @@ var CIVS=[
 ];
 
 /* ============================================================
+   2e. THE EIGHT WONDERS — the seven ancient ones plus the Terracotta Army
+   ============================================================ */
+var WONART={
+ wPyr:'<circle cx="50" cy="11" r="4.6" fill="#ffcf5c"/><rect x="0" y="46" width="60" height="10" fill="#f0dfa8"/>'+
+   '<path d="M4,47 L30,8 L56,47 Z" fill="#e8d191"/><path d="M30,8 L56,47 H30 Z" fill="#d3b76f"/>'+
+   '<rect x="46.2" y="42" width="1.8" height="5" fill="#7a5c3a"/><circle cx="47.1" cy="40.4" r="1.5" fill="#7a5c3a"/>',
+ wGarden:'<rect x="0" y="48" width="60" height="8" fill="#dcc9a0"/>'+
+   '<rect x="6" y="38" width="48" height="10" fill="#bb9d70"/><rect x="11" y="28" width="38" height="10" fill="#c8ab7d"/>'+
+   '<rect x="16" y="18" width="28" height="10" fill="#d5b88a"/><rect x="21" y="10" width="18" height="8" fill="#e0c497"/>'+
+   '<g stroke="#4e9c52" stroke-width="1.2" fill="none"><path d="M12,40 v5 M22,40 v6 M32,40 v5 M42,40 v6 M50,40 v4"/>'+
+   '<path d="M16,30 v5 M26,30 v6 M36,30 v5 M45,30 v4 M22,20 v5 M31,20 v6 M40,20 v4"/></g>'+
+   '<g fill="#63b56a"><ellipse cx="13" cy="38.5" rx="5.2" ry="3.4"/><ellipse cx="24" cy="38.5" rx="5.2" ry="3.4"/>'+
+   '<ellipse cx="35" cy="38.5" rx="5.2" ry="3.4"/><ellipse cx="46" cy="38.5" rx="5" ry="3.2"/>'+
+   '<ellipse cx="17" cy="28.5" rx="4.6" ry="3.2"/><ellipse cx="27" cy="28.5" rx="4.6" ry="3.2"/>'+
+   '<ellipse cx="37" cy="28.5" rx="4.6" ry="3.2"/><ellipse cx="46" cy="28.5" rx="3.8" ry="2.8"/>'+
+   '<ellipse cx="22" cy="18.5" rx="4.4" ry="3"/><ellipse cx="31" cy="18.5" rx="4.4" ry="3"/><ellipse cx="40" cy="18.5" rx="4" ry="2.8"/>'+
+   '<ellipse cx="26" cy="10.5" rx="4.2" ry="2.8"/><ellipse cx="35" cy="10.5" rx="4.2" ry="2.8"/></g>',
+ wTemple:'<rect x="0" y="50" width="60" height="6" fill="#c8cfa8"/>'+
+   '<rect x="2" y="45" width="56" height="5" fill="#ddd6c2"/><rect x="4" y="41" width="52" height="4" fill="#e8e2d2"/>'+
+   '<g fill="#f4efe2"><rect x="7" y="20" width="3.8" height="21"/><rect x="13.4" y="20" width="3.8" height="21"/>'+
+   '<rect x="19.8" y="20" width="3.8" height="21"/><rect x="26.2" y="20" width="3.8" height="21"/>'+
+   '<rect x="32.6" y="20" width="3.8" height="21"/><rect x="39" y="20" width="3.8" height="21"/>'+
+   '<rect x="45.4" y="20" width="3.8" height="21"/><rect x="51.8" y="20" width="3.8" height="21"/></g>'+
+   '<rect x="4" y="15.5" width="52" height="4.8" fill="#e6dfcd"/><path d="M2,16 L30,5 L58,16 Z" fill="#f6f2e6"/>',
+ wZeus:'<rect x="0" y="50" width="60" height="6" fill="#cfc9ae"/><rect x="7" y="12" width="46" height="38" fill="#efe9d8"/>'+
+   '<rect x="13" y="20" width="34" height="30" fill="#a98a52"/><rect x="13" y="15" width="34" height="6" rx="2" fill="#8f7340"/>'+
+   '<circle cx="30" cy="25" r="5.4" fill="#ffd76b"/>'+
+   '<path d="M23,30.5 h14 l1.8,12 h-17.6 z" fill="#ffe9a8"/>'+
+   '<rect x="22.6" y="42" width="7" height="8" fill="#ffd76b"/><rect x="30.4" y="42" width="7" height="8" fill="#ffd76b"/>'+
+   '<rect x="38.4" y="22" width="2.2" height="19" fill="#f2c230"/><circle cx="39.5" cy="19.4" r="2.6" fill="#fff0a8"/>',
+ wTomb:'<rect x="0" y="50" width="60" height="6" fill="#c8cfa8"/><rect x="9" y="34" width="42" height="16" fill="#ded6c0"/>'+
+   '<rect x="11" y="19" width="38" height="15" fill="#b8ad91"/>'+
+   '<g fill="#f6f2e6"><rect x="13" y="22" width="4" height="12"/><rect x="20" y="22" width="4" height="12"/>'+
+   '<rect x="27" y="22" width="4" height="12"/><rect x="34" y="22" width="4" height="12"/><rect x="41" y="22" width="4" height="12"/></g>'+
+   '<rect x="9" y="18" width="42" height="4.4" fill="#e6dfcd"/>'+
+   '<rect x="14" y="14" width="32" height="4" fill="#dcd3ba"/><rect x="18" y="10" width="24" height="4" fill="#e2d9c2"/>'+
+   '<rect x="22" y="6" width="16" height="4" fill="#e8dfc9"/><rect x="26.5" y="1.5" width="7" height="4.5" fill="#c9bda0"/>',
+ wColossus:'<rect x="0" y="46" width="60" height="10" fill="#5fb8d8"/><rect x="15" y="42" width="30" height="5" fill="#b8ae94"/>'+
+   '<path d="M25.6,13 l1,-4.6 M28.6,12 l0.6,-5 M31.4,12 l-0.6,-5 M34.4,13 l-1,-4.6" stroke="#c99a56" stroke-width="1.7"/>'+
+   '<circle cx="30" cy="17" r="5" fill="#c99a56"/><path d="M26,22 h8 v13 h-8 z" fill="#b98f4f"/>'+
+   '<rect x="25.4" y="35" width="3.6" height="8" fill="#a8803f"/><rect x="31" y="35" width="3.6" height="8" fill="#a8803f"/>'+
+   '<rect x="34.4" y="14" width="2.6" height="13" fill="#b98f4f" transform="rotate(20 35.7 20.5)"/>'+
+   '<path d="M39.5,10.5 l2.6,-5.4 l2.6,5.4 z" fill="#ffb03c"/>',
+ wPharos:'<rect x="0" y="47" width="60" height="9" fill="#5fb8d8"/><rect x="13" y="43" width="34" height="5" fill="#c9bda0"/>'+
+   '<path d="M17,43 L20.5,26 h19 L43,43 Z" fill="#e6dfcd"/><path d="M21.5,26 L23.5,14 h13 L38.5,26 Z" fill="#efe9d8"/>'+
+   '<rect x="25.5" y="8" width="9" height="6" fill="#ded5bd"/><path d="M26.5,8 q3.5,-6.5 7,0 z" fill="#ffb03c"/>'+
+   '<circle cx="30" cy="3.6" r="2.4" fill="#ffd54a" opacity=".85"/>'+
+   '<path d="M35,9 l13,-4 M35,11.5 l14,3" stroke="#ffd54a" stroke-width="1.7" opacity=".65" fill="none"/>',
+ wArmy:'<rect x="0" y="41" width="60" height="15" fill="#a8814f"/><rect x="0" y="39" width="60" height="3" fill="#8a6a3f"/>'+
+   '<g fill="#9c7b52"><circle cx="12" cy="23" r="2.6"/><path d="M9,26 h6 l1,13 h-8 z"/>'+
+   '<circle cx="26" cy="23" r="2.6"/><path d="M23,26 h6 l1,13 h-8 z"/>'+
+   '<circle cx="40" cy="23" r="2.6"/><path d="M37,26 h6 l1,13 h-8 z"/>'+
+   '<circle cx="53" cy="23" r="2.6"/><path d="M50,26 h6 l1,13 h-8 z"/></g>'+
+   '<g fill="#c29a63"><circle cx="7" cy="30" r="3.4"/><path d="M3,34 h8 l1.6,14 h-11.2 z"/>'+
+   '<circle cx="22" cy="30" r="3.4"/><path d="M18,34 h8 l1.6,14 h-11.2 z"/>'+
+   '<circle cx="37" cy="30" r="3.4"/><path d="M33,34 h8 l1.6,14 h-11.2 z"/>'+
+   '<circle cx="52" cy="30" r="3.4"/><path d="M48,34 h8 l1.6,14 h-11.2 z"/></g>'
+};
+function wonSVG(k){ return '<svg viewBox="0 0 60 60" class="wonArt" xmlns="http://www.w3.org/2000/svg">'+WONART[k]+'</svg>'; }
+/* here:true = you can still go and see it today */
+var WONDERS=[
+ {id:'pyr',zh:'胡夫金字塔',en:'Great Pyramid of Giza',shZh:'金字塔',shEn:'Pyramid',art:'wPyr',lat:29.98,lon:31.13,
+  bc:2560,here:true,whereZh:'埃及',whereEn:'Egypt',now:'eg',
+  fate:['💪','四千五百多年了，它还好好地站着','After 4,500 years it is still standing'],
+  f:[['🪨','用了两百三十万块大石头堆成','Built from 2.3 million huge blocks of stone'],
+     ['📏','有四千多年一直是世界上最高的建筑','For over 4,000 years it was the tallest building on Earth'],
+     ['⭐','七大奇迹里，只有它还在','Of the seven ancient wonders, it is the only one left']]},
+ {id:'gar',zh:'巴比伦空中花园',en:'Hanging Gardens of Babylon',shZh:'空中花园',shEn:'Gardens',art:'wGarden',lat:32.54,lon:44.42,
+  bc:600,here:false,whereZh:'伊拉克',whereEn:'Iraq',now:null,
+  fate:['❓','谁也没找到过它，也许只是个美丽的传说','Nobody has ever found it — it may be only a beautiful story'],
+  f:[['🌿','花种在一层层高台上，绿叶垂下来像挂在空中','Plants grew on stacked terraces, leaves hanging down in the air'],
+     ['💧','要用机器把河水一直抽到最高层','Machines had to lift river water all the way to the top'],
+     ['👑','传说是国王为想家的王后建的','The story says a king built it for his homesick queen']]},
+ {id:'art',zh:'阿尔忒弥斯神庙',en:'Temple of Artemis',shZh:'神庙',shEn:'Temple',art:'wTemple',lat:37.95,lon:27.36,
+  bc:550,here:false,whereZh:'土耳其',whereEn:'Türkiye',now:'tr',
+  fate:['🔥','被一个想出名的人放火烧掉了','A man burned it down just to make himself famous'],
+  f:[['🏛️','有 127 根大理石柱子，比帕特农神庙还大','127 marble columns — bigger than the Parthenon'],
+     ['⏳','烧掉以后重建了好几次','It was burned and rebuilt more than once'],
+     ['🪨','现在那里只剩下一根柱子','Today just one column still stands there']]},
+ {id:'zeu',zh:'奥林匹亚宙斯神像',en:'Statue of Zeus at Olympia',shZh:'宙斯神像',shEn:'Zeus',art:'wZeus',lat:37.64,lon:21.63,
+  bc:435,here:false,whereZh:'希腊',whereEn:'Greece',now:'gr',
+  fate:['🔥','后来被搬走，毁在一场大火里','It was carried away and lost in a great fire'],
+  f:[['📏','坐着都有 12 米高，快顶到屋顶了','Even sitting down it was 12 m tall — nearly touching the roof'],
+     ['✨','身体用象牙做，衣服用黄金做','Its body was ivory and its robe was gold'],
+     ['🏅','就放在举办第一届奥运会的地方','It stood where the very first Olympic Games were held']]},
+ {id:'mau',zh:'摩索拉斯陵墓',en:'Mausoleum at Halicarnassus',shZh:'陵墓',shEn:'Tomb',art:'wTomb',lat:37.04,lon:27.42,
+  bc:350,here:false,whereZh:'土耳其',whereEn:'Türkiye',now:'tr',
+  fate:['🌍','被好几次地震摇塌了','Earthquakes shook it down over the years'],
+  f:[['👑','是一位国王的大坟墓，有 45 米高','A king\'s giant tomb, 45 m tall'],
+     ['🐴','屋顶上站着一辆四匹马拉的大车','A chariot pulled by four horses stood on the roof'],
+     ['📖','英文里「陵墓」这个词就是从他名字来的','The English word "mausoleum" comes from his name']]},
+ {id:'col',zh:'罗得岛太阳神巨像',en:'Colossus of Rhodes',shZh:'太阳神巨像',shEn:'Colossus',art:'wColossus',lat:36.45,lon:28.23,
+  bc:280,here:false,whereZh:'希腊',whereEn:'Greece',now:'gr',
+  fate:['🌍','只站了 54 年就被地震震倒了','It stood for only 54 years before an earthquake toppled it'],
+  f:[['📏','33 米高，和自由女神像差不多','33 m tall — about the same as the Statue of Liberty'],
+     ['⚔️','用打完仗剩下的青铜武器熔了做的','It was melted down from leftover bronze weapons'],
+     ['🚢','站在港口边，船进港就能看见它','It stood by the harbour, greeting every ship']]},
+ {id:'pha',zh:'亚历山大灯塔',en:'Lighthouse of Alexandria',shZh:'灯塔',shEn:'Lighthouse',art:'wPharos',lat:31.21,lon:29.89,
+  bc:280,here:false,whereZh:'埃及',whereEn:'Egypt',now:'eg',
+  fate:['🌍','三次大地震以后，终于塌进了海里','After three big earthquakes it finally fell into the sea'],
+  f:[['🔥','塔顶一直烧着火，给船指路','A fire burned at the top all night to guide ships'],
+     ['🪞','用大镜子把火光照到很远的海上','A great mirror threw the firelight far out to sea'],
+     ['📏','有一百多米高，是当时最高的塔之一','Over 100 m tall — one of the tallest towers of its time']]},
+ {id:'ter',zh:'秦始皇兵马俑',en:'Terracotta Army',shZh:'兵马俑',shEn:'Army',art:'wArmy',lat:34.38,lon:109.28,
+  bc:210,here:true,whereZh:'中国',whereEn:'China',now:'cn',
+  fate:['🎉','1974 年农民打井时挖到，现在人人都能去看','Farmers digging a well found it in 1974 — anyone can visit now'],
+  f:[['🧑‍🤝‍🧑','有八千多个陶做的兵，还有马和车','More than 8,000 clay soldiers, plus horses and chariots'],
+     ['😮','每一个兵的脸都长得不一样','Every single soldier has a different face'],
+     ['🎨','刚做好时它们身上是有颜色的','When they were new they were painted in bright colours']]}
+];
+
+/* ============================================================
    3. SIMPLE WORLD MAP (coarse outlines, lon/lat)
    ============================================================ */
 var LAND=[
@@ -1520,6 +1651,7 @@ function draw(){
   // country dots
   dots=[];
   if(MODE==='civ'){ drawCivLayer(); return; }
+  if(MODE==='won'){ drawWonLayer(); return; }
   COUNTRIES.forEach(function(c){
     var p=project(c.lon,c.lat);
     if(!p.vis) return;
@@ -1590,6 +1722,38 @@ function drawCivLayer(){
     ctx.fillStyle='rgba(255,255,255,.95)';
     roundRect(sp.x-tw/2-8, sp.y-40, tw+16, 24, 12); ctx.fill();
     ctx.fillStyle='#7a4b12'; ctx.textAlign='center'; ctx.fillText(label, sp.x, sp.y-23);
+    ctx.textAlign='start';
+  }
+}
+/* the eight wonders: solid marker = still standing, hollow dashed = long gone */
+var wonDots=[], wonIdx=0;
+function drawWonLayer(){
+  wonDots=[];
+  var order=[], i;
+  for(i=0;i<WONDERS.length;i++) if(i!==wonIdx) order.push(i);
+  order.push(wonIdx);                       // selected one last, so it sits on top of the Aegean cluster
+  order.forEach(function(k){
+    var w=WONDERS[k], p=project(w.lon,w.lat); if(!p.vis) return;
+    wonDots.push({x:p.x,y:p.y,i:k});
+    var sel=k===wonIdx;
+    if(sel){
+      ctx.beginPath(); ctx.arc(p.x,p.y,10+Math.sin(Date.now()/300)*1.6,0,7);
+      ctx.fillStyle='rgba(255,213,74,.3)'; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(p.x,p.y,sel?6.5:4.2,0,7);
+    if(w.here){ ctx.fillStyle=sel?'#ffd54a':'rgba(255,226,140,.95)'; ctx.fill(); ctx.setLineDash([]); }
+    else { ctx.fillStyle='rgba(255,255,255,.35)'; ctx.fill(); ctx.setLineDash([2.6,2.4]); }
+    ctx.lineWidth=2; ctx.strokeStyle=sel?'rgba(120,72,20,.9)':'rgba(255,255,255,.9)';
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+  var w=WONDERS[wonIdx], sp=project(w.lon,w.lat);
+  if(sp.vis){
+    var label=(document.body.classList.contains('only-en')?w.en:w.zh)+(w.here?' ✅':' 💨');
+    ctx.font='bold 14px "Segoe UI","PingFang SC",sans-serif';
+    var tw=ctx.measureText(label).width;
+    ctx.fillStyle='rgba(255,255,255,.95)';
+    roundRect(sp.x-tw/2-8, sp.y-40, tw+16, 23, 11); ctx.fill();
+    ctx.fillStyle='#7a4b12'; ctx.textAlign='center'; ctx.fillText(label, sp.x, sp.y-24);
     ctx.textAlign='start';
   }
 }
@@ -1668,6 +1832,12 @@ cv.addEventListener('pointerup',function(e){
       var bc=null, bcd=26;
       civDots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bcd){bcd=dd;bc=d.i;} });
       if(bc!==null) pickCiv(bc,true);
+      return;
+    }
+    if(MODE==='won'){
+      var bw=null, bwd=22;
+      wonDots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bwd){bwd=dd;bw=d.i;} });
+      if(bw!==null) pickWon(bw,true);
       return;
     }
     var best=null,bd=24;
@@ -1803,7 +1973,7 @@ function stepPlanes(dt){
 function drawPlanes(){
   planeLights.length=0; planeHits.length=0;
   /* civ mode keeps the globe clean — amber night-lights would read as civilisation markers */
-  if(!planesOn || MODE==='civ') return;
+  if(!planesOn || MODE==='civ' || MODE==='won') return;
   var N=12;
   for(var k=0;k<PLANES.length;k++){
     var pl=PLANES[k], head=Math.min(1,pl.t), tail=Math.max(0,pl.t-pl.tail);
@@ -2132,7 +2302,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
     cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
-var MODES=['learn','civ','hunt','animal','quiz','passport'];
+var MODES=['learn','civ','won','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
@@ -2144,6 +2314,7 @@ function setMode(m){
   });
   if(m==='learn') renderDaily();
   if(m==='civ'){ renderCiv(); flyTo(CIVS[civIdx]); sayCiv(); }
+  if(m==='won'){ renderWon(); flyTo(WONDERS[wonIdx]); sayWon(); }
   if(m==='hunt') startHunt();
   if(m==='quiz') startQuiz();
   if(m==='animal') startAnimal();
@@ -2294,6 +2465,64 @@ function pickCiv(i,user){
   civIdx=i; renderCiv();
   flyTo(CIVS[i]);
   if(user) sayCiv();
+}
+
+/* ============================================================
+   6b. THE EIGHT WONDERS OF THE WORLD
+   ============================================================ */
+function yearsAgo(bc){ return (bc+new Date().getFullYear()).toLocaleString(); }
+function renderWon(){
+  var w=WONDERS[wonIdx], left=WONDERS.filter(function(x){return x.here;}).length;
+  var h='<div class="wonIntro"><span class="emo">🏛️</span><span class="stack">'+
+    T('两千多年前的人挑出了七个最了不起的建筑。地震和大火之后，只剩 <b>金字塔</b> 还站着。'+
+      '后来在中国挖出的 <b>兵马俑</b>，被大家叫做「第八大奇迹」。',
+      'Long ago people chose seven amazing buildings. After earthquakes and fires only the '+
+      '<b>Great Pyramid</b> is still standing. The <b>Terracotta Army</b>, dug up in China, is called the eighth wonder.')+
+    '</span></div>';
+  h+='<div class="wonSel">'+WONDERS.map(function(x,i){
+      return '<button class="btn'+(i===wonIdx?' on':'')+(x.here?'':' gone')+'" data-i="'+i+'">'+
+             (x.here?'✅ ':'💨 ')+T(x.shZh,x.shEn||x.en)+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="wonTop">'+wonSVG(w.art)+'<div><div class="cName stack">'+T(w.zh,w.en)+'</div>'+
+     '<div class="wonMeta stack">'+T('📍 在今天的 <b>'+w.whereZh+'</b>','📍 in what is now <b>'+w.whereEn+'</b>')+'</div>'+
+     '<div class="wonMeta stack">'+T('⏳ 大约公元前 <b>'+w.bc+'</b> 年（'+yearsAgo(w.bc)+' 年前）',
+                                     '⏳ about <b>'+w.bc+' BC</b> ('+yearsAgo(w.bc)+' years ago)')+'</div>'+
+     '<div class="wonBadge '+(w.here?'here':'gone')+'"><span class="stack">'+
+     T(w.here?'✅ 现在还能去看！':'💨 已经消失了',w.here?'✅ You can still go and see it!':'💨 Gone for ever')+
+     '</span></div></div></div>';
+  h+='<ul class="facts">'+w.f.map(function(f){
+      return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
+    }).join('')+'</ul>';
+  h+='<div class="wonFate"><span class="emo">'+w.fate[0]+'</span><span class="stack">'+
+     T('<b>后来呢？</b> '+w.fate[1],'<b>What happened?</b> '+w.fate[2])+'</span></div>';
+  h+='<div class="wonNow">'+(w.now?flagSVG(w.now):'<span class="emo">📍</span>')+
+     '<span class="grow stack">'+T('这地方现在属于 <b>'+w.whereZh+'</b>','This place is in <b>'+w.whereEn+'</b> today')+'</span>'+
+     (w.now?'<button class="btn" id="wonGo">'+T('去看看','Visit')+'</button>':'')+'</div>';
+  h+='<p class="hint stack">'+T('八个里面还剩 <b>'+left+'</b> 个能亲眼看到 —— 地球上的实心小圆点就是它们。',
+     'Only <b>'+left+'</b> of the eight can still be seen — they are the solid dots on the globe.')+'</p>';
+  h+='<div class="navRow"><button class="btn" id="wonPrev">⬅️ '+T('上一个','Back')+'</button>'+
+     '<button class="btn" id="wonSay">🔊 '+T('读给我听','Say it')+'</button>'+
+     '<button class="btn" id="wonNext">'+T('下一个','Next')+' ➡️</button></div>';
+  document.getElementById('wonPanel').innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll('#wonPanel [data-i]'),function(b){
+    b.onclick=function(){ pickWon(+b.dataset.i, true); };
+  });
+  document.getElementById('wonPrev').onclick=function(){ pickWon((wonIdx+WONDERS.length-1)%WONDERS.length,true); };
+  document.getElementById('wonNext').onclick=function(){ pickWon((wonIdx+1)%WONDERS.length,true); };
+  document.getElementById('wonSay').onclick=function(){ sayWon(true); };
+  var go=document.getElementById('wonGo');
+  if(go) go.onclick=function(){ setMode('learn'); select(w.now,true); };
+}
+function sayWon(force){
+  var w=WONDERS[wonIdx];
+  sayList([[w.zh+'，在'+w.whereZh, w.en+', in '+w.whereEn]]
+    .concat(w.f.map(function(f){ return [f[1],f[2]]; }))
+    .concat([[w.fate[1],w.fate[2]]]), force);
+}
+function pickWon(i,user){
+  wonIdx=i; renderWon();
+  flyTo(WONDERS[i]);
+  if(user) sayWon();
 }
 
 /* ============================================================
