@@ -94,21 +94,24 @@
 
   /* ---------- modes ---------- */
   #stage,#picker,#quiz,#animal,#passport{display:none}
-  body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage,body.m-won #stage{display:grid}
+  body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage,body.m-won #stage,
+  body.m-place #stage{display:grid}
   body.m-learn #picker{display:block}
   body.m-quiz #quiz{display:block}
   body.m-animal #animal{display:block}
   body.m-passport #passport{display:block}
-  #card,#huntPanel,#civPanel,#wonPanel{display:none}
+  #card,#huntPanel,#civPanel,#wonPanel,#placePanel{display:none}
   body.m-learn #card{display:block}
   body.m-hunt #huntPanel{display:block}
   body.m-civ #civPanel{display:block}
   body.m-won #wonPanel{display:block}
+  body.m-place #placePanel{display:block}
   body.m-hunt #findBtn,body.m-civ #findBtn,body.m-civ #homeBtn,
-  body.m-won #findBtn,body.m-won #homeBtn{display:none}
+  body.m-won #findBtn,body.m-won #homeBtn,
+  body.m-place #findBtn,body.m-place #homeBtn{display:none}
   #histHint{display:none}
-  body.m-civ #globeHint,body.m-won #globeHint{display:none}
-  body.m-civ #histHint,body.m-won #histHint{display:block}
+  body.m-civ #globeHint,body.m-won #globeHint,body.m-place #globeHint{display:none}
+  body.m-civ #histHint,body.m-won #histHint,body.m-place #histHint{display:block}
 
   /* ---------- ancient civilisations & the eight wonders ---------- */
   .civIntro,.wonIntro{background:linear-gradient(90deg,#fff3d6,#eaf7ff);border-radius:16px;padding:10px 14px;
@@ -307,6 +310,7 @@
     <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
     <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
     <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
+    <button class="btn" data-m="place">🧭 <span class="zh">特别的地方</span><span class="en">Places</span></button>
     <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
     <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
     <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
@@ -342,6 +346,7 @@
     <div id="huntPanel"></div>
     <div id="civPanel"></div>
     <div id="wonPanel"></div>
+    <div id="placePanel"></div>
   </section>
 </main>
 
@@ -1419,6 +1424,153 @@ var WONDERS=[
 ];
 
 /* ============================================================
+   2f. SPECIAL PLACES — spots on Earth that are not countries:
+   islands, cities, deserts, forests, ice caps and patches of ocean.
+   ============================================================ */
+var PLACEART={
+ pHk:'<rect x="0" y="43" width="60" height="13" fill="#4aa8d8"/>'+
+   '<path d="M0,32 L13,15 L27,32 Z" fill="#6f9a66"/><path d="M13,15 L18,21 Q15,19 13,20 Q11,19 8,21 Z" fill="#8fb884"/>'+
+   '<g fill="#9db4c8"><rect x="6" y="26" width="6" height="17"/><rect x="14" y="20" width="7" height="23"/>'+
+   '<rect x="23" y="14" width="6" height="29"/><rect x="31" y="23" width="7" height="20"/>'+
+   '<rect x="40" y="18" width="6" height="25"/><rect x="48" y="27" width="7" height="16"/></g>'+
+   '<g fill="#e8f2fa"><rect x="15" y="24" width="2" height="2"/><rect x="24" y="18" width="2" height="2"/>'+
+   '<rect x="41" y="22" width="2" height="2"/><rect x="32" y="27" width="2" height="2"/></g>'+
+   '<rect x="24" y="10" width="1.6" height="5" fill="#7d94aa"/>'+
+   '<path d="M22,48 h13 l-2.5,4 h-8 z" fill="#e0574f"/><rect x="26" y="45" width="5" height="3" fill="#f2ede0"/>',
+ pTw:'<rect x="0" y="46" width="60" height="10" fill="#4aa8d8"/>'+
+   '<path d="M27,8 q9,3 10,14 q2,15 -3,24 q-4,7 -11,5 q-7,-3 -8,-14 q-1,-17 6,-27 q3,-3 6,-2 z" fill="#7bbf6a"/>'+
+   '<path d="M20,34 L27,17 L34,34 Z" fill="#8a9a7a"/>'+
+   '<path d="M27,17 L31,26 Q28.5,24 27,25.5 Q25.5,24 23,26 Z" fill="#f7fcff"/>'+
+   '<ellipse cx="23" cy="39" rx="4.6" ry="2.8" fill="#5fb8d8"/>'+
+   '<circle cx="46" cy="14" r="4.6" fill="#ffcf5c"/>',
+ pBerm:'<rect x="0" y="0" width="60" height="56" fill="#3f9ecf"/>'+
+   '<g stroke="rgba(255,255,255,.35)" stroke-width="1.4" fill="none">'+
+   '<path d="M2,12 q6,-3 12,0 t12,0"/><path d="M32,50 q6,-3 12,0 t12,0"/></g>'+
+   '<path d="M11,47 L30,7 L51,41 Z" fill="rgba(255,255,255,.16)" stroke="#ffffff" stroke-width="1.8" '+
+   'stroke-dasharray="3.5 3" stroke-linejoin="round"/>'+
+   '<ellipse cx="33" cy="31" rx="11" ry="6" fill="rgba(255,255,255,.45)"/>'+
+   '<ellipse cx="26" cy="35" rx="8" ry="4.4" fill="rgba(255,255,255,.3)"/>'+
+   '<path d="M17,38 h9 l-1.8,3 h-5.4 z" fill="#f2ede0" opacity=".9"/><rect x="21" y="34" width="1.4" height="4" fill="#f2ede0" opacity=".9"/>'+
+   '<path d="M40,20 l5,1.6 l-5,1.6 l1.4,-1.6 z" fill="#ffffff" opacity=".55"/>'+
+   '<circle cx="18" cy="17" r="2.2" fill="#ffffff" opacity=".5"/><circle cx="24" cy="14" r="1.4" fill="#ffffff" opacity=".35"/>',
+ pSahara:'<circle cx="47" cy="12" r="6.4" fill="#ffcf5c"/>'+
+   '<path d="M0,42 q13,-10 24,-2 q11,8 21,-3 q8,-8 15,-1 V56 H0 Z" fill="#ecd396"/>'+
+   '<path d="M0,49 q15,-8 28,0 q13,7 32,-3 V56 H0 Z" fill="#dcbd72"/>'+
+   '<path d="M0,54 q18,-5 34,1 q12,4 26,-2 V56 H0 Z" fill="#c9a559"/>',
+ pAmazon:'<path d="M0,49 q15,-6 30,0 q15,6 30,-1 V56 H0 Z" fill="#4f9a5e"/>'+
+   '<path d="M0,52 q15,-5 30,1 q15,6 30,-2" stroke="#5fb8d8" stroke-width="4.5" fill="none"/>'+
+   '<g fill="#8a6b4a"><rect x="10" y="30" width="2.6" height="16"/><rect x="26" y="24" width="3" height="22"/>'+
+   '<rect x="44" y="32" width="2.6" height="14"/></g>'+
+   '<ellipse cx="11.3" cy="28" rx="10" ry="6" fill="#3f8f4e"/><ellipse cx="27.5" cy="22" rx="12" ry="7" fill="#4fa35e"/>'+
+   '<ellipse cx="45.3" cy="30" rx="10" ry="6" fill="#3f8f4e"/>'+
+   '<ellipse cx="19" cy="16" rx="8" ry="5" fill="#5cb06b"/><ellipse cx="38" cy="14" rx="9" ry="5.4" fill="#63b56a"/>',
+ pAntarc:'<rect x="0" y="40" width="60" height="16" fill="#5aa8d0"/>'+
+   '<path d="M0,42 q16,-9 31,-3 q15,6 29,-2 V44 H0 Z" fill="#eaf6ff"/>'+
+   '<path d="M5,40 L14,20 L23,40 Z" fill="#f7fcff"/><path d="M14,20 L18,29 Q15.5,27 14,28.5 Q12.5,27 10,29 Z" fill="#dceef8"/>'+
+   '<path d="M38,40 L45,26 L52,40 Z" fill="#e2f0fa"/>'+
+   '<g><ellipse cx="29" cy="44" rx="3.2" ry="5" fill="#2f3b47"/><ellipse cx="29" cy="45.5" rx="2" ry="3.4" fill="#f7fcff"/>'+
+   '<circle cx="29" cy="38" r="2.4" fill="#2f3b47"/><path d="M28.2,38.6 l2,0 l-1,1.4 z" fill="#f2a63c"/>'+
+   '<ellipse cx="35" cy="45" rx="2.6" ry="4.2" fill="#2f3b47"/><ellipse cx="35" cy="46.2" rx="1.6" ry="2.8" fill="#f7fcff"/>'+
+   '<circle cx="35" cy="40" r="2" fill="#2f3b47"/></g>',
+ pArctic:'<rect x="0" y="0" width="60" height="56" fill="#3f8fbf"/>'+
+   '<circle cx="47" cy="13" r="5.4" fill="#ffd98a"/>'+
+   '<g fill="#eaf6ff"><path d="M2,40 q10,-5 20,-1 q4,2 -1,4 q-12,3 -19,0 z"/>'+
+   '<path d="M28,47 q13,-5 26,-1 q5,2 -2,4 q-16,3 -24,0 z"/>'+
+   '<path d="M36,34 q10,-4 18,0 q4,2 -2,3.6 q-11,2 -16,0 z"/></g>'+
+   '<g><ellipse cx="14" cy="35" rx="8" ry="4.2" fill="#fbfdff"/><circle cx="21" cy="32.6" r="3" fill="#fbfdff"/>'+
+   '<circle cx="23.2" cy="32.4" r="0.9" fill="#3a3a3a"/><circle cx="21.6" cy="31.2" r="0.7" fill="#3a3a3a"/>'+
+   '<rect x="8" y="38" width="2.4" height="3" fill="#e8f2fa"/><rect x="17" y="38" width="2.4" height="3" fill="#e8f2fa"/></g>',
+ pTrench:'<rect x="0" y="0" width="60" height="14" fill="#6fc4e0"/><rect x="0" y="14" width="60" height="14" fill="#3f8fbf"/>'+
+   '<rect x="0" y="28" width="60" height="14" fill="#255f8a"/><rect x="0" y="42" width="60" height="14" fill="#123a5c"/>'+
+   '<path d="M0,40 h18 l7,16 h6 l7,-16 h22 v16 H0 Z" fill="#6b5f52"/>'+
+   '<path d="M18,40 l7,16 h-3 l-6,-14 z" fill="#5a4f44"/>'+
+   '<g><ellipse cx="30" cy="20" rx="5.4" ry="3.4" fill="#f2c230"/><circle cx="34.6" cy="20" r="1.6" fill="#e0a020"/>'+
+   '<path d="M25,20 l-3.4,-2.2 v4.4 z" fill="#e0a020"/>'+
+   '<path d="M35,20 l9,-3 M35,20.6 l9,3" stroke="rgba(255,236,150,.55)" stroke-width="1.5" fill="none"/></g>',
+ pReef:'<rect x="0" y="0" width="60" height="56" fill="#4fbfe0"/>'+
+   '<path d="M0,46 q15,-5 30,0 q15,5 30,-3 V56 H0 Z" fill="#f2e0a8"/>'+
+   '<g><path d="M12,47 q-1,-9 -5,-12 M12,47 q1,-10 6,-13 M12,47 v-8" stroke="#e8709a" stroke-width="2.6" '+
+   'fill="none" stroke-linecap="round"/>'+
+   '<path d="M44,45 q-1,-8 -5,-11 M44,45 q2,-9 7,-11 M44,45 v-7" stroke="#f2a03c" stroke-width="2.6" '+
+   'fill="none" stroke-linecap="round"/>'+
+   '<path d="M28,48 q-1,-6 -4,-8 M28,48 q2,-7 5,-8" stroke="#a86fd0" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>'+
+   '<g fill="#ffd54a"><ellipse cx="24" cy="20" rx="4.4" ry="2.8"/><path d="M19.8,20 l-3.4,-2.4 v4.8 z"/></g>'+
+   '<g fill="#ff9a3c"><ellipse cx="40" cy="30" rx="3.4" ry="2.2"/><path d="M36.8,30 l-2.8,-2 v4 z"/></g>'+
+   '<g fill="#ffffff" opacity=".8"><circle cx="15" cy="12" r="1.6"/><circle cx="20" cy="7" r="1.1"/><circle cx="47" cy="14" r="1.3"/></g>',
+ pDead:'<path d="M0,0 h60 v22 H0 z" fill="none"/>'+
+   '<path d="M0,26 L14,14 L26,26 Z" fill="#c9a97a"/><path d="M34,26 L46,12 L58,26 Z" fill="#bb9a6a"/>'+
+   '<rect x="0" y="26" width="60" height="30" fill="#6fb0c0"/>'+
+   '<path d="M0,26 h60 v3 H0 z" fill="#8ac4d2"/>'+
+   '<g fill="#f2f7f8"><path d="M0,30 q7,-3 13,0 q-6,3 -13,0 z"/><path d="M46,33 q8,-3 14,0 q-7,3 -14,0 z"/></g>'+
+   '<g><ellipse cx="30" cy="35" rx="11" ry="3.2" fill="#f5d9b8"/><circle cx="19.5" cy="34" r="3.2" fill="#f5d9b8"/>'+
+   '<path d="M34,32 h7 v5 h-7 z" fill="#f2ede0"/><path d="M37.5,32 v5" stroke="#d8d0bd" stroke-width="0.8"/></g>',
+};
+function placeSVG(k){ return '<svg viewBox="0 0 60 60" class="civArt" xmlns="http://www.w3.org/2000/svg">'+PLACEART[k]+'</svg>'; }
+/* poly = an outline drawn on the globe, for places that are an area rather than a dot */
+var PLACES=[
+ {id:'hk',zh:'香港',en:'Hong Kong',art:'pHk',lat:22.32,lon:114.17,kind:'🏙️',
+  kZh:'一座城市',kEn:'a city',whereZh:'中国的特别行政区，在南边的海岸上',whereEn:'a special administrative region of China, on its southern coast',
+  near:'cn',
+  f:[['🏙️','摩天大楼比世界上任何地方都多','More skyscrapers than anywhere else in the world'],
+     ['🚋','有会爬山的缆车，一路开到山顶','A tram climbs all the way up to the Peak'],
+     ['🚢','维多利亚港的船，白天晚上都在跑','Boats cross Victoria Harbour day and night']]},
+ {id:'tw',zh:'台湾',en:'Taiwan',art:'pTw',lat:23.7,lon:121.0,kind:'🏝️',
+  kZh:'一座岛',kEn:'an island',whereZh:'太平洋西边的一座大岛',whereEn:'a large island in the western Pacific',
+  near:null,
+  f:[['⛰️','岛中间是高山，玉山有 3952 米','Tall mountains run down the middle — Yushan is 3,952 m'],
+     ['💧','日月潭是岛上最大的湖','Sun Moon Lake is the biggest lake on the island'],
+     ['🧋','珍珠奶茶就是这里发明的','Bubble tea was invented here']]},
+ {id:'bt',zh:'百慕大三角',en:'Bermuda Triangle',art:'pBerm',lat:25,lon:-71,kind:'🌊',
+  kZh:'一片海',kEn:'a patch of ocean',whereZh:'大西洋上的一片海，没有陆地',whereEn:'a patch of the Atlantic Ocean — no land at all',
+  near:null, poly:[[-80.2,25.8],[-64.75,32.3],[-66.1,18.5],[-80.2,25.8]],
+  f:[['❓','传说有船和飞机在这里不见了','Stories say ships and planes vanished here'],
+     ['🔬','科学家说其实是大风暴和海流在捣乱','Scientists say it is really big storms and strong currents'],
+     ['🚢','其实每天都有很多船平平安安地开过去','Plenty of ships cross it safely every single day']]},
+ {id:'sh',zh:'撒哈拉沙漠',en:'Sahara Desert',art:'pSahara',lat:23,lon:13,kind:'🏜️',
+  kZh:'一片沙漠',kEn:'a desert',whereZh:'非洲北边，跨过十几个国家',whereEn:'across the top of Africa, through more than ten countries',
+  near:'ma', poly:[[-16,21],[-5,27],[10,31],[25,31],[34,24],[36,17],[22,15],[8,15],[-6,17],[-16,21]],
+  f:[['🗺️','世界上最大的热沙漠，差不多和美国一样大','The biggest hot desert on Earth — almost the size of the USA'],
+     ['🌡️','白天热得能烤鸡蛋，晚上却很冷','Hot enough to cook an egg by day, but cold at night'],
+     ['🏔️','有的沙丘有 180 米高，像一座小山','Some sand dunes are 180 m tall — as high as a hill']]},
+ {id:'am',zh:'亚马逊雨林',en:'Amazon Rainforest',art:'pAmazon',lat:-3.5,lon:-62,kind:'🌴',
+  kZh:'一片雨林',kEn:'a rainforest',whereZh:'南美洲，大部分在巴西',whereEn:'in South America, mostly in Brazil',
+  near:'br', poly:[[-73,-2],[-66,3],[-55,4],[-48,-1],[-46,-8],[-56,-13],[-68,-11],[-73,-2]],
+  f:[['🌬️','树太多了，被叫做「地球的肺」','So many trees that people call it the lungs of the Earth'],
+     ['🦜','地球上每 10 种动植物，就有 1 种住在这里','One in every ten kinds of living thing on Earth lives here'],
+     ['🌧️','几乎天天下雨，叶子一直是湿的','It rains almost every day — the leaves never dry out']]},
+ {id:'an',zh:'南极洲',en:'Antarctica',art:'pAntarc',lat:-82,lon:20,kind:'🧊',
+  kZh:'一整块冰的大陆',kEn:'a frozen continent',whereZh:'地球最南边，没有国家也没有城市',whereEn:'the very bottom of the Earth — no countries, no cities',
+  near:null,
+  f:[['🥶','测到过 -89 度，是地球上最冷的地方','It once hit -89°C — the coldest place on Earth'],
+     ['🐧','企鹅住在这里，北极熊不住','Penguins live here — polar bears do not'],
+     ['🔬','没有人真正住在这里，只有科学家来上班','Nobody lives here — only scientists come to work']]},
+ {id:'npole',zh:'北极',en:'The North Pole',art:'pArctic',lat:90,lon:0,kind:'❄️',
+  kZh:'浮在海上的冰',kEn:'ice floating on the sea',whereZh:'地球最北边，冰底下是海，没有陆地',whereEn:'the very top of the Earth — under the ice is sea, not land',
+  near:null,
+  f:[['🧊','脚下的冰是浮在海面上的，底下没有地','The ice floats on the ocean — there is no land beneath'],
+     ['🐻‍❄️','北极熊住在这里，企鹅不住','Polar bears live here — penguins do not'],
+     ['🌞','一年只有一次日出和一次日落','The sun rises once a year and sets once a year']]},
+ {id:'mt',zh:'马里亚纳海沟',en:'Mariana Trench',art:'pTrench',lat:11.35,lon:142.2,kind:'🌊',
+  kZh:'海底最深的地方',kEn:'the deepest place in the sea',whereZh:'太平洋西边的海底',whereEn:'on the floor of the western Pacific',
+  near:null,
+  f:[['📏','深 11000 米，是地球上最深的地方','11,000 m deep — the deepest place on Earth'],
+     ['🏔️','把珠穆朗玛峰放进去，山顶还差 2000 米才露头','Drop Everest in and its peak would still be 2,000 m underwater'],
+     ['🔦','那里一片漆黑，鱼要自己会发光','It is pitch black — the fish make their own light']]},
+ {id:'gbreef',zh:'大堡礁',en:'Great Barrier Reef',art:'pReef',lat:-18.3,lon:147.7,kind:'🪸',
+  kZh:'一片珊瑚礁',kEn:'a coral reef',whereZh:'澳大利亚东北边的海里',whereEn:'in the sea off north-east Australia',
+  near:'au', poly:[[145.3,-14.5],[146.8,-18],[149.5,-21],[152,-23.5],[150.5,-23.8],[147.8,-21.2],[145.6,-17.8],[144.6,-14.4],[145.3,-14.5]],
+  f:[['🛰️','是世界最大的珊瑚礁，从太空都看得见','The biggest reef in the world — you can see it from space'],
+     ['🐠','由几十亿只小小的珊瑚虫一点点盖出来','Billions of tiny coral animals built it, bit by bit'],
+     ['🐢','有一千五百多种鱼，还有海龟','Over 1,500 kinds of fish live there, and sea turtles too']]},
+ {id:'ds',zh:'死海',en:'The Dead Sea',art:'pDead',lat:31.5,lon:35.47,kind:'🧂',
+  kZh:'一个咸水湖',kEn:'a salt lake',whereZh:'西亚，在约旦和以色列中间',whereEn:'in western Asia, between Jordan and Israel',
+  near:null,
+  f:[['🛟','水太咸了，人躺上去会自己浮起来','The water is so salty that you float without trying'],
+     ['⬇️','是陆地上最低的地方，比海平面还低 430 米','The lowest land on Earth — 430 m below sea level'],
+     ['🐟','太咸了，鱼没办法住在里面','Too salty for fish to live in — that is why it is "dead"']]}
+];
+
+/* ============================================================
    3. SIMPLE WORLD MAP (coarse outlines, lon/lat)
    ============================================================ */
 var LAND=[
@@ -1671,6 +1823,7 @@ function draw(){
   dots=[];
   if(MODE==='civ'){ drawCivLayer(); return; }
   if(MODE==='won'){ drawWonLayer(); return; }
+  if(MODE==='place'){ drawPlaceLayer(); return; }
   COUNTRIES.forEach(function(c){
     var p=project(c.lon,c.lat);
     if(!p.vis) return;
@@ -1741,6 +1894,52 @@ function drawCivLayer(){
     ctx.fillStyle='rgba(255,255,255,.95)';
     roundRect(sp.x-tw/2-8, sp.y-40, tw+16, 24, 12); ctx.fill();
     ctx.fillStyle='#7a4b12'; ctx.textAlign='center'; ctx.fillText(label, sp.x, sp.y-23);
+    ctx.textAlign='start';
+  }
+}
+/* special places: an outline for the ones that are an area, a teal marker for each */
+var placeDots=[], placeIdx=0;
+function drawPlaceLayer(){
+  placeDots=[];
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  PLACES.forEach(function(v,i){
+    if(!v.poly) return;
+    var sel=i===placeIdx;
+    ctx.beginPath(); var st=false;
+    v.poly.forEach(function(pt){
+      var p=project(pt[0],pt[1]);
+      if(p.vis){ st?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); st=true; } else st=false;
+    });
+    ctx.lineWidth=sel?3:1.8;
+    ctx.setLineDash(sel?[6,4]:[3,3]);
+    ctx.strokeStyle=sel?'rgba(120,245,235,.95)':'rgba(170,240,235,.45)';
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+  ctx.lineCap='butt';
+  var order=[], i;
+  for(i=0;i<PLACES.length;i++) if(i!==placeIdx) order.push(i);
+  order.push(placeIdx);
+  order.forEach(function(k){
+    var v=PLACES[k], p=project(v.lon,v.lat); if(!p.vis) return;
+    placeDots.push({x:p.x,y:p.y,i:k});
+    var sel=k===placeIdx;
+    if(sel){
+      ctx.beginPath(); ctx.arc(p.x,p.y,10+Math.sin(Date.now()/300)*1.6,0,7);
+      ctx.fillStyle='rgba(90,230,215,.3)'; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(p.x,p.y,sel?6.5:4.2,0,7);
+    ctx.fillStyle=sel?'#4fe0d0':'rgba(150,240,232,.92)'; ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle=sel?'rgba(12,90,88,.9)':'rgba(255,255,255,.9)';
+    ctx.stroke();
+  });
+  var v=PLACES[placeIdx], sp=project(v.lon,v.lat);
+  if(sp.vis){
+    var label=v.kind+' '+(document.body.classList.contains('only-en')?v.en:v.zh);
+    ctx.font='bold 14px "Segoe UI","PingFang SC",sans-serif';
+    var tw=ctx.measureText(label).width;
+    ctx.fillStyle='rgba(255,255,255,.95)';
+    roundRect(sp.x-tw/2-8, sp.y-40, tw+16, 23, 11); ctx.fill();
+    ctx.fillStyle='#0d5f5c'; ctx.textAlign='center'; ctx.fillText(label, sp.x, sp.y-24);
     ctx.textAlign='start';
   }
 }
@@ -1857,6 +2056,12 @@ cv.addEventListener('pointerup',function(e){
       var bw=null, bwd=22;
       wonDots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bwd){bwd=dd;bw=d.i;} });
       if(bw!==null) pickWon(bw,true);
+      return;
+    }
+    if(MODE==='place'){
+      var bl=null, bld=24;
+      placeDots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bld){bld=dd;bl=d.i;} });
+      if(bl!==null) pickPlace(bl,true);
       return;
     }
     var best=null,bd=24;
@@ -1992,7 +2197,7 @@ function stepPlanes(dt){
 function drawPlanes(){
   planeLights.length=0; planeHits.length=0;
   /* civ mode keeps the globe clean — amber night-lights would read as civilisation markers */
-  if(!planesOn || MODE==='civ' || MODE==='won') return;
+  if(!planesOn || MODE==='civ' || MODE==='won' || MODE==='place') return;
   var N=12;
   for(var k=0;k<PLANES.length;k++){
     var pl=PLANES[k], head=Math.min(1,pl.t), tail=Math.max(0,pl.t-pl.tail);
@@ -2539,7 +2744,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
     cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
-var MODES=['learn','civ','won','hunt','animal','quiz','passport'];
+var MODES=['learn','civ','won','place','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
@@ -2552,6 +2757,7 @@ function setMode(m){
   if(m==='learn') renderDaily();
   if(m==='civ'){ renderCiv(); flyTo(CIVS[civIdx]); sayCiv(); }
   if(m==='won'){ renderWon(); flyTo(WONDERS[wonIdx]); sayWon(); }
+  if(m==='place'){ renderPlace(); flyTo(PLACES[placeIdx]); sayPlace(); }
   if(m==='hunt') startHunt();
   if(m==='quiz') startQuiz();
   if(m==='animal') startAnimal();
@@ -2766,6 +2972,55 @@ function pickWon(i,user){
   wonIdx=i; renderWon();
   flyTo(WONDERS[i]);
   if(user) sayWon();
+}
+
+/* ============================================================
+   6c. SPECIAL PLACES — the bits of the world that are not countries
+   ============================================================ */
+function renderPlace(){
+  var v=PLACES[placeIdx];
+  var h='<div class="wonIntro"><span class="emo">🧭</span><span class="stack">'+
+    T('地球上有些地方<b>不是国家</b> —— 有的是一片海，有的是沙漠、雨林和冰原，有的是城市和岛。它们一样很了不起。',
+      'Some places on Earth are <b>not countries</b> — patches of ocean, deserts, forests, ice, cities and islands. They are just as amazing.')+
+    '</span></div>';
+  h+='<div class="wonSel">'+PLACES.map(function(x,i){
+      return '<button class="btn'+(i===placeIdx?' on':'')+'" data-i="'+i+'">'+x.kind+' '+T(x.zh,x.en)+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="wonTop">'+placeSVG(v.art)+'<div><div class="cName stack">'+T(v.zh,v.en)+'</div>'+
+     '<div class="wonMeta stack">'+T(v.kind+' 这是<b>'+v.kZh+'</b>，不是国家',
+                                    v.kind+' <b>'+v.kEn+'</b>, not a country')+'</div>'+
+     '<div class="wonMeta stack">'+T('📍 '+v.whereZh,'📍 '+v.whereEn)+'</div></div></div>';
+  h+='<ul class="facts">'+v.f.map(function(f){
+      return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
+    }).join('')+'</ul>';
+  if(v.near){
+    var nc=byId(v.near);
+    h+='<div class="wonNow">'+flagSVG(nc.id)+'<span class="grow stack">'+
+       T('旁边的国家是 <b>'+nc.zh+'</b>','The country beside it is <b>'+nc.en+'</b>')+'</span>'+
+       '<button class="btn" id="placeGo">'+T('去看看','Visit')+'</button></div>';
+  }
+  h+='<div class="navRow"><button class="btn" id="plPrev">⬅️ '+T('上一个','Back')+'</button>'+
+     '<button class="btn" id="plSay">🔊 '+T('读给我听','Say it')+'</button>'+
+     '<button class="btn" id="plNext">'+T('下一个','Next')+' ➡️</button></div>';
+  document.getElementById('placePanel').innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll('#placePanel [data-i]'),function(b){
+    b.onclick=function(){ pickPlace(+b.dataset.i, true); };
+  });
+  document.getElementById('plPrev').onclick=function(){ pickPlace((placeIdx+PLACES.length-1)%PLACES.length,true); };
+  document.getElementById('plNext').onclick=function(){ pickPlace((placeIdx+1)%PLACES.length,true); };
+  document.getElementById('plSay').onclick=function(){ sayPlace(true); };
+  var go=document.getElementById('placeGo');
+  if(go) go.onclick=function(){ setMode('learn'); select(v.near,true); };
+}
+function sayPlace(force){
+  var v=PLACES[placeIdx];
+  sayList([[v.zh+'，'+v.whereZh, v.en+' — '+v.whereEn]]
+    .concat(v.f.map(function(f){ return [f[1],f[2]]; })), force);
+}
+function pickPlace(i,user){
+  placeIdx=i; renderPlace();
+  flyTo(PLACES[i]);
+  if(user) sayPlace();
 }
 
 /* ============================================================
