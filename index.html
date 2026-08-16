@@ -260,11 +260,12 @@
       <button class="btn" id="spinBtn">⏸ <span class="zh">暂停转动</span><span class="en">Pause</span></button>
       <button class="btn" id="findBtn">🎯 <span class="zh">飞到这个国家</span><span class="en">Fly there</span></button>
       <button class="btn on" id="dnBtn">🌗 <span class="zh">昼夜</span><span class="en">Day &amp; night</span></button>
+      <button class="btn on" id="planeBtn">✈️ <span class="zh">飞机</span><span class="en">Planes</span></button>
       <button class="btn" id="homeBtn">🏠 <span class="zh">回家看看</span><span class="en">Go home</span></button>
     </div>
     <p class="hint stack">
-      <span class="zh">用手指或鼠标拖动地球，转一转看看！点亮的小圆点就是国家。</span>
-      <span class="en">Drag the globe to spin it! Tap a glowing dot to visit a country.</span>
+      <span class="zh">拖动地球转一转！点亮的小圆点就是国家，点一点飞过的小飞机，看看它要飞去哪里。</span>
+      <span class="en">Drag the globe to spin it! Tap a glowing dot to visit a country, or tap a passing plane to see where it is going.</span>
     </p>
   </section>
 
@@ -1367,8 +1368,10 @@ function draw(){
   ctx.fillStyle=sh; ctx.fill();
   ctx.lineWidth=4; ctx.strokeStyle='#ffffff'; ctx.stroke();
 
-  // night side
+  // planes first, so the night mask dims the ones flying over the dark side
+  drawPlanes();
   drawNight();
+  drawPlaneLights();
 
   // ocean & sea names
   var onlyZh=document.body.classList.contains('only-zh'),
@@ -1478,7 +1481,11 @@ function showJourney(from,to,info){
   say(from.zh+V.zh+(info.ocean?'，跨过'+info.ocean.zhF:'')+'，到'+to.zh,
       'From '+from.en+' '+V.en+(info.ocean?', across '+info.ocean.enF:'')+', to '+to.en);
 }
+var lastTick=null;
 function tick(){
+  var now=performance.now();
+  stepPlanes(lastTick===null?16:Math.min(80,now-lastTick));
+  lastTick=now;
   if(journey){
     if(journey.start===null) journey.start=performance.now();
     var e=(performance.now()-journey.start)/journey.dur;
@@ -1518,7 +1525,12 @@ cv.addEventListener('pointerup',function(e){
     var r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
     var best=null,bd=24;
     dots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bd){bd=dd;best=d.c;} });
-    if(best){ if(MODE==='hunt') huntPick(best); else select(best.id,true); }
+    if(best){ if(MODE==='hunt') huntPick(best); else select(best.id,true); return; }
+    if(MODE==='learn'){          // no country there — maybe they tapped a passing plane
+      var bp=null, bpd=20;
+      planeHits.forEach(function(h){ var dd=Math.hypot(h.x-mx,h.y-my); if(dd<bpd){bpd=dd;bp=h.pl;} });
+      if(bp) showPlaneInfo(bp);
+    }
   }
 });
 
@@ -1609,6 +1621,97 @@ var DAYPART=[
  [24,'😴','很晚了，该睡觉了','late — time for bed']
 ];
 function dayPart(h){ for(var i=0;i<DAYPART.length;i++) if(h<DAYPART[i][0]) return DAYPART[i]; return DAYPART[8]; }
+
+/* how high is the sun above the horizon at this spot? <0 means night */
+function sunDot(lon,lat){
+  var ll=sunNow(), S=toVec(ll.lon,ll.lat), V=toVec(lon,lat);
+  return S[0]*V[0]+S[1]*V[1]+S[2]*V[2];
+}
+
+/* ============================================================
+   4b2. AIR TRAFFIC — little planes crossing the globe, trailing contrails
+   ============================================================ */
+var planesOn=true;
+try{ planesOn=localStorage.getItem('we_planes_v1')!=='0'; }catch(e){}
+var PLANES=[], MAXPLANES=7, planeLights=[], planeHits=[];
+function makePlane(seeded){
+  var a,b,dist,tries=0;
+  do{
+    a=COUNTRIES[(Math.random()*COUNTRIES.length)|0];
+    do{ b=COUNTRIES[(Math.random()*COUNTRIES.length)|0]; }while(b===a);
+    dist=kmBetween(a,b);
+  }while(dist<2500 && ++tries<12);
+  return {A:toVec(a.lon,a.lat), B:toVec(b.lon,b.lat), from:a, to:b, dist:dist,
+          t:seeded?Math.random():0, dur:9000+dist*2.4, tail:0.10+Math.random()*0.08};
+}
+function stepPlanes(dt){
+  if(!planesOn){ if(PLANES.length) PLANES.length=0; return; }
+  while(PLANES.length<MAXPLANES) PLANES.push(makePlane(true));
+  for(var i=0;i<PLANES.length;i++){
+    PLANES[i].t+=dt/PLANES[i].dur;
+    if(PLANES[i].t-PLANES[i].tail>=1) PLANES[i]=makePlane(false);
+  }
+}
+/* drawn before the night shading, so a plane over the dark side dims like everything else */
+function drawPlanes(){
+  planeLights.length=0; planeHits.length=0;
+  if(!planesOn) return;
+  var N=12;
+  for(var k=0;k<PLANES.length;k++){
+    var pl=PLANES[k], head=Math.min(1,pl.t), tail=Math.max(0,pl.t-pl.tail);
+    if(tail>=1) continue;
+    var pts=[], i, s, ll;
+    for(i=0;i<=N;i++){
+      s=tail+(head-tail)*i/N; ll=gcPoint(pl.A,pl.B,s);
+      pts.push({ll:ll, p:project(ll[0],ll[1])});
+    }
+    ctx.lineCap='round'; ctx.lineWidth=1.9;
+    for(i=1;i<=N;i++){
+      if(!pts[i-1].p.vis||!pts[i].p.vis) continue;
+      ctx.beginPath(); ctx.moveTo(pts[i-1].p.x,pts[i-1].p.y); ctx.lineTo(pts[i].p.x,pts[i].p.y);
+      ctx.strokeStyle='rgba(255,255,255,'+(0.07+0.68*i/N).toFixed(3)+')'; ctx.stroke();
+    }
+    ctx.lineCap='butt';
+    var h=pts[N], hb=pts[N-1];
+    if(head>=1 || !h.p.vis) continue;
+    ctx.save();
+    ctx.translate(h.p.x,h.p.y);
+    ctx.rotate(Math.atan2(h.p.y-hb.p.y, h.p.x-hb.p.x));
+    ctx.beginPath();                    // little top-down plane: nose, swept wings, tailplane
+    ctx.moveTo(6.2,0);
+    ctx.lineTo(0.6,1.5); ctx.lineTo(-2.2,4.6); ctx.lineTo(-3.4,4.6); ctx.lineTo(-2.6,1.4);
+    ctx.lineTo(-5,1.1); ctx.lineTo(-6,2.6); ctx.lineTo(-6.6,2.6); ctx.lineTo(-6.2,0);
+    ctx.lineTo(-6.6,-2.6); ctx.lineTo(-6,-2.6); ctx.lineTo(-5,-1.1); ctx.lineTo(-2.6,-1.4);
+    ctx.lineTo(-3.4,-4.6); ctx.lineTo(-2.2,-4.6); ctx.lineTo(0.6,-1.5);
+    ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,.97)'; ctx.fill();
+    ctx.lineWidth=0.8; ctx.strokeStyle='rgba(25,65,115,.5)'; ctx.stroke();
+    ctx.restore();
+    planeHits.push({x:h.p.x, y:h.p.y, pl:pl});
+    if(dayNight && sunDot(h.ll[0],h.ll[1])<-0.02) planeLights.push(h.p);
+  }
+}
+/* the blinking lights go on top of the night mask so they actually twinkle */
+function drawPlaneLights(){
+  if(!planeLights.length) return;
+  var on=(Date.now()%1300)<430;
+  for(var i=0;i<planeLights.length;i++){
+    ctx.beginPath(); ctx.arc(planeLights[i].x,planeLights[i].y,on?2.8:1.5,0,7);
+    ctx.fillStyle=on?'rgba(255,222,130,.95)':'rgba(255,196,96,.45)';
+    ctx.fill();
+  }
+}
+function showPlaneInfo(pl){
+  var box=document.getElementById('journey');
+  box.className='stack show';
+  box.innerHTML=T('<span class="veh">✈️</span><br>这架飞机从 <b>'+pl.from.zh+'</b> 飞去 <b>'+pl.to.zh+'</b><br>'+
+                  '<small>大约 '+pl.dist.toLocaleString()+' 公里</small>',
+                  '<span class="veh">✈️</span><br>This plane is flying from <b>'+pl.from.en+'</b> to <b>'+pl.to.en+'</b><br>'+
+                  '<small>about '+pl.dist.toLocaleString()+' km</small>');
+  say('这架飞机从'+pl.from.zh+'飞去'+pl.to.zh,
+      'This plane is flying from '+pl.from.en+' to '+pl.to.en);
+  hideJourneyLater();
+}
 
 /* ============================================================
    4c. MY HOME — distances and size comparisons from where you live
@@ -1916,6 +2019,11 @@ document.getElementById('dnBtn').onclick=function(){
   dayNight=!dayNight;
   this.classList.toggle('on',dayNight);
   try{ localStorage.setItem('we_daynight_v1',dayNight?'1':'0'); }catch(e){}
+};
+document.getElementById('planeBtn').onclick=function(){
+  planesOn=!planesOn;
+  this.classList.toggle('on',planesOn);
+  try{ localStorage.setItem('we_planes_v1',planesOn?'1':'0'); }catch(e){}
 };
 document.getElementById('homeBtn').onclick=function(){
   var h=homeC();
@@ -2256,6 +2364,7 @@ function renderAnimalEnd(){
    ============================================================ */
 document.body.classList.add('m-learn');
 document.getElementById('dnBtn').classList.toggle('on',dayNight);
+document.getElementById('planeBtn').classList.toggle('on',planesOn);
 resize(); renderTabs(); renderGrid(); renderCard(); renderDaily(); updateBadge(); flyTo(current); tick();
 setTimeout(resize, 60);
 /* ask once where home is — never nag again if it is skipped */
