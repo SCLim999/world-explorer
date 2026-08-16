@@ -132,6 +132,24 @@
   .wonFate{margin-top:12px;background:#fff5ef;border-radius:16px;padding:10px 14px;font-size:15px;
     line-height:1.4;display:flex;gap:9px;align-items:flex-start}
   .wonFate .emo{font-size:22px;flex:none}
+
+  /* ---------- CSS 3D models ---------- */
+  .m3d{position:relative;width:100%;max-width:260px;height:252px;margin:4px auto 10px;
+    perspective:640px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+  .m3d:active{cursor:grabbing}
+  .m3d.sm{max-width:172px;height:196px;margin:0}
+  /* the scene stops short of the bottom so the "drag me" tip never sits on the model */
+  .m3dScene{position:absolute;left:0;top:0;right:0;bottom:30px;transform-style:preserve-3d}
+  /* the idle spin is a CSS animation, so the compositor runs it instead of the main thread */
+  .m3dSpin{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;
+    animation:m3dspin 26s linear infinite}
+  @keyframes m3dspin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+  @media (prefers-reduced-motion:reduce){.m3dSpin{animation:none}}
+  .m3dScene .f3{position:absolute;left:50%;top:50%;display:block}
+  .m3dScene .tilt{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d}
+  .m3dTip{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:12.5px;color:var(--ink2)}
+  .m3d.sm .m3dTip{font-size:11px}
+  .trio button .d3{display:block;font-size:11px;font-weight:bold;color:#b9761a;margin-top:2px}
   .civTime{margin-top:16px;padding:6px 10px 4px}
   .civTime .lab{font-size:13px;color:var(--ink2);text-align:center;margin-bottom:20px}
   .civTime .rail{position:relative;height:6px;border-radius:999px;
@@ -1523,6 +1541,7 @@ function routeInfo(a,b){
    4. GLOBE
    ============================================================ */
 var cv=document.getElementById('globe'), ctx=cv.getContext('2d');
+var detailBox=document.getElementById('detail');
 var rot={lon:100,lat:15}, target=null, spinning=true, dragging=false, last=null;
 var MODE='learn', huntReveal=false;
 var W=0,H=0,CX=0,CY=0,RR=0, dots=[];
@@ -1807,7 +1826,7 @@ function tick(){
     rot.lon+=0.25;
   }
   if(rot.lon>180)rot.lon-=360; if(rot.lon<-180)rot.lon+=360;
-  draw();
+  if(!detailBox.classList.contains('show')) draw();   // globe is covered by the close-up
   requestAnimationFrame(tick);
 }
 function flyTo(c){ target={lon:c.lon, lat:Math.max(-60,Math.min(60,c.lat))}; }
@@ -2153,6 +2172,220 @@ function noteDaily(id){
 }
 
 /* ============================================================
+   4f. 3D MODELS — real CSS 3D solids, no library, works offline
+   Every solid is built from flat <i> faces placed in space with translate3d;
+   the parent keeps transform-style:preserve-3d, so the browser does the
+   perspective and the depth sorting for us.
+   ============================================================ */
+function mul(hex,f){                       /* shade a face so the solid reads as solid */
+  var n=parseInt(hex.slice(1),16), r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  function c(v){ v=Math.round(v*f); return v<0?0:(v>255?255:v); }
+  return '#'+((1<<24)+(c(r)<<16)+(c(g)<<8)+c(b)).toString(16).slice(1);
+}
+function f3(w,h,col,tr,clip){              /* face anchored at its centre */
+  return '<i class="f3" style="width:'+w.toFixed(1)+'px;height:'+h.toFixed(1)+'px;background:'+col+
+    ';margin-left:'+(-w/2).toFixed(1)+'px;margin-top:'+(-h/2).toFixed(1)+'px;transform:'+tr+
+    (clip?';clip-path:'+clip:'')+'"></i>';
+}
+function f3b(w,h,col,tr,clip){             /* face anchored at its bottom edge */
+  return '<i class="f3" style="width:'+w.toFixed(1)+'px;height:'+h.toFixed(1)+'px;background:'+col+
+    ';margin-left:'+(-w/2).toFixed(1)+'px;margin-top:'+(-h).toFixed(1)+'px;transform-origin:50% 100%;transform:'+tr+
+    (clip?';clip-path:'+clip:'')+'"></i>';
+}
+function at(o,cy){ return 'translate3d('+(o.x||0)+'px,'+(-cy)+'px,'+(o.z||0)+'px) '; }
+/* y is always the BOTTOM of a solid, so pieces stack by adding heights */
+function box(o){
+  var w=o.w, h=o.h, d=o.d===undefined?o.w:o.d, c=o.c, b=at(o,(o.y||0)+h/2);
+  return f3(w,h,mul(c,.92),b+'translateZ('+(d/2)+'px)')+
+         f3(w,h,mul(c,.60),b+'rotateY(180deg) translateZ('+(d/2)+'px)')+
+         f3(d,h,mul(c,.78),b+'rotateY(90deg) translateZ('+(w/2)+'px)')+
+         f3(d,h,mul(c,.68),b+'rotateY(-90deg) translateZ('+(w/2)+'px)')+
+         f3(w,d,mul(c,1.08),b+'rotateX(90deg) translateZ('+(h/2)+'px)');
+}
+var TRI='polygon(50% 0,100% 100%,0 100%)';
+function pyr(o){
+  var w=o.w, h=o.h, d=o.d===undefined?o.w:o.d, c=o.c, b=at(o,o.y||0);
+  var sf=Math.sqrt(h*h+d*d/4), tf=Math.atan2(d/2,h)*180/Math.PI;
+  var ss=Math.sqrt(h*h+w*w/4), ts=Math.atan2(w/2,h)*180/Math.PI;
+  return f3b(w,sf,mul(c,.95),b+'translateZ('+(d/2)+'px) rotateX('+tf.toFixed(2)+'deg)',TRI)+
+         f3b(w,sf,mul(c,.58),b+'rotateY(180deg) translateZ('+(d/2)+'px) rotateX('+tf.toFixed(2)+'deg)',TRI)+
+         f3b(d,ss,mul(c,.80),b+'rotateY(90deg) translateZ('+(w/2)+'px) rotateX('+ts.toFixed(2)+'deg)',TRI)+
+         f3b(d,ss,mul(c,.70),b+'rotateY(-90deg) translateZ('+(w/2)+'px) rotateX('+ts.toFixed(2)+'deg)',TRI);
+}
+function cyl(o){
+  var r=o.r, h=o.h, n=o.n||10, c=o.c, b=at(o,(o.y||0)+h/2), s='', i;
+  var ap=r*Math.cos(Math.PI/n), fw=2*r*Math.sin(Math.PI/n)+0.5;
+  for(i=0;i<n;i++){
+    var a=i*360/n, lit=.60+.40*Math.max(0,Math.cos((a-25)*Math.PI/180));
+    s+=f3(fw,h,mul(c,lit),b+'rotateY('+a.toFixed(1)+'deg) translateZ('+ap.toFixed(1)+'px)');
+  }
+  if(o.cap===false) return s;
+  return s+f3(2*r,2*r,mul(c,1.08),b+'rotateX(90deg) translateZ('+(h/2)+'px)','circle(50%)');
+}
+/* gable roof: pediment triangles face front and back, ridge runs along the depth */
+function gable(o){
+  var w=o.w, h=o.h, d=o.d, c=o.c, b=at(o,o.y||0);
+  var L=Math.sqrt(h*h+w*w/4), t=Math.atan2(w/2,h)*180/Math.PI;
+  return f3b(w,h,mul(c,1.04),b+'translateZ('+(d/2)+'px)',TRI)+
+         f3b(w,h,mul(c,.70), b+'rotateY(180deg) translateZ('+(d/2)+'px)',TRI)+
+         f3b(d,L,mul(c,.96), b+'rotateY(90deg) translateZ('+(w/2)+'px) rotateX('+t.toFixed(2)+'deg)')+
+         f3b(d,L,mul(c,.80), b+'rotateY(-90deg) translateZ('+(w/2)+'px) rotateX('+t.toFixed(2)+'deg)');
+}
+/* a colonnaded temple, shared by the Parthenon and the Temple of Artemis */
+function temple(o){
+  var w=o.w, d=o.d, ch=o.ch, c=o.c||'#f2ede0', r=o.r||5, i, s;
+  s = box({w:w+16,h:4,d:d+16,y:0,c:'#d2cbb2'})+box({w:w+8,h:4,d:d+8,y:4,c:'#ded7c0'})+
+      box({w:w,h:4,d:d,y:8,c:'#e8e2d2'});
+  s+= box({w:w-26,h:ch,d:d-24,y:12,c:mul(c,.86)});
+  for(i=0;i<o.n;i++){
+    var x=-w/2+9+i*((w-18)/(o.n-1));
+    s+=cyl({r:r,h:ch,y:12,x:x,z:d/2-8,c:c,n:5,cap:false})+cyl({r:r,h:ch,y:12,x:x,z:-(d/2-8),c:c,n:5,cap:false});
+  }
+  for(i=1;i<o.m-1;i++){
+    var z=-(d/2-8)+i*((d-16)/(o.m-1));
+    s+=cyl({r:r,h:ch,y:12,x:-(w/2-9),z:z,c:c,n:5,cap:false})+cyl({r:r,h:ch,y:12,x:(w/2-9),z:z,c:c,n:5,cap:false});
+  }
+  return s+box({w:w+3,h:6,d:d+3,y:12+ch,c:'#e6dfcd'})+gable({w:w+4,h:11,d:d+4,y:18+ch,c:'#f6f2e6'});
+}
+
+var MODELS={
+ pyramid:function(){
+   return box({w:112,h:5,d:112,y:0,c:'#e0cf9a'})+
+     pyr({w:90,h:64,y:5,c:'#e6cf8e'})+
+     pyr({w:50,h:36,y:5,x:56,z:-42,c:'#dcc484'})+
+     pyr({w:32,h:23,y:5,x:-54,z:-46,c:'#d5bc78'});
+ },
+ chichen:function(){
+   var s=box({w:106,h:4,d:106,y:0,c:'#a9c48a'}), i;
+   for(i=0;i<6;i++) s+=box({w:86-i*11,h:9,d:86-i*11,y:4+i*9,c:i%2?'#cbb68f':'#c0a97e'});
+   for(i=0;i<6;i++) s+=box({w:15,h:9,d:4,y:4+i*9,z:(86-i*11)/2+2,c:'#b9a47d'});
+   return s+box({w:26,h:17,d:26,y:58,c:'#d6c39c'})+box({w:29,h:3,d:29,y:75,c:'#c2ae86'});
+ },
+ boro:function(){
+   var s=box({w:112,h:4,d:112,y:0,c:'#a9c48a'}), i, r=[26,20,14];
+   for(i=0;i<4;i++) s+=box({w:96-i*15,h:8,d:96-i*15,y:4+i*8,c:i%2?'#a8a196':'#b0a99e'});
+   for(i=0;i<3;i++) s+=cyl({r:r[i],h:7,y:36+i*7,c:'#b3aca0',n:14});
+   return s+cyl({r:7,h:9,y:57,c:'#bbb4a7',n:10})+pyr({w:11,h:10,y:66,c:'#c6bfb2'});
+ },
+ gwall:function(){
+   var s=box({w:132,h:6,d:72,y:0,c:'#84c07a'}), i;
+   s+=box({w:126,h:20,d:17,y:6,c:'#c3b294'});
+   for(i=0;i<13;i++) s+=box({w:6,h:5,d:17,y:26,x:-57+i*9.5,c:'#ad9970'});
+   [-50,50].forEach(function(x){
+     s+=box({w:21,h:30,d:21,y:6,x:x,c:'#ad9970'})+box({w:25,h:4,d:25,y:36,x:x,c:'#8d7a58'});
+   });
+   return s;
+ },
+ twin:function(){
+   var s=box({w:124,h:5,d:84,y:0,c:'#9fd3a8'});
+   [-30,30].forEach(function(x){
+     s+=box({w:25,h:42,d:25,y:5,x:x,c:'#a8bdd1'})+box({w:20,h:21,d:20,y:47,x:x,c:'#b8cbdd'})+
+        box({w:14,h:12,d:14,y:68,x:x,c:'#c9d9e6'})+box({w:3,h:15,d:3,y:80,x:x,c:'#7d94aa'});
+   });
+   return s+box({w:35,h:3.5,d:7,y:44,c:'#cbd9e5'});
+ },
+ burj:function(){
+   var s=box({w:112,h:5,d:112,y:0,c:'#e8d9a8'}), wd=[46,38,31,25,19,14,10], y=5, i;
+   for(i=0;i<wd.length;i++){ s+=box({w:wd[i],h:13,d:wd[i],y:y,c:i%2?'#b9c6d2':'#c6d2dc'}); y+=13; }
+   return s+box({w:3.5,h:22,d:3.5,y:y,c:'#8d949c'});
+ },
+ pisa:function(){
+   var t=cyl({r:20,h:64,y:0,c:'#f0ebde',n:14}), i;
+   for(i=0;i<5;i++) t+=cyl({r:21.5,h:2.6,y:9+i*11,c:'#d8cfba',n:14});
+   t+=cyl({r:15,h:9,y:64,c:'#e4dcc8',n:14});
+   return box({w:104,h:5,d:104,y:0,c:'#9fd3a8'})+
+     '<div class="tilt" style="transform:rotateZ(-5.5deg)">'+t+'</div>';
+ },
+ parthenon:function(){ return temple({w:62,d:96,ch:34,n:6,m:6,r:4.8}); },
+ wTemple:function(){ return temple({w:70,d:108,ch:38,n:7,m:7,r:5,c:'#f4efe2'}); },
+ wTomb:function(){
+   var s=box({w:104,h:4,d:104,y:0,c:'#c8cfa8'})+box({w:82,h:32,d:82,y:4,c:'#ded6c0'}), i, p;
+   for(i=0;i<5;i++){
+     p=-32+i*16;
+     s+=cyl({r:4.6,h:24,y:36,x:p,z:34,c:'#f0ebde',n:5,cap:false})+cyl({r:4.6,h:24,y:36,x:p,z:-34,c:'#f0ebde',n:5,cap:false});
+     if(i>0&&i<4) s+=cyl({r:4.6,h:24,y:36,x:34,z:p,c:'#f0ebde',n:5,cap:false})+cyl({r:4.6,h:24,y:36,x:-34,z:p,c:'#f0ebde',n:5,cap:false});
+   }
+   s+=box({w:80,h:6,d:80,y:60,c:'#e6dfcd'});
+   for(i=0;i<5;i++) s+=box({w:68-i*12,h:5,d:68-i*12,y:66+i*5,c:i%2?'#dcd3ba':'#e4dbc4'});
+   return s+box({w:11,h:11,d:11,y:91,c:'#c9bda0'});
+ },
+ wPharos:function(){
+   var s=box({w:112,h:5,d:112,y:0,c:'#7fc9e0'})+box({w:64,h:6,d:64,y:5,c:'#c9bda0'}), i;
+   for(i=0;i<5;i++) s+=box({w:50-i*5,h:9,d:50-i*5,y:11+i*9,c:i%2?'#e6dfcd':'#ece6d6'});
+   return s+cyl({r:14,h:24,y:56,c:'#efe9d8',n:8})+cyl({r:8.5,h:13,y:80,c:'#ded5bd',n:10})+
+     cyl({r:5,h:7,y:93,c:'#ffb03c',n:8})+cyl({r:2.6,h:5,y:100,c:'#ffd54a',n:6});
+ },
+ wGarden:function(){
+   var s=box({w:112,h:4,d:112,y:0,c:'#dcc9a0'}), wd=[92,76,60,44], y=4, i;
+   for(i=0;i<4;i++){
+     s+=box({w:wd[i],h:12,d:wd[i],y:y,c:'#c2a578'})+box({w:wd[i]-3,h:3.5,d:wd[i]-3,y:y+12,c:'#63b56a'});
+     y+=15.5;
+   }
+   return s+box({w:28,h:10,d:28,y:y,c:'#e0c497'})+box({w:26,h:3.5,d:26,y:y+10,c:'#74c47a'});
+ }
+};
+MODELS.wPyr=MODELS.pyramid;      /* the Great Pyramid is both a landmark and a wonder */
+MODELS.civEg=MODELS.pyramid;
+/* w = ground footprint once rotated, h = total height — used to frame each model in its stage,
+   so a long low wall and a tall thin tower both fill the box nicely */
+var M3SIZE={
+ pyramid:{w:146,h:69}, chichen:{w:138,h:78}, boro:{w:146,h:76},     gwall:{w:172,h:40},
+ twin:{w:161,h:95},    burj:{w:146,h:118},   pisa:{w:135,h:73},     parthenon:{w:146,h:63},
+ wTemple:{w:161,h:67}, wTomb:{w:135,h:102},  wPharos:{w:146,h:105}, wGarden:{w:146,h:79}
+};
+M3SIZE.wPyr=M3SIZE.pyramid; M3SIZE.civEg=M3SIZE.pyramid;
+function has3D(k){ return !!MODELS[k]; }
+function stage3D(k,small){
+  return '<div class="m3d'+(small?' sm':'')+'" data-m3d="'+k+'"><div class="m3dScene"><div class="m3dSpin">'+
+         MODELS[k]()+'</div></div>'+
+         '<div class="m3dTip stack">'+T('👆 用手指转一转','👆 drag to spin')+'</div></div>';
+}
+var m3d=null;
+var SPIN_MS=26000;
+function mount3D(root){
+  unmount3D();
+  var el=root.querySelector('.m3d'); if(!el) return;
+  var sc=el.querySelector('.m3dScene'), sp=el.querySelector('.m3dSpin');
+  var sz=M3SIZE[el.dataset.m3d]||{w:150,h:80};
+  var bw=sc.clientWidth||220, bh=sc.clientHeight||200;
+  var sk=Math.min(0.94*bw/sz.w, 0.76*bh/sz.h);
+  var lift=sz.h*sk/2-6;                      /* put the model's middle on the stage's middle */
+  m3d={el:el, sp:sp, rx:-14, ry:-26, from:-26, t0:performance.now(), drag:false, last:null};
+  function tilt(){
+    sc.style.transform='translateY('+lift.toFixed(1)+'px) rotateX('+m3d.rx.toFixed(2)+
+      'deg) scale('+sk.toFixed(3)+')';
+  }
+  /* hand the spin back to CSS, starting from the angle it is at right now */
+  function autoSpin(a){
+    m3d.from=a; m3d.t0=performance.now();
+    sp.style.animation='none'; void sp.offsetWidth;
+    sp.style.transform='';
+    sp.style.animation='m3dspin '+(SPIN_MS/1000)+'s linear infinite';
+    sp.style.animationDelay=(-((((a%360)+360)%360)/360)*(SPIN_MS/1000)).toFixed(3)+'s';
+  }
+  function angleNow(){ return m3d.from+(performance.now()-m3d.t0)/SPIN_MS*360; }
+  el.addEventListener('pointerdown',function(e){
+    if(!m3d) return;
+    m3d.ry=angleNow(); m3d.drag=true; m3d.last={x:e.clientX,y:e.clientY};
+    sp.style.animation='none';
+    sp.style.transform='rotateY('+m3d.ry.toFixed(2)+'deg)';
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  el.addEventListener('pointermove',function(e){
+    if(!m3d||!m3d.drag) return;
+    m3d.ry+=(e.clientX-m3d.last.x)*0.55;
+    m3d.rx=Math.max(-72,Math.min(18,m3d.rx-(e.clientY-m3d.last.y)*0.4));
+    m3d.last={x:e.clientX,y:e.clientY};
+    sp.style.transform='rotateY('+m3d.ry.toFixed(2)+'deg)';
+    tilt();
+  });
+  function up(){ if(m3d&&m3d.drag){ m3d.drag=false; autoSpin(m3d.ry); } }
+  el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+  tilt(); autoSpin(-26);
+}
+function unmount3D(){ m3d=null; }
+
+/* ============================================================
    5. UI
    ============================================================ */
 var current=COUNTRIES[0], filter='all';
@@ -2174,7 +2407,8 @@ function renderCard(){
   var x=EXTRA[c.id];
   html+='<div class="trio">'+
     '<button data-s="lm"><div class="lbl stack">'+T('🏛️ 地标','🏛️ LANDMARK')+'</div>'+lmSVG(x.lm[0])+
-      '<div class="nm stack">'+T(x.lm[1],x.lm[2])+'</div></button>'+
+      '<div class="nm stack">'+T(x.lm[1],x.lm[2])+'</div>'+
+      (has3D(x.lm[0])?'<span class="d3 stack">'+T('🧊 点开看 3D','🧊 tap for 3D')+'</span>':'')+'</button>'+
     '<button data-s="an"><div class="lbl stack">'+T('🐾 代表动物','🐾 ANIMAL')+'</div><div class="emo">'+x.an[0]+'</div>'+
       '<div class="nm stack">'+T(x.an[1],x.an[2])+'</div></button>'+
     '<button data-s="fl"><div class="lbl stack">'+T('🌸 国花','🌸 FLOWER')+'</div>'+flSVG(x.fl[0])+
@@ -2229,6 +2463,7 @@ var KINDS={
 function openDetail(kind){
   var c=current, x=EXTRA[c.id], facts=DETAIL[c.id][kind], item=x[kind];
   var pic = kind==='an' ? '<div class="bigEmo">'+item[0]+'</div>'
+          : (kind==='lm' && has3D(item[0])) ? stage3D(item[0])
           : (kind==='lm' ? lmSVG(item[0]) : flSVG(item[0])).replace('class="pic"','class="big"');
   var html='<div class="dcard">'+
     '<div class="kind stack">'+T(KINDS[kind].zh,KINDS[kind].en)+'</div>'+pic+
@@ -2241,6 +2476,7 @@ function openDetail(kind){
     '<button class="btn big" id="dClose">👍 '+T('知道啦','Got it')+'</button></div></div>';
   var box=document.getElementById('detail');
   box.innerHTML=html; box.classList.add('show');
+  mount3D(box);
   var lines=[[item[1],item[2]]].concat(facts.map(function(f){ return [f[1],f[2]]; }));
   sayList(lines,true);
   document.getElementById('dSay').onclick=function(){ sayList(lines,true); };
@@ -2249,6 +2485,7 @@ function openDetail(kind){
 }
 function closeDetail(){
   document.getElementById('detail').classList.remove('show');
+  unmount3D();
   if(window.speechSynthesis) speechSynthesis.cancel();
 }
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeDetail(); });
@@ -2426,7 +2663,8 @@ function renderCiv(){
   h+='<div class="civSel">'+CIVS.map(function(c,i){
       return '<button class="btn'+(i===civIdx?' on':'')+'" data-i="'+i+'">🏺 '+T(c.zh,c.en)+'</button>';
     }).join('')+'</div>';
-  h+='<div class="civTop">'+civSVG(v.art)+'<div><div class="cName stack">'+T(v.zh,v.en)+'</div>'+
+  h+='<div class="civTop">'+(has3D(v.art)?stage3D(v.art,true):civSVG(v.art))+
+     '<div><div class="cName stack">'+T(v.zh,v.en)+'</div>'+
      '<div class="civMeta stack">'+T('🌊 靠着 <b>'+v.rvZh+'</b>','🌊 beside <b>'+v.rvEn+'</b>')+'</div>'+
      '<div class="civMeta stack">'+T('⏳ 大约 <b>'+v.ago.toLocaleString()+'</b> 年前开始',
                                      '⏳ began about <b>'+v.ago.toLocaleString()+'</b> years ago')+'</div></div></div>';
@@ -2446,7 +2684,9 @@ function renderCiv(){
   h+='<div class="navRow"><button class="btn" id="civPrev">⬅️ '+T('上一个','Back')+'</button>'+
      '<button class="btn" id="civSay">🔊 '+T('读给我听','Say it')+'</button>'+
      '<button class="btn" id="civNext">'+T('下一个','Next')+' ➡️</button></div>';
-  document.getElementById('civPanel').innerHTML=h;
+  var cpanel=document.getElementById('civPanel');
+  cpanel.innerHTML=h;
+  mount3D(cpanel);
   Array.prototype.forEach.call(document.querySelectorAll('#civPanel [data-i]'),function(b){
     b.onclick=function(){ pickCiv(+b.dataset.i, true); };
   });
@@ -2483,7 +2723,8 @@ function renderWon(){
       return '<button class="btn'+(i===wonIdx?' on':'')+(x.here?'':' gone')+'" data-i="'+i+'">'+
              (x.here?'✅ ':'💨 ')+T(x.shZh,x.shEn||x.en)+'</button>';
     }).join('')+'</div>';
-  h+='<div class="wonTop">'+wonSVG(w.art)+'<div><div class="cName stack">'+T(w.zh,w.en)+'</div>'+
+  h+='<div class="wonTop">'+(has3D(w.art)?stage3D(w.art,true):wonSVG(w.art))+
+     '<div><div class="cName stack">'+T(w.zh,w.en)+'</div>'+
      '<div class="wonMeta stack">'+T('📍 在今天的 <b>'+w.whereZh+'</b>','📍 in what is now <b>'+w.whereEn+'</b>')+'</div>'+
      '<div class="wonMeta stack">'+T('⏳ 大约公元前 <b>'+w.bc+'</b> 年（'+yearsAgo(w.bc)+' 年前）',
                                      '⏳ about <b>'+w.bc+' BC</b> ('+yearsAgo(w.bc)+' years ago)')+'</div>'+
@@ -2503,7 +2744,9 @@ function renderWon(){
   h+='<div class="navRow"><button class="btn" id="wonPrev">⬅️ '+T('上一个','Back')+'</button>'+
      '<button class="btn" id="wonSay">🔊 '+T('读给我听','Say it')+'</button>'+
      '<button class="btn" id="wonNext">'+T('下一个','Next')+' ➡️</button></div>';
-  document.getElementById('wonPanel').innerHTML=h;
+  var panel=document.getElementById('wonPanel');
+  panel.innerHTML=h;
+  mount3D(panel);
   Array.prototype.forEach.call(document.querySelectorAll('#wonPanel [data-i]'),function(b){
     b.onclick=function(){ pickWon(+b.dataset.i, true); };
   });
