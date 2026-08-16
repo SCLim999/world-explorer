@@ -141,6 +141,21 @@
   .cert{margin-top:14px;border:5px double #e0a93c;border-radius:18px;background:linear-gradient(180deg,#fffdf5,#fff6e0);padding:18px;text-align:center}
   .cert .big{font-size:40px}
   .cert .t{font-size:22px;font-weight:bold;margin-top:6px}
+  /* ---------- close-up ---------- */
+  #detail{position:fixed;inset:0;background:rgba(20,45,75,.55);display:none;align-items:center;
+    justify-content:center;z-index:80;padding:16px}
+  #detail.show{display:flex}
+  .dcard{background:var(--card);border-radius:26px;max-width:470px;width:100%;max-height:88vh;overflow:auto;
+    padding:22px 20px;box-shadow:0 20px 50px rgba(0,0,0,.32);animation:pop .3s ease-out;text-align:center}
+  .dcard .kind{font-size:12px;font-weight:bold;color:var(--ink2);letter-spacing:1.5px}
+  .dcard .big{width:100%;max-width:180px;margin:6px auto;display:block}
+  .dcard .bigEmo{font-size:104px;line-height:1.15}
+  .dcard h3{font-size:27px;margin:4px 0 0;line-height:1.2}
+  .dcard h3 .en{font-size:18px;color:var(--ink2);font-weight:normal}
+  .dcard .where{font-size:14px;color:var(--ink2);margin-top:4px}
+  .dcard .facts{text-align:left;margin-top:16px}
+  .dcard .facts li{font-size:17px}
+  .drow{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
   #stampFx{position:fixed;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none;z-index:70}
   #stampFx.show{display:flex}
   #stampFx .big{width:206px;height:206px;border-radius:50%;border:6px solid #d2544e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.95);box-shadow:0 10px 30px rgba(0,0,0,.28);animation:thump .8s ease-out}
@@ -217,6 +232,7 @@
 
 <canvas id="confetti"></canvas>
 <div id="stampFx"></div>
+<div id="detail"></div>
 
 <footer class="stack">
   <span class="zh">一年级小朋友的世界地理小课堂 · 24 个国家 · 一起认识地球上的朋友吧！</span>
@@ -608,6 +624,130 @@ var EXTRA={
  nz:{lm:['skytower','天空塔','Sky Tower'],   an:['🐦','奇异鸟','Kiwi Bird'],    fl:['puff,0,#e8384f,#f2c230','圣诞红花','Pōhutukawa']}
 };
 
+/* close-up knowledge: [emoji, 中文, English] */
+var DETAIL={
+ cn:{lm:[['📏','它有两万多公里长，是世界上最长的墙','Over 20,000 km long — the longest wall on Earth'],
+         ['👷','两千多年前，古人就一块砖一块砖地开始建了','People began building it more than 2,000 years ago']],
+     an:[['🎋','一天要花十几个小时吃竹子','It eats bamboo for more than 10 hours a day'],
+         ['👶','刚出生时只有一支粉笔那么大','A newborn panda is as small as a piece of chalk']],
+     fl:[['👑','被人们叫做「花中之王」','People call it the king of flowers']]},
+ jp:{lm:[['🏔️','高 3776 米，是日本最高的山','3,776 m high — the tallest mountain in Japan'],
+         ['❄️','山顶一年有大半年盖着白雪','Snow covers its top for most of the year']],
+     an:[['🙇','奈良的鹿会向人鞠躬要饼干','Deer in Nara bow to ask you for a biscuit'],
+         ['⚪','背上的白色斑点像小梅花','The white spots on its back look like plum flowers']],
+     fl:[['🌸','开花只有一个星期左右就飘落了','The blossom lasts only about a week']]},
+ my:{lm:[['🏢','有 452 米高，一共 88 层','452 m tall, with 88 floors'],
+         ['🌉','两座塔中间有一条空中天桥连着','A skybridge joins the two towers in the middle']],
+     an:[['🌳','几乎一辈子都住在树上','It spends almost its whole life up in the trees'],
+         ['☂️','下雨时会摘一片大叶子当雨伞','When it rains, it picks a big leaf for an umbrella']],
+     fl:[['🇲🇾','五片花瓣代表国家的五项原则','Its five petals stand for the five national principles']]},
+ sg:{lm:[['🛥️','三座高楼顶上躺着一艘「大船」','A boat-shaped roof sits on top of three towers'],
+         ['🏊','船上有全世界最高的游泳池之一','It holds one of the highest swimming pools in the world']],
+     an:[['🏙️','「新加坡」这个名字的意思就是狮子城','The name Singapore means Lion City'],
+         ['😴','狮子一天要睡差不多 20 个小时','Lions sleep for about 20 hours a day']],
+     fl:[['🌺','是一位女士在自家花园里发现的兰花','A lady found this orchid in her own garden']]},
+ in:{lm:[['🤍','整座建筑全部用白色大理石造成','The whole building is made of white marble'],
+         ['💐','是一位国王为了纪念王后建的','A king built it to remember his queen']],
+     an:[['🐾','每只老虎身上的条纹都不一样','Every tiger has its own pattern of stripes'],
+         ['🏊','老虎很会游泳，最喜欢泡在水里','Tigers are strong swimmers and love the water']],
+     fl:[['💧','长在泥水里，花却干干净净','It grows in muddy water yet stays perfectly clean']]},
+ kr:{lm:[['👑','是韩国国王住过的大宫殿','It was the palace where Korean kings lived'],
+         ['💂','门口每天都有换岗仪式','Guards change at the gate every single day']],
+     an:[['🏠','非常忠心，走再远也能自己找路回家','So loyal it can find its own way home from far away'],
+         ['🤍','大多是白色的，耳朵尖尖地立着','Most are white, with pointy ears standing up']],
+     fl:[['♾️','名字的意思是「永远不凋谢的花」','Its name means the flower that never fades']]},
+ th:{lm:[['✨','外面贴满了金光闪闪的金箔','It is covered all over in shiny gold leaf'],
+         ['🙏','人们会来这里安安静静地许愿','People come here quietly to make a wish']],
+     an:[['👃','鼻子有四万块肌肉，能捡起一颗花生','Its trunk has 40,000 muscles — it can pick up a peanut'],
+         ['👂','扇动大耳朵是为了让身体凉快','It flaps its big ears to cool itself down']],
+     fl:[['💛','金黄色的花一串串垂下来，像链子','Golden flowers hang down in long chains']]},
+ id:{lm:[['🔺','是世界上最大的佛教建筑','The largest Buddhist monument in the world'],
+         ['🔔','最上面有 72 座钟形的小塔','72 bell-shaped stupas stand on the top']],
+     an:[['🦖','世界上最大的蜥蜴，可以长到 3 米长','The world\'s biggest lizard — up to 3 m long'],
+         ['👅','用舌头「闻」味道来找食物','It smells its food using its tongue']],
+     fl:[['👃','小小白白的，可是香得不得了','Tiny and white — but it smells wonderful']]},
+ ru:{lm:[['🧅','屋顶像彩色洋葱，每一个都不一样','Its onion domes are every one a different colour'],
+         ['🎨','其实是 9 座小教堂连在一起','It is really nine little churches joined together']],
+     an:[['😴','冬天要一口气睡好几个月','It sleeps right through winter for months'],
+         ['🐟','最喜欢站在河里抓鲑鱼','It loves standing in rivers catching salmon']],
+     fl:[['🍵','花瓣可以泡成香香的花茶','Its petals make a sweet-smelling tea']]},
+ gb:{lm:[['🔔','「大本钟」其实是里面那口大钟的名字','Big Ben is really the name of the huge bell inside'],
+         ['🕰️','一个钟面比好几个大人叠起来还高','One clock face is taller than several grown-ups']],
+     an:[['👑','英国的天鹅归国王管','Swans in Britain belong to the King'],
+         ['❤️','一对天鹅常常一辈子在一起','A pair of swans often stays together for life']],
+     fl:[['🌹','英国以前打过一场以玫瑰命名的仗','England once fought a war named after roses']]},
+ fr:{lm:[['🔩','用一万八千多块铁拼起来的','Made from more than 18,000 pieces of iron'],
+         ['📏','高 330 米，天热的时候还会「长高」一点','330 m tall — and it grows a little in hot weather']],
+     an:[['🌅','天一亮就「喔喔喔」地叫醒大家','It crows the moment the sun comes up'],
+         ['⚽','法国队的球衣上就印着它','It is printed on the French team\'s shirt']],
+     fl:[['⚜️','法国国王的徽章用的就是它','French kings used it as their royal emblem']]},
+ de:{lm:[['🏰','很多童话城堡都是照着它画的','Many fairy-tale castles were inspired by it'],
+         ['⛰️','建在高高的山上，冬天像浮在云里','It stands high on a hill, floating in cloud in winter']],
+     an:[['👃','鼻子超级灵，能闻到埋在地下的食物','Its nose can smell food buried under the ground'],
+         ['🏃','跑起来比大人还要快','It can run faster than a grown-up']],
+     fl:[['💙','长在金黄的麦田里，蓝得像天空','It grows in golden wheat fields, as blue as the sky']]},
+ it:{lm:[['📐','它会歪，是因为地基下面的土太软了','It leans because the ground underneath is too soft'],
+         ['🚶','要爬 294 级楼梯才能到塔顶','294 steps take you all the way to the top']],
+     an:[['🏛️','传说是一只母狼养大了罗马城的建立者','Legend says a she-wolf raised the founders of Rome'],
+         ['🎶','狼用长长的嚎叫和同伴聊天','Wolves howl to talk to each other far away']],
+     fl:[['🌼','晚上会把花瓣合起来「睡觉」','It closes its petals at night to sleep']]},
+ es:{lm:[['⏳','建了一百四十多年，到现在还没建完','It has been under construction for over 140 years'],
+         ['🌿','里面的柱子像大树，走进去像走进森林','Its pillars look like trees — inside feels like a forest']],
+     an:[['🎪','西班牙有很多和牛有关的节日','Spain has many festivals all about bulls'],
+         ['👀','牛其实看不出红色，是布在动才生气','Bulls can\'t see red — it\'s the moving cloth that annoys them']],
+     fl:[['💃','跳弗拉门戈舞的人会把它戴在头上','Flamenco dancers wear it in their hair']]},
+ eg:{lm:[['🪨','用了两百多万块大石头堆成','Built from more than 2 million huge stone blocks'],
+         ['⏰','四千五百多年前就已经造好了','It was finished more than 4,500 years ago']],
+     an:[['🐱','古埃及人把猫当作神一样敬重','Ancient Egyptians treated cats as sacred'],
+         ['🦻','耳朵可以转半圈来听声音','Its ears can turn halfway around to listen']],
+     fl:[['🌅','太阳出来才开花，天一黑就合上','It opens with the sun and closes when night falls']]},
+ ke:{lm:[['☂️','树冠平平的，像撑开的一把大伞','Its flat top looks like a giant open umbrella'],
+         ['🦒','长颈鹿最爱伸长脖子吃它的叶子','Giraffes stretch up to eat its leaves']],
+     an:[['📏','脖子有 2 米长，却和你一样只有 7 块颈骨','Its 2 m neck has just 7 bones — the same as yours'],
+         ['💜','舌头是紫黑色的，有 50 厘米长','Its tongue is purple-black and 50 cm long']],
+     fl:[['🎨','花的颜色多得像一盒颜料','It comes in almost every colour you can think of']]},
+ za:{lm:[['🍽️','山顶平得像一张大桌子','Its top is as flat as a big table'],
+         ['☁️','云盖住山顶的时候，人们叫它「桌布」','When cloud covers it, people call it the tablecloth']],
+     an:[['🖤','每只斑马的条纹都独一无二','No two zebras have the same stripes'],
+         ['👥','一群斑马站在一起，狮子会看花眼','A herd standing together confuses lions']],
+     fl:[['👑','世界上最大的花之一，像盘子那么大','One of the biggest flowers — as wide as a dinner plate']]},
+ us:{lm:[['🎁','是法国送给美国的一份大礼物','It was a giant gift from France to America'],
+         ['🔥','连火炬一起有 93 米高','With her torch she stands 93 m tall']],
+     an:[['👁️','眼睛非常厉害，很远就能看见水里的鱼','Its eyes can spot a fish from far, far away'],
+         ['🪺','它的鸟巢是所有鸟里最大的，比浴缸还大','It builds the biggest nest of any bird — bigger than a bathtub']],
+     fl:[['🇺🇸','1986 年被选为美国的国花','It became America\'s national flower in 1986']]},
+ ca:{lm:[['📡','有 553 米高，曾经是世界最高的塔','553 m tall — once the tallest tower in the world'],
+         ['🦶','有一块玻璃地板，站上去能看到脚底下','A glass floor lets you look straight down under your feet']],
+     an:[['🪵','会用牙齿咬断大树，拿来造水坝','It gnaws down whole trees to build dams'],
+         ['🦷','门牙一辈子都在长，所以要不停地啃','Its front teeth never stop growing, so it must keep gnawing']],
+     fl:[['🍁','秋天变成红色，树汁还能熬成枫糖浆','It turns red in autumn, and its sap becomes maple syrup']]},
+ mx:{lm:[['🪜','四面各有 91 级台阶，加上顶层正好 365','Each of its 4 stairways has 91 steps — 365 in all'],
+         ['🐍','阳光一照，台阶上会出现一条蛇的影子','Sunlight makes a snake-shaped shadow slide down the steps']],
+     an:[['💪','咬合力是所有猫科动物里最强的','It has the strongest bite of all the big cats'],
+         ['🌊','和别的猫不一样，它超级喜欢游泳','Unlike most cats, it loves to swim']],
+     fl:[['🌈','有好几千个不同的品种','There are thousands of different kinds']]},
+ br:{lm:[['🙌','张开的双臂有 28 米宽','His open arms stretch 28 m from hand to hand'],
+         ['⛰️','站在 700 米高的山顶上守望整座城市','He stands on a 700 m hilltop watching over the city']],
+     an:[['🗣️','会学人说话，还会记住句子','It can copy human words and remember them'],
+         ['💞','一对鹦鹉常常整天形影不离','A pair of macaws stays side by side all day']],
+     fl:[['🌳','开花时整棵树金灿灿的，一片叶子也没有','The whole tree turns gold, without a single leaf']]},
+ ar:{lm:[['📍','立在全世界最宽的大马路中间','It stands in the middle of the widest avenue in the world'],
+         ['⚽','球队赢球以后，球迷都会来这里庆祝','Fans gather here to celebrate when their team wins']],
+     an:[['🏔️','住在高高的安第斯山上，很耐冷','It lives high in the Andes and doesn\'t mind the cold'],
+         ['💦','生气的时候会「呸」地吐口水','When it gets annoyed, it spits!']],
+     fl:[['🔥','红艳艳的，像一团团小火焰','Its red flowers look like little flames']]},
+ au:{lm:[['⛵','屋顶像鼓起的风帆，也像贝壳','Its roof looks like sails — or like seashells'],
+         ['🎵','里面有好几个大厅，几乎天天有演出','It has several halls with shows almost every day']],
+     an:[['👜','妈妈肚子上有个育儿袋，宝宝住在里面','Mothers carry their babies in a pouch'],
+         ['🦵','一跳能跳过三个大人躺着那么远','One hop can clear three grown-ups lying down']],
+     fl:[['🟡','毛茸茸的黄色小球，一开就是一大片','Fluffy yellow balls cover the whole tree']]},
+ nz:{lm:[['🗼','328 米高，是南半球最高的建筑之一','328 m tall — one of the tallest in the Southern Hemisphere'],
+         ['🪂','胆子大的人可以绑着绳子从塔顶跳下来','Brave people jump off the top on a rope']],
+     an:[['🚫','不会飞，翅膀小得几乎看不见','It cannot fly — its wings are almost invisible'],
+         ['🥚','蛋特别大，差不多有妈妈体重的四分之一','Its egg is huge — about a quarter of the mother\'s weight']],
+     fl:[['🎄','正好在圣诞节的时候开出红花','It blooms bright red right at Christmas']]}
+};
+
 /* ============================================================
    3. SIMPLE WORLD MAP (coarse outlines, lon/lat)
    ============================================================ */
@@ -980,7 +1120,8 @@ function renderCard(){
       '<div class="nm stack">'+T(x.an[1],x.an[2])+'</div></button>'+
     '<button data-s="fl"><div class="lbl stack">'+T('🌸 国花','🌸 FLOWER')+'</div>'+flSVG(x.fl[0])+
       '<div class="nm stack">'+T(x.fl[1],x.fl[2])+'</div></button>'+
-    '</div>';
+    '</div>'+
+    '<p class="hint stack">'+T('👆 点一点图片，看大图和小知识','👆 Tap a picture for a close-up and fun facts')+'</p>';
   html+='<div class="hello stack">'+T('打招呼要说：<b>'+c.hi+'</b>（'+c.hiR+'）','Say hello: <b>'+c.hi+'</b> ('+c.hiR+')')+'</div>';
   html+='<div class="navRow">'+
     '<button class="btn" id="prevB">⬅️ '+T('上一个','Back')+'</button>'+
@@ -991,7 +1132,7 @@ function renderCard(){
   document.getElementById('nextB').onclick=function(){ step(1); };
   document.getElementById('sayB').onclick=speak;
   Array.prototype.forEach.call(document.querySelectorAll('.trio button'),function(b){
-    b.onclick=function(){ var d=EXTRA[current.id][b.dataset.s]; say(d[1],d[2],true); };
+    b.onclick=function(){ openDetail(b.dataset.s); };
   });
 }
 function step(d){
@@ -999,20 +1140,57 @@ function step(d){
   select(COUNTRIES[(i+d+COUNTRIES.length)%COUNTRIES.length].id, true);
 }
 var autoSpeak=true;
-function say(zh,en,force){
+function utter(txt,lang){
+  if(!txt) return;
+  var u=new SpeechSynthesisUtterance(String(txt).replace(/<[^>]*>/g,''));
+  u.lang=lang; u.rate=0.85; speechSynthesis.speak(u);
+}
+/* pairs = [[zh,en], [zh,en], ...] read one after another */
+function sayList(pairs,force){
   if(!window.speechSynthesis) return;
   if(!autoSpeak && !force) return;
   speechSynthesis.cancel();
   var cl=document.body.className;
-  function utter(txt,lang){
-    if(!txt) return;
-    var u=new SpeechSynthesisUtterance(String(txt).replace(/<[^>]*>/g,''));
-    u.lang=lang; u.rate=0.85; speechSynthesis.speak(u);
-  }
-  if(cl.indexOf('only-en')<0) utter(zh,'zh-CN');
-  if(cl.indexOf('only-zh')<0) utter(en,'en-US');
+  pairs.forEach(function(p){
+    if(cl.indexOf('only-en')<0) utter(p[0],'zh-CN');
+    if(cl.indexOf('only-zh')<0) utter(p[1],'en-US');
+  });
 }
+function say(zh,en,force){ sayList([[zh,en]],force); }
 function speak(){ say(current.zh, current.en, true); }
+
+/* ---------- close-up view for landmark / animal / flower ---------- */
+var KINDS={
+  lm:{zh:'🏛️ 地标建筑', en:'🏛️ LANDMARK'},
+  an:{zh:'🐾 代表动物', en:'🐾 ANIMAL'},
+  fl:{zh:'🌸 国花',     en:'🌸 FLOWER'}
+};
+function openDetail(kind){
+  var c=current, x=EXTRA[c.id], facts=DETAIL[c.id][kind], item=x[kind];
+  var pic = kind==='an' ? '<div class="bigEmo">'+item[0]+'</div>'
+          : (kind==='lm' ? lmSVG(item[0]) : flSVG(item[0])).replace('class="pic"','class="big"');
+  var html='<div class="dcard">'+
+    '<div class="kind stack">'+T(KINDS[kind].zh,KINDS[kind].en)+'</div>'+pic+
+    '<h3 class="stack">'+T(item[1],item[2])+'</h3>'+
+    '<div class="where stack">'+T('📍 在 '+c.zh,'📍 in '+c.en)+'</div>'+
+    '<ul class="facts">'+facts.map(function(f){
+      return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
+    }).join('')+'</ul>'+
+    '<div class="drow"><button class="btn" id="dSay">🔊 '+T('再读一次','Read again')+'</button>'+
+    '<button class="btn big" id="dClose">👍 '+T('知道啦','Got it')+'</button></div></div>';
+  var box=document.getElementById('detail');
+  box.innerHTML=html; box.classList.add('show');
+  var lines=[[item[1],item[2]]].concat(facts.map(function(f){ return [f[1],f[2]]; }));
+  sayList(lines,true);
+  document.getElementById('dSay').onclick=function(){ sayList(lines,true); };
+  document.getElementById('dClose').onclick=closeDetail;
+  box.onclick=function(e){ if(e.target===box) closeDetail(); };
+}
+function closeDetail(){
+  document.getElementById('detail').classList.remove('show');
+  if(window.speechSynthesis) speechSynthesis.cancel();
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeDetail(); });
 function select(id,user){
   var prev=current;
   current=COUNTRIES.filter(function(c){return c.id===id;})[0];
@@ -1068,6 +1246,7 @@ function setMode(m){
   document.body.classList.add('m-'+m);
   MODE=m; huntReveal=false; journey=null;
   document.getElementById('journey').classList.remove('show');
+  closeDetail();
   Array.prototype.forEach.call(document.querySelectorAll('#modeNav .btn'),function(b){
     b.classList.toggle('on', b.dataset.m===m);
   });
