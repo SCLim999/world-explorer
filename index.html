@@ -177,6 +177,57 @@
   .bigMsg{font-size:22px;text-align:center;padding:20px}
   #confetti{position:fixed;inset:0;pointer-events:none;display:none;z-index:65}
   footer{max-width:1180px;margin:18px auto 6px;text-align:center;color:var(--ink2);font-size:14px}
+
+  /* ---------- local time · home · compare ---------- */
+  .infoRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .chip{flex:1 1 200px;background:#f2f8ff;border-radius:16px;padding:10px 14px;font-size:15px;line-height:1.4;
+    display:flex;gap:9px;align-items:flex-start}
+  .chip .emo{font-size:22px;line-height:1.15;flex:none}
+  .chip b{color:#1a6fc4}
+  .chip.home{background:linear-gradient(90deg,#fff3d6,#eafaf0)}
+  .chip.night{background:linear-gradient(90deg,#e7ecfb,#f3eaff)}
+  .chip .btn{margin-top:6px;font-size:14px;padding:5px 12px;border-width:2px}
+  .cmpLine+.cmpLine{margin-top:4px}
+
+  /* ---------- daily trip ---------- */
+  #daily{display:none;background:linear-gradient(90deg,#eaf4ff,#fff0f6);border-radius:18px;padding:10px 14px;
+    margin-bottom:12px;align-items:center;gap:12px;flex-wrap:wrap;font-size:16px}
+  body.m-learn #daily{display:flex}
+  #daily svg{width:54px;height:36px;border-radius:5px;box-shadow:0 2px 6px rgba(0,0,0,.2);flex:none}
+  #daily b{color:#1a6fc4}
+
+  /* ---------- home picker ---------- */
+  #homePick{position:fixed;inset:0;background:rgba(20,45,75,.6);display:none;align-items:center;
+    justify-content:center;z-index:90;padding:16px}
+  #homePick.show{display:flex}
+  .hcard{background:var(--card);border-radius:26px;max-width:820px;width:100%;max-height:88vh;overflow:auto;
+    padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.32);animation:pop .3s ease-out}
+  .hcard h3{font-size:25px;margin:0;text-align:center;line-height:1.2}
+  .hcard h3 .en{font-size:18px;color:var(--ink2)}
+  .cbtn .hb{position:absolute;top:-8px;right:-6px;font-size:20px}
+  .cbtn{position:relative}
+  .slot .hb{font-size:15px;color:#c98a2e;font-weight:bold}
+
+  /* ---------- printable certificate ---------- */
+  .ppName{font-family:inherit;font-size:17px;padding:8px 14px;border:3px solid #d7e7ff;border-radius:999px;
+    max-width:200px;color:var(--ink)}
+  #certPrint{display:none}
+  @media print{
+    body{background:#fff;padding:0}
+    body>*{display:none!important}
+    #certPrint{display:block!important}
+    .certPage{border:8px double #e0a93c;border-radius:16px;padding:28px;text-align:center;margin:10px}
+    .certPage .cTitle{font-size:34px;font-weight:bold}
+    .certPage .cSub{font-size:17px;color:#5b7a96;letter-spacing:2px}
+    .certPage .cName{font-size:30px;font-weight:bold;margin:18px 0 4px;border-bottom:3px dotted #e0a93c;
+      display:inline-block;padding:0 26px 4px}
+    .certPage .cBody{font-size:19px;margin-top:14px;line-height:1.6}
+    .certPage .cFlags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+    .certPage .cf{width:74px;font-size:11px;line-height:1.25}
+    .certPage .cf .en{font-size:9px;color:#5b7a96}
+    .certPage .cf svg{width:100%;height:auto;aspect-ratio:3/2;border-radius:3px;display:block;margin-bottom:2px}
+    .certPage .cDate{margin-top:22px;font-size:14px;color:#5b7a96}
+  }
 </style>
 </head>
 <body class="both">
@@ -208,6 +259,8 @@
     <div class="globeTools">
       <button class="btn" id="spinBtn">⏸ <span class="zh">暂停转动</span><span class="en">Pause</span></button>
       <button class="btn" id="findBtn">🎯 <span class="zh">飞到这个国家</span><span class="en">Fly there</span></button>
+      <button class="btn on" id="dnBtn">🌗 <span class="zh">昼夜</span><span class="en">Day &amp; night</span></button>
+      <button class="btn" id="homeBtn">🏠 <span class="zh">回家看看</span><span class="en">Go home</span></button>
     </div>
     <p class="hint stack">
       <span class="zh">用手指或鼠标拖动地球，转一转看看！点亮的小圆点就是国家。</span>
@@ -216,6 +269,7 @@
   </section>
 
   <section class="panel">
+    <div id="daily"></div>
     <div id="card"></div>
     <div id="huntPanel"></div>
   </section>
@@ -233,6 +287,8 @@
 <canvas id="confetti"></canvas>
 <div id="stampFx"></div>
 <div id="detail"></div>
+<div id="homePick"></div>
+<div id="certPrint"></div>
 
 <footer class="stack">
   <span class="zh">一年级小朋友的世界地理小课堂 · 40 个国家 · 一起认识地球上的朋友吧！</span>
@@ -584,6 +640,50 @@ var COUNTRIES=[
      ['🐠','海底有五彩的珊瑚和小鱼','Colourful coral and fish live under the sea'],
      ['👋','见面要笑着说「Bula！」','People smile and say "Bula!" when they meet']]}
 ];
+
+/* time zone (IANA, so the browser handles daylight saving), area in km², people */
+var FACTS={
+ cn:{tz:'Asia/Shanghai',    area:9600000, pop:1410000000},
+ jp:{tz:'Asia/Tokyo',       area:378000,  pop:124000000},
+ my:{tz:'Asia/Kuala_Lumpur',area:330000,  pop:34000000},
+ sg:{tz:'Asia/Singapore',   area:730,     pop:5900000},
+ in:{tz:'Asia/Kolkata',     area:3287000, pop:1440000000},
+ kr:{tz:'Asia/Seoul',       area:100000,  pop:51700000},
+ th:{tz:'Asia/Bangkok',     area:513000,  pop:71700000},
+ id:{tz:'Asia/Jakarta',     area:1905000, pop:281000000},
+ vn:{tz:'Asia/Ho_Chi_Minh', area:331000,  pop:100000000},
+ ph:{tz:'Asia/Manila',      area:300000,  pop:115000000},
+ np:{tz:'Asia/Kathmandu',   area:147000,  pop:30000000},
+ ae:{tz:'Asia/Dubai',       area:83600,   pop:10000000},
+ tr:{tz:'Europe/Istanbul',  area:784000,  pop:85000000},
+ ru:{tz:'Europe/Moscow',    area:17100000,pop:144000000},
+ gb:{tz:'Europe/London',    area:244000,  pop:68000000},
+ fr:{tz:'Europe/Paris',     area:552000,  pop:68000000},
+ de:{tz:'Europe/Berlin',    area:358000,  pop:84000000},
+ it:{tz:'Europe/Rome',      area:302000,  pop:59000000},
+ es:{tz:'Europe/Madrid',    area:506000,  pop:48000000},
+ nl:{tz:'Europe/Amsterdam', area:41500,   pop:18000000},
+ ch:{tz:'Europe/Zurich',    area:41300,   pop:8900000},
+ gr:{tz:'Europe/Athens',    area:132000,  pop:10400000},
+ no:{tz:'Europe/Oslo',      area:385000,  pop:5500000},
+ eg:{tz:'Africa/Cairo',     area:1002000, pop:114000000},
+ ke:{tz:'Africa/Nairobi',   area:580000,  pop:55000000},
+ za:{tz:'Africa/Johannesburg',area:1221000,pop:63000000},
+ ma:{tz:'Africa/Casablanca',area:447000,  pop:38000000},
+ tz:{tz:'Africa/Dar_es_Salaam',area:947000,pop:67000000},
+ mg:{tz:'Indian/Antananarivo',area:587000,pop:31000000},
+ us:{tz:'America/New_York', area:9830000, pop:335000000},
+ ca:{tz:'America/Toronto',  area:9985000, pop:40000000},
+ mx:{tz:'America/Mexico_City',area:1964000,pop:129000000},
+ cu:{tz:'America/Havana',   area:110000,  pop:11000000},
+ br:{tz:'America/Sao_Paulo',area:8516000, pop:216000000},
+ ar:{tz:'America/Argentina/Buenos_Aires',area:2780000,pop:46000000},
+ pe:{tz:'America/Lima',     area:1285000, pop:34000000},
+ cl:{tz:'America/Santiago', area:756000,  pop:19600000},
+ au:{tz:'Australia/Sydney', area:7692000, pop:27000000},
+ nz:{tz:'Pacific/Auckland', area:268000,  pop:5200000},
+ fj:{tz:'Pacific/Fiji',     area:18300,   pop:930000}
+};
 
 /* ============================================================
    2b. EACH COUNTRY'S THREE TREASURES — landmark / animal / flower
@@ -1267,6 +1367,9 @@ function draw(){
   ctx.fillStyle=sh; ctx.fill();
   ctx.lineWidth=4; ctx.strokeStyle='#ffffff'; ctx.stroke();
 
+  // night side
+  drawNight();
+
   // ocean & sea names
   var onlyZh=document.body.classList.contains('only-zh'),
       onlyEn=document.body.classList.contains('only-en');
@@ -1420,6 +1523,215 @@ cv.addEventListener('pointerup',function(e){
 });
 
 /* ============================================================
+   4b. SUN & LOCAL TIME — where is it day right now?
+   ============================================================ */
+var RD=Math.PI/180;
+/* subsolar point: the spot where the sun is straight overhead */
+function sunPos(d){
+  var n=d.getTime()/86400000+2440587.5-2451545.0;
+  var L=(280.460+0.9856474*n)%360, g=((357.528+0.9856003*n)%360)*RD;
+  var lam=(L+1.915*Math.sin(g)+0.020*Math.sin(2*g))*RD, eps=(23.439-0.0000004*n)*RD;
+  var dec=Math.asin(Math.sin(eps)*Math.sin(lam))/RD;
+  var ra=Math.atan2(Math.cos(eps)*Math.sin(lam),Math.cos(lam))/RD;
+  var lon=ra-(18.697374558+24.06570982441908*n)%24*15;
+  return {lon:((lon%360)+540)%360-180, lat:dec};
+}
+var sunLL=sunPos(new Date()), sunAt=Date.now();
+function sunNow(){
+  if(Date.now()-sunAt>60000){ sunLL=sunPos(new Date()); sunAt=Date.now(); }
+  return sunLL;
+}
+var dayNight=true;
+try{ dayNight=localStorage.getItem('we_daynight_v1')!=='0'; }catch(e){}
+
+/* night side, painted as a soft mask so the terminator fades like real twilight */
+var NN=100, nightCv=null, nightImg=null;
+function drawNight(){
+  if(!dayNight) return;
+  if(!nightCv){
+    nightCv=document.createElement('canvas'); nightCv.width=NN; nightCv.height=NN;
+    nightImg=nightCv.getContext('2d').createImageData(NN,NN);
+  }
+  var ll=sunNow(), S=toVec(ll.lon,ll.lat);
+  var p0=rot.lat*RD, l0=rot.lon*RD;
+  var sp=Math.sin(p0), cp=Math.cos(p0), sl=Math.sin(l0), cl=Math.cos(l0);
+  /* the sun vector, turned into the same frame the globe is drawn in */
+  var Sx=-S[0]*sl+S[1]*cl;
+  var Sy=-S[0]*sp*cl-S[1]*sp*sl+S[2]*cp;
+  var Sz= S[0]*cp*cl+S[1]*cp*sl+S[2]*sp;
+  var d=nightImg.data, i, j, k=0, u, v, w2, dot, a;
+  for(j=0;j<NN;j++){
+    v=1-(j+0.5)*2/NN;
+    for(i=0;i<NN;i++,k+=4){
+      u=(i+0.5)*2/NN-1;
+      w2=1-u*u-v*v;
+      if(w2<=0){ d[k+3]=0; continue; }
+      dot=u*Sx+v*Sy+Math.sqrt(w2)*Sz;
+      a = dot>0.12 ? 0 : (dot<-0.12 ? 1 : (0.12-dot)/0.24);
+      d[k]=10; d[k+1]=24; d[k+2]=58; d[k+3]=a*162|0;
+    }
+  }
+  nightCv.getContext('2d').putImageData(nightImg,0,0);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,RR,0,7); ctx.clip();
+  ctx.drawImage(nightCv,CX-RR,CY-RR,RR*2,RR*2);
+  ctx.restore();
+  var sp2=project(ll.lon,ll.lat);
+  if(sp2.vis){
+    ctx.font=(RR*0.11).toFixed(0)+'px "Segoe UI Emoji",serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('☀️',sp2.x,sp2.y);
+    ctx.textAlign='start'; ctx.textBaseline='alphabetic';
+  }
+}
+
+/* what time is it over there, and what are the kids doing? */
+function localTime(c){
+  var d=new Date(), h, m;
+  try{
+    var s=new Intl.DateTimeFormat('en-GB',{timeZone:FACTS[c.id].tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
+    h=+s.split(':')[0]%24; m=+s.split(':')[1];
+  }catch(e){
+    var t=new Date(d.getTime()+Math.round(c.lon/15)*3600000);
+    h=t.getUTCHours(); m=t.getUTCMinutes();
+  }
+  return {h:h, txt:(h<10?'0':'')+h+':'+(m<10?'0':'')+m};
+}
+var DAYPART=[
+ [5, '🌙','天还没亮，大家都在睡觉','still dark — everyone is asleep'],
+ [7, '🌅','天刚刚亮起来','the sun is just coming up'],
+ [9, '🥞','早上，在吃早餐','morning — breakfast time'],
+ [12,'📚','上午，小朋友在上学','late morning — kids are at school'],
+ [14,'🍚','中午，在吃午饭','midday — lunch time'],
+ [17,'🌤️','下午，在外面玩','afternoon — time to play'],
+ [19,'🌇','傍晚，太阳要下山了','early evening — the sun is going down'],
+ [21,'🍲','晚上，在吃晚饭','evening — dinner time'],
+ [24,'😴','很晚了，该睡觉了','late — time for bed']
+];
+function dayPart(h){ for(var i=0;i<DAYPART.length;i++) if(h<DAYPART[i][0]) return DAYPART[i]; return DAYPART[8]; }
+
+/* ============================================================
+   4c. MY HOME — distances and size comparisons from where you live
+   ============================================================ */
+var HKEY='we_home_v1', homeId=null;
+try{ homeId=localStorage.getItem(HKEY)||null; }catch(e){}
+function byId(id){ return COUNTRIES.filter(function(c){return c.id===id;})[0]||null; }
+if(homeId && !byId(homeId)) homeId=null;
+function homeC(){ return homeId?byId(homeId):null; }
+function setHome(id){
+  homeId=id;
+  try{ localStorage.setItem(HKEY,id); localStorage.setItem('we_home_asked_v1','1'); }catch(e){}
+  renderCard(); renderGrid();
+  if(document.body.classList.contains('m-passport')) renderPassport();
+}
+var SPEED={train:120, ship:40, plane:850};
+function travelTime(info){
+  var h=info.dist/SPEED[info.v]+(info.v==='plane'?1:0);
+  if(h<24){ h=Math.max(1,Math.round(h)); return {zh:'大约 '+h+' 个小时',en:'about '+h+' hours'}; }
+  var d=Math.round(h/24);
+  return {zh:'大约 '+d+' 天',en:'about '+d+' days'};
+}
+/* "Brazil is 25 Malaysias big" reads better to a 6-year-old than 8,516,000 km² */
+function times(a,b){
+  var r=a/b;
+  if(r>=1.5) return {k:1, n:Math.round(r).toLocaleString()};
+  if(r<=0.67) return {k:-1, n:Math.round(b/a).toLocaleString()};
+  return {k:0};
+}
+function cmpLine(kind,a,b,hz,he){
+  var t=times(a,b), zh, en;
+  if(kind==='size'){
+    zh = t.k>0 ? '📏 有 <b>'+t.n+'</b> 个'+hz+'那么大'
+       : t.k<0 ? '📏 '+hz+'有 <b>'+t.n+'</b> 个它那么大'
+       : '📏 和'+hz+'差不多大';
+    en = t.k>0 ? '📏 <b>'+t.n+'×</b> the size of '+he
+       : t.k<0 ? '📏 '+he+' is <b>'+t.n+'×</b> its size'
+       : '📏 about the same size as '+he;
+  } else {
+    zh = t.k>0 ? '👨‍👩‍👧 人有 <b>'+t.n+'</b> 个'+hz+'那么多'
+       : t.k<0 ? '👨‍👩‍👧 '+hz+'的人有 <b>'+t.n+'</b> 个它那么多'
+       : '👨‍👩‍👧 人数和'+hz+'差不多';
+    en = t.k>0 ? '👨‍👩‍👧 <b>'+t.n+'×</b> as many people as '+he
+       : t.k<0 ? '👨‍👩‍👧 '+he+' has <b>'+t.n+'×</b> as many people'
+       : '👨‍👩‍👧 about as many people as '+he;
+  }
+  return '<div class="cmpLine stack">'+T(zh,en)+'</div>';
+}
+function infoRow(c){
+  var lt=localTime(c), dp=dayPart(lt.h), h=homeC(), s='<div class="infoRow">';
+  var atHome = h && h.id===c.id;
+  s+='<div class="chip'+(lt.h<6||lt.h>=19?' night':'')+'"><span class="emo">'+dp[1]+'</span><span class="stack">'+
+     T('现在'+(atHome?'你家':'那边')+'是 <b>'+lt.txt+'</b>，'+dp[2],
+       'It is <b>'+lt.txt+'</b> '+(atHome?'where you live':'there')+' — '+dp[3])+'</span></div>';
+  if(!h){
+    s+='<div class="chip home"><span class="emo">🏠</span><span>'+
+       '<span class="stack">'+T('告诉我你住在哪里，就能算出离家有多远！','Tell me where you live and I can measure the distance!')+'</span>'+
+       '<button class="btn" id="setHomeB">'+T('选我的家','Pick my home')+'</button></span></div>';
+  } else if(h.id===c.id){
+    s+='<div class="chip home"><span class="emo">🏠</span><span class="stack">'+
+       T('这里就是你的家！','This is your home!')+'</span></div>';
+  } else {
+    var info=routeInfo(h,c), tt=travelTime(info), V=VEHICLES[info.v];
+    s+='<div class="chip home"><span class="emo">'+V.e+'</span><span class="stack">'+
+       T('离你家 <b>'+info.dist.toLocaleString()+'</b> 公里，'+V.zh+tt.zh,
+         '<b>'+info.dist.toLocaleString()+' km</b> from home, '+tt.en+' '+V.en)+'</span></div>';
+    var fa=FACTS[c.id], fh=FACTS[h.id];
+    s+='<div class="chip"><span class="emo">⚖️</span><span>'+
+       cmpLine('size',fa.area,fh.area,h.zh,h.en)+
+       cmpLine('pop',fa.pop,fh.pop,h.zh,h.en)+'</span></div>';
+  }
+  return s+'</div>';
+}
+function openHomePick(){
+  var box=document.getElementById('homePick');
+  box.innerHTML='<div class="hcard">'+
+    '<h3 class="stack">'+T('🏠 你住在哪个国家？','🏠 Which country do you live in?')+'</h3>'+
+    '<p class="hint stack">'+T('选好以后，每个国家都会告诉你离家有多远、有几个你家那么大。',
+      'Once you choose, every country tells you how far away it is and how many of your home it would take to fill it.')+'</p>'+
+    '<div class="grid" id="hGrid">'+COUNTRIES.map(function(c){
+      return '<button class="cbtn'+(c.id===homeId?' on':'')+'" data-id="'+c.id+'">'+flagSVG(c.id)+
+             '<span class="stack">'+T(c.zh,c.en)+'</span></button>';
+    }).join('')+'</div>'+
+    '<div class="drow"><button class="btn" id="hSkip">'+T('以后再说','Maybe later')+'</button></div></div>';
+  box.classList.add('show');
+  Array.prototype.forEach.call(box.querySelectorAll('.cbtn'),function(b){
+    b.onclick=function(){ setHome(b.dataset.id); closeHomePick(); var c=byId(b.dataset.id);
+      say('你的家在'+c.zh,'Your home is '+c.en); flyTo(c); };
+  });
+  document.getElementById('hSkip').onclick=function(){
+    try{ localStorage.setItem('we_home_asked_v1','1'); }catch(e){}
+    closeHomePick();
+  };
+  box.onclick=function(e){ if(e.target===box) closeHomePick(); };
+}
+function closeHomePick(){ document.getElementById('homePick').classList.remove('show'); }
+
+/* ============================================================
+   4d. TODAY'S LITTLE TRIP — one country a day, same for the whole day
+   ============================================================ */
+var DKEY='we_daily_v1';
+function dayKey(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function dailyCountry(){
+  var k=dayKey(), h=0;
+  for(var i=0;i<k.length;i++) h=(h*31+k.charCodeAt(i))>>>0;
+  return COUNTRIES[h%COUNTRIES.length];
+}
+function dailyDone(){ try{ return localStorage.getItem(DKEY)===dayKey(); }catch(e){ return false; } }
+function renderDaily(){
+  var c=dailyCountry(), done=dailyDone(), box=document.getElementById('daily');
+  box.innerHTML=flagSVG(c.id)+
+    '<div class="grow stack">'+
+    T(done?'✅ 今天的小旅行 <b>'+c.zh+'</b>，已经去过啦！':'📮 今天的小旅行是 <b>'+c.zh+'</b>，出发吧！',
+      done?'✅ You already made today\'s trip to <b>'+c.en+'</b>!':'📮 Today\'s little trip is <b>'+c.en+'</b> — let\'s go!')+
+    '</div><button class="btn" id="dailyGo">'+T(done?'再去一次':'出发！',done?'Go again':'Let\'s go!')+'</button>';
+  document.getElementById('dailyGo').onclick=function(){ select(c.id,true); };
+}
+function noteDaily(id){
+  if(id!==dailyCountry().id || dailyDone()) return;
+  try{ localStorage.setItem(DKEY,dayKey()); }catch(e){}
+}
+
+/* ============================================================
    5. UI
    ============================================================ */
 var current=COUNTRIES[0], filter='all';
@@ -1437,6 +1749,7 @@ function renderCard(){
     html+='<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
   });
   html+='</ul>';
+  html+=infoRow(c);
   var x=EXTRA[c.id];
   html+='<div class="trio">'+
     '<button data-s="lm"><div class="lbl stack">'+T('🏛️ 地标','🏛️ LANDMARK')+'</div>'+lmSVG(x.lm[0])+
@@ -1456,6 +1769,8 @@ function renderCard(){
   document.getElementById('prevB').onclick=function(){ step(-1); };
   document.getElementById('nextB').onclick=function(){ step(1); };
   document.getElementById('sayB').onclick=speak;
+  var shb=document.getElementById('setHomeB');
+  if(shb) shb.onclick=openHomePick;
   Array.prototype.forEach.call(document.querySelectorAll('.trio button'),function(b){
     b.onclick=function(){ openDetail(b.dataset.s); };
   });
@@ -1520,7 +1835,7 @@ function select(id,user){
   var prev=current;
   current=COUNTRIES.filter(function(c){return c.id===id;})[0];
   renderCard(); markGrid();
-  if(user) addStamp(current.id);
+  if(user){ addStamp(current.id); noteDaily(current.id); renderDaily(); }
   if(user && prev && prev.id!==current.id && MODE==='learn'){
     startJourney(prev,current);
   } else {
@@ -1544,7 +1859,8 @@ function renderTabs(){
 function renderGrid(){
   var list=COUNTRIES.filter(function(c){return filter==='all'||c.c===filter;});
   document.getElementById('grid').innerHTML=list.map(function(c){
-    return '<button class="cbtn" data-id="'+c.id+'">'+flagSVG(c.id)+'<span class="stack">'+T(c.zh,c.en)+'</span></button>';
+    return '<button class="cbtn" data-id="'+c.id+'">'+(c.id===homeId?'<i class="hb">🏠</i>':'')+
+           flagSVG(c.id)+'<span class="stack">'+T(c.zh,c.en)+'</span></button>';
   }).join('');
   Array.prototype.forEach.call(document.querySelectorAll('#grid .cbtn'),function(b){
     b.onclick=function(){ select(b.dataset.id, true); };
@@ -1575,6 +1891,7 @@ function setMode(m){
   Array.prototype.forEach.call(document.querySelectorAll('#modeNav .btn'),function(b){
     b.classList.toggle('on', b.dataset.m===m);
   });
+  if(m==='learn') renderDaily();
   if(m==='hunt') startHunt();
   if(m==='quiz') startQuiz();
   if(m==='animal') startAnimal();
@@ -1595,6 +1912,16 @@ document.getElementById('spinBtn').onclick=function(){
   this.innerHTML=(spinning?'⏸ ':'▶️ ')+(spinning?T('暂停转动','Pause'):T('继续转动','Spin'));
 };
 document.getElementById('findBtn').onclick=function(){ flyTo(current); };
+document.getElementById('dnBtn').onclick=function(){
+  dayNight=!dayNight;
+  this.classList.toggle('on',dayNight);
+  try{ localStorage.setItem('we_daynight_v1',dayNight?'1':'0'); }catch(e){}
+};
+document.getElementById('homeBtn').onclick=function(){
+  var h=homeC();
+  if(!h){ openHomePick(); return; }
+  setMode('learn'); select(h.id,true);
+};
 
 /* ============================================================
    6. QUIZ
@@ -1716,16 +2043,44 @@ function renderPassport(){
   if(n===tot) h+='<div class="cert"><div class="big">🏆</div><div class="t stack">'+
       T('恭喜你！你已经环游世界一圈了！','Congratulations! You have travelled the whole world!')+'</div></div>';
   h+='<div class="pp">'+COUNTRIES.map(function(c){
+      var hm = c.id===homeId ? '<div class="hb stack">'+T('🏠 我的家','🏠 my home')+'</div>' : '';
       return passport[c.id]
-        ? '<div class="slot got"><div class="stampImg"><div class="ring"></div>'+flagSVG(c.id)+'</div><div class="nm stack">'+T(c.zh,c.en)+'</div></div>'
-        : '<div class="slot"><div class="q">?</div><div class="nm stack">'+T('还没去过','Not yet')+'</div></div>';
+        ? '<div class="slot got"><div class="stampImg"><div class="ring"></div>'+flagSVG(c.id)+'</div><div class="nm stack">'+T(c.zh,c.en)+'</div>'+hm+'</div>'
+        : '<div class="slot"><div class="q">?</div><div class="nm stack">'+T('还没去过','Not yet')+'</div>'+hm+'</div>';
     }).join('')+'</div>';
-  h+='<div style="text-align:center;margin-top:16px"><button class="btn" id="ppReset">🧹 '+T('清空重来','Clear all stamps')+'</button></div>';
+  var nm='';
+  try{ nm=localStorage.getItem('we_name_v1')||''; }catch(e){}
+  h+='<div style="text-align:center;margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center">'+
+     '<input class="ppName" id="ppName" maxlength="20" value="'+esc(nm)+'" placeholder="'+
+     (document.body.classList.contains('only-en')?'Your name':'你的名字')+'">'+
+     (n?'<button class="btn big" id="ppPrint">🖨️ '+T('打印奖状','Print certificate')+'</button>':'')+
+     '<button class="btn" id="ppHome">🏠 '+T(homeId?'换一个家':'设定我的家',homeId?'Change home':'Set my home')+'</button>'+
+     '<button class="btn" id="ppReset">🧹 '+T('清空重来','Clear all stamps')+'</button></div>';
   box.innerHTML=h;
+  if(n) document.getElementById('ppPrint').onclick=printCert;
+  document.getElementById('ppHome').onclick=openHomePick;
   document.getElementById('ppReset').onclick=function(){
     var ask=document.body.classList.contains('only-en')?'Clear all stamps and start over?':'确定要清空所有印章，重新开始吗？';
     if(window.confirm(ask)){ passport={}; savePassport(); updateBadge(); renderPassport(); }
   };
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,function(m){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+function printCert(){
+  var nm=document.getElementById('ppName').value.trim();
+  try{ localStorage.setItem('we_name_v1',nm); }catch(e){}
+  var got=COUNTRIES.filter(function(c){ return passport[c.id]; }), d=new Date();
+  document.getElementById('certPrint').innerHTML='<div class="certPage">'+
+    '<div class="cTitle">🌍 环游世界小奖状</div><div class="cSub">WORLD EXPLORER CERTIFICATE</div>'+
+    (nm?'<div class="cName">'+esc(nm)+'</div>':'')+
+    '<div class="cBody">已经认识了 <b>'+got.length+'</b> 个国家，走过 '+
+    (got.length===COUNTRIES.length?'全世界！':'地球的好多地方！')+'<br>'+
+    'has met <b>'+got.length+'</b> countries around the world!</div>'+
+    '<div class="cFlags">'+got.map(function(c){
+      return '<div class="cf">'+flagSVG(c.id)+'<span class="stack">'+T(c.zh,c.en)+'</span></div>'; }).join('')+'</div>'+
+    '<div class="cDate">'+d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月 '+d.getDate()+' 日 · '+
+    '🌍 环游世界小课堂 World Explorer for Kids</div></div>';
+  window.print();
 }
 
 /* ============================================================
@@ -1889,7 +2244,7 @@ function renderAnimalEnd(){
   burst(140);
   document.getElementById('animal').innerHTML=
     '<div class="bigMsg stack">'+T('全部小动物都回家啦！🎉','Every animal is home! 🎉')+'</div>'+
-    '<div class="bigMsg score">⭐ '+am.score+' / '+ANIMALS.length+'</div>'+
+    '<div class="bigMsg score">⭐ '+am.score+' / '+(am.n*am.per)+'</div>'+
     '<div style="text-align:center"><button class="btn big" id="aAgain">🔁 '+T('再玩一次','Play again')+'</button> '+
     '<button class="btn" id="aBack">📚 '+T('回去学习','Back')+'</button></div>';
   document.getElementById('aAgain').onclick=startAnimal;
@@ -1900,8 +2255,13 @@ function renderAnimalEnd(){
    7. GO
    ============================================================ */
 document.body.classList.add('m-learn');
-resize(); renderTabs(); renderGrid(); renderCard(); updateBadge(); flyTo(current); tick();
+document.getElementById('dnBtn').classList.toggle('on',dayNight);
+resize(); renderTabs(); renderGrid(); renderCard(); renderDaily(); updateBadge(); flyTo(current); tick();
 setTimeout(resize, 60);
+/* ask once where home is — never nag again if it is skipped */
+var asked=false;
+try{ asked=localStorage.getItem('we_home_asked_v1')==='1'; }catch(e){}
+if(!homeId && !asked) setTimeout(openHomePick, 900);
 </script>
 </body>
 </html>
