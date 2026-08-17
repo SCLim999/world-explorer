@@ -93,10 +93,11 @@
   .cbtn .en{font-size:12px;color:var(--ink2)}
 
   /* ---------- modes ---------- */
-  #stage,#picker,#quiz,#animal,#passport{display:none}
+  #stage,#picker,#quiz,#animal,#passport,#build{display:none}
   body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage,body.m-won #stage,
   body.m-place #stage{display:grid}
   body.m-learn #picker{display:block}
+  body.m-build #build{display:block}
   body.m-quiz #quiz{display:block}
   body.m-animal #animal{display:block}
   body.m-passport #passport{display:block}
@@ -135,6 +136,27 @@
   .wonFate{margin-top:12px;background:#fff5ef;border-radius:16px;padding:10px 14px;font-size:15px;
     line-height:1.4;display:flex;gap:9px;align-items:flex-start}
   .wonFate .emo{font-size:22px;flex:none}
+
+  /* ---------- build workshop ---------- */
+  .bMsg{background:#f2f8ff;border-radius:16px;padding:10px 14px;font-size:15px;line-height:1.4;margin-bottom:12px}
+  .bMsg.good{background:#eefbf2}
+  .bWrap{display:grid;grid-template-columns:minmax(230px,1fr) minmax(280px,1.05fr);gap:16px;align-items:start}
+  @media (max-width:780px){.bWrap{grid-template-columns:1fr}}
+  .bLeft{background:#f7fbff;border-radius:18px;padding:6px 6px 2px}
+  .bBar{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+  .bBar .lv{font-size:16px;font-weight:bold;min-width:132px;text-align:center;line-height:1.25}
+  .bBar .lv .en{font-size:13px;color:var(--ink2)}
+  .bGrid{display:grid;gap:3px;max-width:330px;margin:0 auto}
+  .bCell{aspect-ratio:1;border:2px solid #dfe8f3;border-radius:6px;background:#fbfdff;padding:0;
+    transition:transform .08s}
+  .bCell:hover{transform:scale(1.08)}
+  .bCell.want{border-style:dashed;border-color:#c2a86a}
+  .bCell.on{border-color:rgba(20,40,60,.28);box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)}
+  .bPal{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .bPal button{width:38px;height:38px;border-radius:11px;border:3px solid #dfe8f3;
+    box-shadow:0 3px 0 rgba(31,59,87,.12);transition:transform .1s}
+  .bPal button.on{border-color:var(--ink);transform:translateY(-4px)}
+  .bTools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
 
   /* ---------- CSS 3D models ---------- */
   .m3d{position:relative;width:100%;max-width:260px;height:252px;margin:4px auto 10px;
@@ -311,6 +333,7 @@
     <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
     <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
     <button class="btn" data-m="place">🧭 <span class="zh">特别的地方</span><span class="en">Places</span></button>
+    <button class="btn" data-m="build">🧱 <span class="zh">搭建工坊</span><span class="en">Build</span></button>
     <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
     <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
     <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
@@ -355,6 +378,7 @@
   <div class="grid" id="grid"></div>
 </section>
 
+<div id="build" class="picker panel"><div id="buildPanel"></div></div>
 <div id="quiz" class="picker panel"></div>
 <div id="animal" class="picker panel"></div>
 <div id="passport" class="picker panel"></div>
@@ -2387,10 +2411,10 @@ function mul(hex,f){                       /* shade a face so the solid reads as
   function c(v){ v=Math.round(v*f); return v<0?0:(v>255?255:v); }
   return '#'+((1<<24)+(c(r)<<16)+(c(g)<<8)+c(b)).toString(16).slice(1);
 }
-function f3(w,h,col,tr,clip){              /* face anchored at its centre */
+function f3(w,h,col,tr,clip,extra){        /* face anchored at its centre */
   return '<i class="f3" style="width:'+w.toFixed(1)+'px;height:'+h.toFixed(1)+'px;background:'+col+
     ';margin-left:'+(-w/2).toFixed(1)+'px;margin-top:'+(-h/2).toFixed(1)+'px;transform:'+tr+
-    (clip?';clip-path:'+clip:'')+'"></i>';
+    (clip?';clip-path:'+clip:'')+(extra||'')+'"></i>';
 }
 function f3b(w,h,col,tr,clip){             /* face anchored at its bottom edge */
   return '<i class="f3" style="width:'+w.toFixed(1)+'px;height:'+h.toFixed(1)+'px;background:'+col+
@@ -2410,11 +2434,12 @@ function bar3(ax,az,bx,bz,o){
 /* y is always the BOTTOM of a solid, so pieces stack by adding heights */
 function box(o){
   var w=o.w, h=o.h, d=o.d===undefined?o.w:o.d, c=o.c, b=at(o,(o.y||0)+h/2);
-  return f3(w,h,mul(c,.92),b+'translateZ('+(d/2)+'px)')+
-         f3(w,h,mul(c,.60),b+'rotateY(180deg) translateZ('+(d/2)+'px)')+
-         f3(d,h,mul(c,.78),b+'rotateY(90deg) translateZ('+(w/2)+'px)')+
-         f3(d,h,mul(c,.68),b+'rotateY(-90deg) translateZ('+(w/2)+'px)')+
-         f3(w,d,mul(c,1.08),b+'rotateX(90deg) translateZ('+(h/2)+'px)');
+  var e=o.op?';opacity:'+o.op:'';
+  return f3(w,h,mul(c,.92),b+'translateZ('+(d/2)+'px)',null,e)+
+         f3(w,h,mul(c,.60),b+'rotateY(180deg) translateZ('+(d/2)+'px)',null,e)+
+         f3(d,h,mul(c,.78),b+'rotateY(90deg) translateZ('+(w/2)+'px)',null,e)+
+         f3(d,h,mul(c,.68),b+'rotateY(-90deg) translateZ('+(w/2)+'px)',null,e)+
+         f3(w,d,mul(c,1.08),b+'rotateX(90deg) translateZ('+(h/2)+'px)',null,e);
 }
 var TRI='polygon(50% 0,100% 100%,0 100%)';
 function pyr(o){
@@ -2706,6 +2731,208 @@ function mount3D(root){
 function unmount3D(){ m3d=null; }
 
 /* ============================================================
+   4g. BUILD WORKSHOP — rebuild a landmark out of blocks, layer by layer
+   ============================================================ */
+var BCOL={stone:'#9aa3ad', sand:'#e3c684', brick:'#c06a52', wood:'#a5794e',
+          grass:'#63b56a', water:'#6fb6de', white:'#e8ecf0'};
+var BCOLZH={stone:'石头',sand:'沙石',brick:'红砖',wood:'木头',grass:'草地',water:'玻璃',white:'白石'};
+var BCOLEN={stone:'Stone',sand:'Sandstone',brick:'Brick',wood:'Wood',grass:'Grass',water:'Glass',white:'Marble'};
+function bpRing(p,y,a,b,c){ for(var i=a;i<=b;i++){ p(i,a,y,c); p(i,b,y,c); p(a,i,y,c); p(b,i,y,c); } }
+function bpFill(p,y,a,b,c){ for(var x=a;x<=b;x++) for(var z=a;z<=b;z++) p(x,z,y,c); }
+/* p(x, z, layer, colour) — ground coordinates first, height last */
+var BP=[
+ {id:'pyr',zh:'金字塔',en:'Great Pyramid',eraZh:'古代',eraEn:'ancient',n:7,near:'eg',
+  gen:function(p){ bpRing(p,0,0,6,'sand'); bpRing(p,1,1,5,'sand'); bpRing(p,2,2,4,'sand'); p(3,3,3,'sand'); }},
+ {id:'wall',zh:'长城',en:'Great Wall',eraZh:'古代',eraEn:'ancient',n:9,near:'cn',
+  gen:function(p){
+    var x,y,dx,dz;
+    for(x=0;x<9;x++){ p(x,4,0,'stone'); p(x,4,1,'stone'); }
+    for(x=0;x<9;x+=2) p(x,4,2,'stone');
+    [1,7].forEach(function(tx){
+      for(dx=0;dx<2;dx++) for(dz=0;dz<2;dz++) for(y=0;y<3;y++) p(tx+dx,3+dz,y,'wood');
+    });
+  }},
+ {id:'parth',zh:'帕特农神庙',en:'Parthenon',eraZh:'古代',eraEn:'ancient',n:9,near:'gr',
+  gen:function(p){
+    bpRing(p,0,1,7,'white');
+    [[1,1],[1,4],[1,7],[4,1],[4,7],[7,1],[7,4],[7,7]].forEach(function(q){
+      p(q[0],q[1],1,'white'); p(q[0],q[1],2,'white');
+    });
+    bpRing(p,3,1,7,'white');
+  }},
+ {id:'twin',zh:'双子塔',en:'Petronas Towers',eraZh:'现代',eraEn:'modern',n:9,near:'my',
+  gen:function(p){
+    [2,6].forEach(function(cx){
+      for(var dx=0;dx<2;dx++) for(var dz=0;dz<2;dz++) for(var y=0;y<6;y++) p(cx+dx,3+dz,y,'water');
+    });
+    p(4,3,3,'stone'); p(5,3,3,'stone'); p(4,4,3,'stone'); p(5,4,3,'stone');
+  }},
+ {id:'burj',zh:'哈利法塔',en:'Burj Khalifa',eraZh:'现代',eraEn:'modern',n:9,near:'ae',
+  gen:function(p){
+    bpRing(p,0,2,6,'water'); bpFill(p,1,3,5,'water'); bpFill(p,2,3,5,'water');
+    p(4,4,3,'water'); p(3,4,3,'water'); p(5,4,3,'water'); p(4,3,3,'water'); p(4,5,3,'water');
+    p(4,4,4,'white'); p(4,4,5,'white');
+  }},
+ {id:'eiffel',zh:'埃菲尔铁塔',en:'Eiffel Tower',eraZh:'现代',eraEn:'modern',n:9,near:'fr',
+  gen:function(p){
+    [[1,1],[1,6],[6,1],[6,6]].forEach(function(q){
+      for(var dx=0;dx<2;dx++) for(var dz=0;dz<2;dz++) p(q[0]+dx,q[1]+dz,0,'wood');
+    });
+    bpRing(p,1,2,6,'wood'); p(4,4,2,'wood');
+    bpRing(p,3,3,5,'wood'); p(4,4,3,'wood'); p(4,4,4,'wood'); p(4,4,5,'stone');
+  }}
+];
+var bpIdx=0, bLayer=0, bPaint='stone', bFree=false, build={}, target={}, bDone=false;
+var BN=9, BLAY=6, BS=12;                       /* grid width, layers, block size in model units */
+function bpTarget(){
+  var t={};
+  if(bFree) return t;
+  BP[bpIdx].gen(function(x,z,y,c){ t[x+','+y+','+z]=c; });
+  return t;
+}
+function bGridN(){ return bFree?9:BP[bpIdx].n; }
+function bCount(){
+  var need=0, got=0, k;
+  for(k in target){ need++; if(build[k]) got++; }
+  return {need:need, got:got};
+}
+function buildModelHTML(){
+  var n=bGridN(), off=(n-1)/2, s='', k, p, c;
+  for(k in build){
+    p=k.split(','); c=BCOL[build[k]]||BCOL.stone;
+    s+=box({w:BS-0.6,h:BS-0.6,d:BS-0.6,x:(p[0]-off)*BS,y:p[1]*BS,z:(p[2]-off)*BS,c:c});
+  }
+  for(k in target){                            /* what is still missing, as a ghost */
+    if(build[k]) continue;
+    p=k.split(',');
+    s+=box({w:BS-3,h:BS-3,d:BS-3,x:(p[0]-off)*BS,y:p[1]*BS+1.5,z:(p[2]-off)*BS,
+            c:BCOL[target[k]]||BCOL.stone, op:0.22});
+  }
+  return box({w:n*BS+6,h:4,d:n*BS+6,y:-4,c:'#b9c9a8'})+s;
+}
+function buildStage(){
+  var n=bGridN();
+  M3SIZE._build={w:n*BS*1.35, h:BLAY*BS};
+  return '<div class="m3d" data-m3d="_build"><div class="m3dScene"><div class="m3dSpin">'+
+         buildModelHTML()+'</div></div>'+
+         '<div class="m3dTip stack">'+T('👆 转一转看看','👆 drag to spin')+'</div></div>';
+}
+function refreshBuild3D(){
+  var sp=document.querySelector('#buildPanel .m3dSpin');
+  if(sp) sp.innerHTML=buildModelHTML();       /* only the parts, so the spin keeps running */
+}
+var BKEY='we_build_v1', bSave={};
+try{ bSave=JSON.parse(localStorage.getItem(BKEY)||'{}')||{}; }catch(e){ bSave={}; }
+function bSlot(){ return bFree?'free':BP[bpIdx].id; }
+function bStore(){ bSave[bSlot()]=build; try{ localStorage.setItem(BKEY,JSON.stringify(bSave)); }catch(e){} }
+function bLoad(){
+  build=bSave[bSlot()]||{}; target=bpTarget(); bLayer=0;
+  var c=bCount(); bDone=!bFree && c.need>0 && c.got===c.need;
+  if(!bFree){                                 /* start them holding the block this build needs most */
+    var tally={}, k, best=null;
+    for(k in target){ tally[target[k]]=(tally[target[k]]||0)+1;
+      if(!best||tally[target[k]]>tally[best]) best=target[k]; }
+    if(best) bPaint=best;
+  }
+}
+function bCellStyle(x,z){
+  var k=x+','+bLayer+','+z, has=build[k], want=target[k];
+  return {cls:'bCell'+(has?' on':'')+(want&&!has?' want':''),
+          st: has?('background:'+BCOL[has]) : (want?('background:'+BCOL[want]+';opacity:.34'):'')};
+}
+function bPaintCell(el,x,z){
+  var v=bCellStyle(x,z); el.className=v.cls; el.style.cssText=v.st;
+}
+function bScore(){
+  var box=document.getElementById('bScore');
+  var c=bCount();
+  if(box) box.textContent=c.got+' / '+c.need;
+  bLayerLabel();
+  if(!bFree && !bDone && c.need>0 && c.got===c.need){
+    bDone=true; burst(160);
+    var bp=BP[bpIdx], msg=document.getElementById('bMsg');
+    if(msg){ msg.className='bMsg good stack';
+      msg.innerHTML=T('🎉 搭好啦！你亲手造出了一座<b>'+bp.zh+'</b>！',
+                      '🎉 Finished! You built the <b>'+bp.en+'</b> yourself!'); }
+    say('太棒了，你搭好了'+bp.zh, 'Brilliant! You built the '+bp.en);
+  }
+}
+function bLayerLabel(){
+  var el=document.getElementById('bLv'); if(!el) return;
+  var left=0, k;
+  for(k in target) if(+k.split(',')[1]===bLayer && !build[k]) left++;
+  el.innerHTML=T('第 <b>'+(bLayer+1)+'</b> 层'+(bFree?'':'　还差 '+left+' 块'),
+                 'Level <b>'+(bLayer+1)+'</b>'+(bFree?'':' — '+left+' to go'));
+}
+function bRedrawGrid(){
+  var g=document.getElementById('bGrid'); if(!g) return;
+  var n=bGridN(), cells=g.children, x, z, i=0;
+  for(z=0;z<n;z++) for(x=0;x<n;x++){ bPaintCell(cells[i],x,z); i++; }
+  bLayerLabel();
+}
+function renderBuild(){
+  var bp=BP[bpIdx], n=bGridN(), c=bCount(), x, z, v;
+  var h='<div class="qHead"><div class="qTitle stack">'+T('🧱 搭建工坊','🧱 Build Workshop')+'</div>'+
+        '<div class="grow"></div>'+
+        (bFree?'':'<div class="score" id="bScore">'+c.got+' / '+c.need+'</div>')+'</div>';
+  h+='<div class="wonSel">'+BP.map(function(b,i){
+      return '<button class="btn'+(!bFree&&i===bpIdx?' on':'')+'" data-bp="'+i+'">'+
+             (b.eraZh==='古代'?'🏛️ ':'🏙️ ')+T(b.zh,b.en)+'</button>';
+    }).join('')+'<button class="btn'+(bFree?' on':'')+'" data-bp="free">✨ '+
+    T('自由搭建','Free build')+'</button></div>';
+  h+='<div class="bMsg stack" id="bMsg">'+(bFree
+      ? T('想搭什么就搭什么！先选一种方块，再点格子放上去。','Build whatever you like! Pick a block, then tap a square to place it.')
+      : T('照着<b>淡淡的影子</b>一层一层搭，搭完第 1 层再往上加。',
+          'Follow the <b>faint shadow</b> layer by layer — finish level 1, then build upwards.'))+'</div>';
+  h+='<div class="bWrap"><div class="bLeft">'+buildStage()+'</div><div class="bRight">';
+  h+='<div class="bBar"><button class="btn" id="bDown">⬇️</button>'+
+     '<span class="lv stack" id="bLv"></span><button class="btn" id="bUp">⬆️</button></div>';
+  h+='<div class="bGrid" id="bGrid" style="grid-template-columns:repeat('+n+',1fr)">';
+  for(z=0;z<n;z++) for(x=0;x<n;x++){ v=bCellStyle(x,z);
+    h+='<button class="'+v.cls+'" data-x="'+x+'" data-z="'+z+'" style="'+v.st+'"></button>'; }
+  h+='</div><div class="bPal">'+Object.keys(BCOL).map(function(k){
+      return '<button class="'+(k===bPaint?'on':'')+'" data-col="'+k+'" style="background:'+BCOL[k]+'"></button>';
+    }).join('')+'</div>';
+  h+='<div class="bTools"><button class="btn" id="bClear">🧹 '+T('清空重搭','Clear')+'</button>'+
+     (bp.near&&!bFree?'<button class="btn" id="bGo">🔍 '+T('看看真的','See the real one')+'</button>':'')+
+     '</div></div></div>';
+  var panel=document.getElementById('buildPanel');
+  panel.innerHTML=h;
+  mount3D(panel);
+  bLayerLabel();
+  Array.prototype.forEach.call(panel.querySelectorAll('[data-bp]'),function(b){
+    b.onclick=function(){
+      bFree=(b.dataset.bp==='free');
+      if(!bFree) bpIdx=+b.dataset.bp;
+      bLoad(); renderBuild();
+      if(!bFree) say('来搭一座'+BP[bpIdx].zh, 'Let us build the '+BP[bpIdx].en);
+    };
+  });
+  Array.prototype.forEach.call(panel.querySelectorAll('.bCell'),function(b){
+    b.onclick=function(){
+      var X=+b.dataset.x, Z=+b.dataset.z, k=X+','+bLayer+','+Z;
+      if(build[k]) delete build[k]; else build[k]=bPaint;
+      bPaintCell(b,X,Z); bStore(); refreshBuild3D(); bScore();
+    };
+  });
+  Array.prototype.forEach.call(panel.querySelectorAll('.bPal button'),function(b){
+    b.onclick=function(){
+      bPaint=b.dataset.col;
+      Array.prototype.forEach.call(panel.querySelectorAll('.bPal button'),function(o){ o.classList.remove('on'); });
+      b.classList.add('on');
+    };
+  });
+  document.getElementById('bUp').onclick=function(){ if(bLayer<BLAY-1){ bLayer++; bRedrawGrid(); } };
+  document.getElementById('bDown').onclick=function(){ if(bLayer>0){ bLayer--; bRedrawGrid(); } };
+  document.getElementById('bClear').onclick=function(){
+    var ask=document.body.classList.contains('only-en')?'Clear everything and start again?':'确定要全部清空，重新搭吗？';
+    if(window.confirm(ask)){ build={}; bDone=false; bStore(); renderBuild(); }
+  };
+  var go=document.getElementById('bGo');
+  if(go) go.onclick=function(){ setMode('learn'); select(bp.near,true); };
+}
+
+/* ============================================================
    5. UI
    ============================================================ */
 var current=COUNTRIES[0], filter='all';
@@ -2859,7 +3086,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
     cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
-var MODES=['learn','civ','won','place','hunt','animal','quiz','passport'];
+var MODES=['learn','civ','won','place','build','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
@@ -2873,6 +3100,7 @@ function setMode(m){
   if(m==='civ'){ renderCiv(); flyTo(CIVS[civIdx]); sayCiv(); }
   if(m==='won'){ renderWon(); flyTo(WONDERS[wonIdx]); sayWon(); }
   if(m==='place'){ renderPlace(); flyTo(PLACES[placeIdx]); sayPlace(); }
+  if(m==='build'){ bLoad(); renderBuild(); }
   if(m==='hunt') startHunt();
   if(m==='quiz') startQuiz();
   if(m==='animal') startAnimal();
