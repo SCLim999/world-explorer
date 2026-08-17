@@ -48,8 +48,10 @@
 
   /* ---------- globe ---------- */
   #globeWrap{position:relative;display:flex;flex-direction:column;align-items:center}
-  canvas{width:100%;max-width:460px;aspect-ratio:1;touch-action:none;cursor:grab;border-radius:50%}
-  canvas:active{cursor:grabbing}
+  /* scoped to the globe: as a bare canvas{} rule this also shrank the confetti
+     overlay and the roam view to a 460px circle */
+  #globe{width:100%;max-width:460px;aspect-ratio:1;touch-action:none;cursor:grab;border-radius:50%}
+  #globe:active{cursor:grabbing}
   .hint{font-size:14px;color:var(--ink2);margin-top:8px;text-align:center}
   #journey{display:none;margin-top:10px;background:linear-gradient(90deg,#e6f3ff,#eafaf0);border-radius:16px;
     padding:10px 14px;font-size:16px;text-align:center;line-height:1.35;width:100%;box-sizing:border-box}
@@ -93,11 +95,12 @@
   .cbtn .en{font-size:12px;color:var(--ink2)}
 
   /* ---------- modes ---------- */
-  #stage,#picker,#quiz,#animal,#passport,#build{display:none}
+  #stage,#picker,#quiz,#animal,#passport,#build,#roam{display:none}
   body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage,body.m-won #stage,
   body.m-place #stage{display:grid}
   body.m-learn #picker{display:block}
   body.m-build #build{display:block}
+  body.m-roam #roam{display:block}
   body.m-quiz #quiz{display:block}
   body.m-animal #animal{display:block}
   body.m-passport #passport{display:block}
@@ -157,6 +160,26 @@
     box-shadow:0 3px 0 rgba(31,59,87,.12);transition:transform .1s}
   .bPal button.on{border-color:var(--ink);transform:translateY(-4px)}
   .bTools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+
+  /* ---------- roam ---------- */
+  .roamWrap{position:relative;max-width:820px;margin:0 auto;touch-action:none}
+  #roamCv{width:100%;display:block;border-radius:18px;background:#bfe4f7;cursor:grab;
+    box-shadow:inset 0 0 0 3px rgba(255,255,255,.6)}
+  #roamCv:active{cursor:grabbing}
+  .roamPad{position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:8px}
+  .roamPad .col{display:flex;flex-direction:column;gap:8px}
+  .roamPad button{width:52px;height:44px;border-radius:13px;background:rgba(255,255,255,.82);
+    border:3px solid rgba(31,59,87,.18);font-size:19px;color:var(--ink);font-weight:bold;
+    box-shadow:0 3px 0 rgba(31,59,87,.18)}
+  .roamPad button.on{background:var(--yellow);transform:translateY(2px)}
+  .roamCard{position:absolute;left:50%;top:14px;transform:translateX(-50%) translateY(-14px);
+    background:rgba(255,255,255,.95);border-radius:16px;padding:10px 16px;max-width:74%;
+    display:none;gap:10px;align-items:flex-start;font-size:15px;line-height:1.35;
+    box-shadow:0 8px 22px rgba(0,0,0,.2)}
+  .roamCard.show{display:flex;animation:pop .3s ease-out}
+  .roamCard .emo{font-size:22px;flex:none}
+  .roamTip{text-align:center;font-size:13.5px;color:var(--ink2);margin-top:8px}
+  #roamHud .rFind{font-size:16px;font-weight:bold;background:#fff7e6;border-radius:999px;padding:5px 14px}
 
   /* ---------- CSS 3D models ---------- */
   .m3d{position:relative;width:100%;max-width:260px;height:252px;margin:4px auto 10px;
@@ -334,6 +357,7 @@
     <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
     <button class="btn" data-m="place">🧭 <span class="zh">特别的地方</span><span class="en">Places</span></button>
     <button class="btn" data-m="build">🧱 <span class="zh">搭建工坊</span><span class="en">Build</span></button>
+    <button class="btn" data-m="roam">🌍 <span class="zh">漫游世界</span><span class="en">Explore</span></button>
     <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
     <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
     <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
@@ -379,6 +403,7 @@
 </section>
 
 <div id="build" class="picker panel"><div id="buildPanel"></div></div>
+<div id="roam" class="picker panel"><div id="roamPanel"></div></div>
 <div id="quiz" class="picker panel"></div>
 <div id="animal" class="picker panel"></div>
 <div id="passport" class="picker panel"></div>
@@ -2049,7 +2074,7 @@ function tick(){
     rot.lon+=0.25;
   }
   if(rot.lon>180)rot.lon-=360; if(rot.lon<-180)rot.lon+=360;
-  if(!detailBox.classList.contains('show')) draw();   // globe is covered by the close-up
+  if(!detailBox.classList.contains('show') && MODE!=='roam' && MODE!=='build') draw();
   requestAnimationFrame(tick);
 }
 function flyTo(c){ target={lon:c.lon, lat:Math.max(-60,Math.min(60,c.lat))}; }
@@ -2933,6 +2958,254 @@ function renderBuild(){
 }
 
 /* ============================================================
+   4h. ROAM — a first person world you can walk around.
+   Rendered on canvas with a tiny software renderer: transform to camera
+   space, clip against the near plane, cull back faces, sort far-to-near
+   and fill. CSS 3D cannot do this — once you stand inside a scene its
+   element sorting shows walls through walls.
+   ============================================================ */
+var RS=4;                                   /* one block, in world units */
+var W3={boxes:[], top:{}, px:0, py:0, pz:0, feet:0, yaw:0, pitch:0,
+        keys:{}, site:0, found:{}, raf:0, last:0, drag:null, move:null, card:null};
+var ROAMFACE=[                              /* normal, corner offsets, shade */
+ [[0,1,0], [[0,1,0],[1,1,0],[1,1,1],[0,1,1]], 1.10],
+ [[0,0,1], [[0,0,1],[1,0,1],[1,1,1],[0,1,1]], 0.90],
+ [[0,0,-1],[[1,0,0],[0,0,0],[0,1,0],[1,1,0]], 0.62],
+ [[1,0,0], [[1,0,1],[1,0,0],[1,1,0],[1,1,1]], 0.78],
+ [[-1,0,0],[[0,0,0],[0,0,1],[0,1,1],[0,1,0]], 0.70]
+];
+function rnd(seed){ var x=Math.sin(seed*127.1+311.7)*43758.5453; return x-Math.floor(x); }
+function addBox(x,y,z,w,h,d,c){
+  W3.boxes.push({x:x,y:y,z:z,w:w,h:h,d:d,
+    cols:ROAMFACE.map(function(f){ return mul(c,f[2]); })});
+}
+function roamBuild(i){
+  var bp=BP[i], off=(bp.n-1)/2, k, j;
+  W3.boxes=[]; W3.top={}; W3.site=i; W3.found={};
+  bp.gen(function(x,z,y,c){
+    var wx=(x-off)*RS, wz=(z-off)*RS;
+    addBox(wx-RS/2, y*RS, wz-RS/2, RS, RS, RS, BCOL[c]);
+    k=(x-off)+','+(z-off);
+    W3.top[k]=Math.max(W3.top[k]||0, (y+1)*RS);
+  });
+  var desert=(bp.near==='eg'||bp.near==='ae');
+  W3.ground=desert?'#e6cf8e':'#7fb86a';
+  W3.sky=desert?['#bfe4f7','#fdf0cf']:['#a8dcf7','#e8f6ff'];
+  var spawnZ=off*RS+32;
+  for(j=0;j<46;j++){                        /* scenery, so movement is easy to feel */
+    var a=rnd(j*3+i)*Math.PI*2, r=26+rnd(j*7+i)*54;
+    var dx=Math.cos(a)*r, dz=Math.sin(a)*r;
+    if(Math.abs(dx)<off*RS+6 && Math.abs(dz)<off*RS+6) continue;
+    if(Math.hypot(dx, dz-spawnZ)<14) continue;   /* never drop scenery on the spawn point */
+    if(desert){
+      var mh=1.4+rnd(j*2)*1.6;
+      addBox(dx,0,dz,3+rnd(j)*3,mh,3+rnd(j*5)*3,'#dcbd72');
+      markSolid(dx+1.5,dz+1.5,mh);            /* low enough to step onto */
+    } else {
+      addBox(dx-0.8,0,dz-0.8,1.6,4.5,1.6,'#8a6b4a');
+      addBox(dx-3,4,dz-3,6,3.4,6,rnd(j*11)>0.5?'#4f9a5e':'#63b56a');
+      markSolid(dx,dz,8);                     /* the trunk stops you walking through */
+    }
+  }
+  var c=byId(bp.near), d=DETAIL[bp.near].lm;
+  var q=off*RS+10;
+  W3.spots=[                                /* three signposts to walk into and learn from */
+   {x:-q, z:q,  zh:d[0][1], en:d[0][2], e:d[0][0]},
+   {x:-q, z:-q, zh:d[1][1], en:d[1][2], e:d[1][0]},
+   {x:q,  z:0,  zh:c.f[0][1], en:c.f[0][2], e:c.f[0][0]}
+  ];
+  W3.spots.forEach(function(sp){ markSolid(sp.x, sp.z, 0); });
+  W3.px=0; W3.pz=off*RS+32; W3.feet=0; W3.yaw=0; W3.pitch=-0.02; W3.card=null;
+}
+function markSolid(x,z,top){
+  var k=Math.round(x/RS)+','+Math.round(z/RS);
+  W3.top[k]=Math.max(W3.top[k]||0, top);
+}
+function roamTop(x,z){ return W3.top[Math.round(x/RS)+','+Math.round(z/RS)]||0; }
+function roamMove(dt){
+  var sp=0, st=0, m=W3.move, K=W3.keys;
+  if(K.w||K.ArrowUp||m==='f') sp=1; if(K.s||K.ArrowDown||m==='b') sp=-1;
+  if(K.a||K.ArrowLeft||m==='l') st=-1; if(K.d||K.ArrowRight||m==='r') st=1;
+  if(!sp&&!st) return;
+  var v=17*dt, fx=Math.sin(W3.yaw), fz=-Math.cos(W3.yaw);
+  var nx=W3.px+(fx*sp+Math.cos(W3.yaw)*st)*v, nz=W3.pz+(fz*sp+Math.sin(W3.yaw)*st)*v;
+  var t=roamTop(nx,nz);
+  if(t<=W3.feet+RS+0.1){ W3.px=nx; W3.pz=nz; W3.feet=t; }   /* step up one block, like Minecraft */
+  else { var tx=roamTop(nx,W3.pz);
+         if(tx<=W3.feet+RS+0.1){ W3.px=nx; W3.feet=tx; }
+         else { var tz=roamTop(W3.px,nz); if(tz<=W3.feet+RS+0.1){ W3.pz=nz; W3.feet=tz; } } }
+  W3.px=Math.max(-95,Math.min(95,W3.px)); W3.pz=Math.max(-95,Math.min(95,W3.pz));
+  var i, s;
+  for(i=0;i<W3.spots.length;i++){
+    s=W3.spots[i];
+    if(!W3.found[i] && Math.hypot(s.x-W3.px, s.z-W3.pz)<7){
+      W3.found[i]=1; W3.card={i:i, t:performance.now()};
+      say(s.zh, s.en);
+      roamHud();
+      if(Object.keys(W3.found).length===3){
+        burst(150);
+        say('你把这里都逛遍啦！', 'You have explored the whole place!');
+      }
+    }
+  }
+}
+function roamDraw(){
+  var cv=W3.cv, ctx=W3.ctx, W=W3.w, H=W3.h;
+  var g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,W3.sky[0]); g.addColorStop(1,W3.sky[1]);
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  var f=(W/2)/Math.tan(0.42), ex=W3.px, ey=W3.feet+6, ez=W3.pz;
+  var cy=Math.cos(W3.yaw), sy=Math.sin(W3.yaw), cp=Math.cos(W3.pitch), sp2=Math.sin(W3.pitch);
+  function cam(x,y,z){
+    var dx=x-ex, dy=y-ey, dz=z-ez;
+    var rx=dx*cy+dz*sy, rz=dx*sy-dz*cy;
+    return {x:rx, y:dy*cp-rz*sp2, z:dy*sp2+rz*cp};
+  }
+  function clipProject(pts){
+    var out=[], n=pts.length, i, a, b, ain, bin, t;
+    for(i=0;i<n;i++){
+      a=pts[i]; b=pts[(i+1)%n]; ain=a.z>0.4; bin=b.z>0.4;
+      if(ain) out.push(a);
+      if(ain!==bin){ t=(0.4-a.z)/(b.z-a.z);
+        out.push({x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t, z:0.4}); }
+    }
+    if(out.length<3) return null;
+    return out.map(function(p){ return [W/2+f*p.x/p.z, H/2-f*p.y/p.z]; });
+  }
+  var quads=[];
+  function push(pts,col,dist){
+    var pr=clipProject(pts); if(pr) quads.push({p:pr,c:col,d:dist});
+  }
+  /* ground: one big quad that follows the player */
+  push([cam(ex-160,0,ez-160),cam(ex+160,0,ez-160),cam(ex+160,0,ez+160),cam(ex-160,0,ez+160)],
+       W3.ground, 1e9);
+  var i, j, bx, fc, n, cxm, cym, czm, dd, pts, k;
+  for(i=0;i<W3.boxes.length;i++){
+    bx=W3.boxes[i];
+    cxm=bx.x+bx.w/2; cym=bx.y+bx.h/2; czm=bx.z+bx.d/2;
+    dd=(cxm-ex)*(cxm-ex)+(cym-ey)*(cym-ey)+(czm-ez)*(czm-ez);
+    if(dd>19000) continue;
+    for(j=0;j<5;j++){
+      fc=ROAMFACE[j]; n=fc[0];
+      if(n[0]*(cxm+n[0]*bx.w/2-ex)+n[1]*(cym+n[1]*bx.h/2-ey)+n[2]*(czm+n[2]*bx.d/2-ez)>=0) continue;
+      pts=[];
+      for(k=0;k<4;k++){
+        var o=fc[1][k];
+        pts.push(cam(bx.x+o[0]*bx.w, bx.y+o[1]*bx.h, bx.z+o[2]*bx.d));
+      }
+      push(pts, bx.cols[j], dd);
+    }
+  }
+  /* knowledge markers */
+  for(i=0;i<W3.spots.length;i++){
+    if(W3.found[i]) continue;
+    var s=W3.spots[i], bob=Math.sin(performance.now()/380+i)*0.5+3.4, hw=1.0, ht=2.2;
+    dd=(s.x-ex)*(s.x-ex)+(s.z-ez)*(s.z-ez);
+    push([cam(s.x-0.25,0,s.z-0.25),cam(s.x+0.25,0,s.z-0.25),cam(s.x+0.25,bob,s.z-0.25),cam(s.x-0.25,bob,s.z-0.25)],
+         '#a5794e', dd+2);                   /* the post */
+    push([cam(s.x-hw,bob,s.z),cam(s.x+hw,bob,s.z),cam(s.x+hw,bob+ht,s.z),cam(s.x-hw,bob+ht,s.z)],
+         '#ffd54a', dd-1);
+    push([cam(s.x,bob,s.z-hw),cam(s.x,bob,s.z+hw),cam(s.x,bob+ht,s.z+hw),cam(s.x,bob+ht,s.z-hw)],
+         '#f2b52e', dd-1);
+  }
+  quads.sort(function(a,b){ return b.d-a.d; });
+  ctx.lineWidth=1; ctx.strokeStyle='rgba(30,45,60,.13)'; ctx.lineJoin='round';
+  for(i=0;i<quads.length;i++){
+    var q=quads[i];
+    ctx.beginPath(); ctx.moveTo(q.p[0][0],q.p[0][1]);
+    for(j=1;j<q.p.length;j++) ctx.lineTo(q.p[j][0],q.p[j][1]);
+    ctx.closePath(); ctx.fillStyle=q.c; ctx.fill();
+    if(q.d<4200) ctx.stroke();               /* block edges, but only where they read */
+  }
+}
+function roamTick(now){
+  if(MODE!=='roam'){ W3.raf=0; return; }
+  var dt=Math.min(0.05,(now-W3.last)/1000); W3.last=now;
+  roamMove(dt); roamDraw();
+  W3.raf=requestAnimationFrame(roamTick);
+}
+function roamResize(){
+  var cv=W3.cv; if(!cv) return;
+  var r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  W3.w=Math.max(260,r.width); W3.h=Math.max(220,Math.round(W3.w*0.62));
+  cv.width=W3.w*dpr; cv.height=W3.h*dpr; cv.style.height=W3.h+'px';
+  W3.ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function roamHud(){
+  var el=document.getElementById('roamHud'); if(!el) return;
+  var n=Object.keys(W3.found).length;
+  el.innerHTML='<span class="rFind">🔎 '+T('找到 '+n+' / 3 个小知识','found '+n+' / 3')+'</span>';
+  var c=document.getElementById('roamCard');
+  if(c){
+    if(W3.card){
+      var s=W3.spots[W3.card.i];
+      c.className='roamCard show';
+      c.innerHTML='<span class="emo">'+s.e+'</span><span class="stack">'+T(s.zh,s.en)+'</span>';
+      clearTimeout(W3.cardT);
+      W3.cardT=setTimeout(function(){ c.className='roamCard'; W3.card=null; }, 6000);
+    } else c.className='roamCard';
+  }
+}
+function renderRoam(){
+  var bp=BP[W3.site];
+  var h='<div class="qHead"><div class="qTitle stack">'+T('🌍 漫游世界','🌍 Explore')+'</div>'+
+        '<div class="grow"></div><div id="roamHud"></div></div>';
+  h+='<div class="wonSel">'+BP.map(function(b,i){
+      return '<button class="btn'+(i===W3.site?' on':'')+'" data-rs="'+i+'">'+
+             (b.eraZh==='古代'?'🏛️ ':'🏙️ ')+T(b.zh,b.en)+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="roamWrap"><canvas id="roamCv"></canvas>'+
+     '<div class="roamCard" id="roamCard"></div>'+
+     '<div class="roamPad">'+
+     '<button data-mv="l">◀</button><div class="col">'+
+     '<button data-mv="f">▲</button><button data-mv="b">▼</button></div>'+
+     '<button data-mv="r">▶</button></div>'+
+     '<div class="roamTip stack">'+T('拖动画面转头 · 按住方向键走路','drag to look · hold the arrows to walk')+'</div>'+
+     '</div>';
+  h+='<div class="bTools"><button class="btn" id="rBack">↩️ '+T('回到入口','Back to the start')+'</button>'+
+     '<button class="btn" id="rGo">🔍 '+T('看看这个国家','See the country')+'</button></div>';
+  document.getElementById('roamPanel').innerHTML=h;
+  W3.cv=document.getElementById('roamCv'); W3.ctx=W3.cv.getContext('2d');
+  roamBuild(W3.site); roamResize(); roamHud();
+  var panel=document.getElementById('roamPanel');
+  Array.prototype.forEach.call(panel.querySelectorAll('[data-rs]'),function(b){
+    b.onclick=function(){ W3.site=+b.dataset.rs; renderRoam();
+      say('欢迎来到'+BP[W3.site].zh, 'Welcome to the '+BP[W3.site].en); };
+  });
+  Array.prototype.forEach.call(panel.querySelectorAll('[data-mv]'),function(b){
+    var d=b.dataset.mv;
+    b.addEventListener('pointerdown',function(e){ W3.move=d; b.classList.add('on');
+      try{ b.setPointerCapture(e.pointerId); }catch(err){} e.preventDefault(); });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+      b.addEventListener(ev,function(){ if(W3.move===d) W3.move=null; b.classList.remove('on'); });
+    });
+  });
+  W3.cv.addEventListener('pointerdown',function(e){
+    W3.drag={x:e.clientX,y:e.clientY};
+    try{ W3.cv.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  W3.cv.addEventListener('pointermove',function(e){
+    if(!W3.drag) return;
+    W3.yaw+=(e.clientX-W3.drag.x)*0.006;
+    W3.pitch=Math.max(-0.9,Math.min(0.9,W3.pitch-(e.clientY-W3.drag.y)*0.004));
+    W3.drag={x:e.clientX,y:e.clientY};
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    W3.cv.addEventListener(ev,function(){ W3.drag=null; });
+  });
+  document.getElementById('rBack').onclick=function(){
+    var off=(BP[W3.site].n-1)/2;
+    W3.px=0; W3.pz=off*RS+32; W3.feet=0; W3.yaw=0; W3.pitch=-0.02;
+  };
+  document.getElementById('rGo').onclick=function(){ setMode('learn'); select(bp.near,true); };
+  if(!W3.raf){ W3.last=performance.now(); W3.raf=requestAnimationFrame(roamTick); }
+}
+document.addEventListener('keydown',function(e){ if(MODE==='roam'){ W3.keys[e.key]=1;
+  if(/^Arrow/.test(e.key)) e.preventDefault(); } });
+document.addEventListener('keyup',function(e){ W3.keys[e.key]=0; });
+window.addEventListener('resize',function(){ if(MODE==='roam') roamResize(); });
+
+/* ============================================================
    5. UI
    ============================================================ */
 var current=COUNTRIES[0], filter='all';
@@ -3086,7 +3359,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
     cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
-var MODES=['learn','civ','won','place','build','hunt','animal','quiz','passport'];
+var MODES=['learn','civ','won','place','build','roam','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
@@ -3101,6 +3374,7 @@ function setMode(m){
   if(m==='won'){ renderWon(); flyTo(WONDERS[wonIdx]); sayWon(); }
   if(m==='place'){ renderPlace(); flyTo(PLACES[placeIdx]); sayPlace(); }
   if(m==='build'){ bLoad(); renderBuild(); }
+  if(m==='roam') renderRoam();
   if(m==='hunt') startHunt();
   if(m==='quiz') startQuiz();
   if(m==='animal') startAnimal();
