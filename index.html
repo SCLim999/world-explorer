@@ -184,6 +184,8 @@
   .roamZoom .btn{background:rgba(255,255,255,.82);border-color:rgba(31,59,87,.18);padding:6px 12px;font-size:15px}
 
   /* ---------- zoom & full screen ---------- */
+  .bpBtn svg{width:23px;height:15.3px;border-radius:2px;vertical-align:-2px;margin-right:6px;
+    box-shadow:0 1px 3px rgba(0,0,0,.28)}
   .zoomGrp{display:inline-flex;gap:6px}
   .zoomGrp .btn[disabled]{opacity:.4}
   body.fs-globe #globeWrap{background:linear-gradient(180deg,#dff0ff,#eaf7ff);justify-content:center;height:100vh}
@@ -2863,6 +2865,51 @@ var BP=[
     });
     bpRing(p,1,2,6,'wood'); p(4,4,2,'wood');
     bpRing(p,3,3,5,'wood'); p(4,4,3,'wood'); p(4,4,4,'wood'); p(4,4,5,'stone');
+  }},
+ {id:'chichen',zh:'奇琴伊察金字塔',en:'Chichén Itzá',eraZh:'古代',eraEn:'ancient',n:9,near:'mx',
+  gen:function(p){
+    bpRing(p,0,1,7,'sand'); bpRing(p,1,2,6,'sand'); bpRing(p,2,3,5,'sand');
+    bpFill(p,3,3,5,'stone');
+    p(4,8,0,'sand'); p(4,0,0,'sand');          /* the great staircases */
+  }},
+ {id:'boro',zh:'婆罗浮屠',en:'Borobudur',eraZh:'古代',eraEn:'ancient',n:9,near:'id',
+  gen:function(p){
+    bpRing(p,0,1,7,'stone'); bpRing(p,1,2,6,'stone'); bpRing(p,2,3,5,'stone');
+    p(4,4,3,'stone'); p(3,4,3,'stone'); p(5,4,3,'stone'); p(4,3,3,'stone'); p(4,5,3,'stone');
+    p(4,4,4,'white');
+  }},
+ {id:'taj',zh:'泰姬陵',en:'Taj Mahal',eraZh:'古代',eraEn:'ancient',n:9,near:'in',
+  gen:function(p){
+    bpFill(p,0,3,5,'white'); bpFill(p,1,3,5,'white'); bpFill(p,2,3,5,'white');
+    p(4,4,3,'white'); p(3,4,3,'white'); p(5,4,3,'white'); p(4,3,3,'white'); p(4,5,3,'white');
+    p(4,4,4,'white');
+    [[1,1],[1,7],[7,1],[7,7]].forEach(function(q){
+      for(var y=0;y<4;y++) p(q[0],q[1],y,'white');
+    });
+  }},
+ {id:'bigben',zh:'大本钟',en:'Big Ben',eraZh:'现代',eraEn:'modern',n:9,near:'gb',
+  gen:function(p){
+    bpFill(p,0,3,6,'sand');
+    for(var y=1;y<4;y++){ p(4,4,y,'sand'); p(5,4,y,'sand'); p(4,5,y,'sand'); p(5,5,y,'sand'); }
+    bpFill(p,4,3,6,'brick');
+    p(4,4,5,'sand'); p(5,4,5,'sand'); p(4,5,5,'sand'); p(5,5,5,'sand');
+  }},
+ {id:'castle',zh:'新天鹅堡',en:'Neuschwanstein Castle',eraZh:'现代',eraEn:'modern',n:9,near:'de',
+  gen:function(p){
+    bpFill(p,0,3,6,'white'); bpFill(p,1,3,6,'white');
+    [[3,3],[6,3],[3,6],[6,6]].forEach(function(q){
+      for(var y=2;y<5;y++) p(q[0],q[1],y,'white');
+    });
+    p(4,4,2,'white'); p(5,4,2,'white'); p(4,5,2,'white'); p(5,5,2,'white');
+    p(4,4,3,'white'); p(5,4,3,'white'); p(4,5,3,'white'); p(5,5,3,'white');
+    p(3,3,5,'water'); p(6,6,5,'water');
+  }},
+ {id:'mbs',zh:'滨海湾金沙',en:'Marina Bay Sands',eraZh:'现代',eraEn:'modern',n:9,near:'sg',
+  gen:function(p){
+    [1,4,7].forEach(function(cx){
+      for(var y=0;y<5;y++){ p(cx,4,y,'water'); p(cx,5,y,'water'); }
+    });
+    for(var x=0;x<9;x++){ p(x,4,5,'white'); p(x,5,5,'white'); }
   }}
 ];
 var bpIdx=0, bLayer=0, bPaint='stone', bFree=false, build={}, target={}, bDone=false;
@@ -2959,8 +3006,8 @@ function renderBuild(){
         '<div class="grow"></div>'+
         (bFree?'':'<div class="score" id="bScore">'+c.got+' / '+c.need+'</div>')+'</div>';
   h+='<div class="wonSel">'+BP.map(function(b,i){
-      return '<button class="btn'+(!bFree&&i===bpIdx?' on':'')+'" data-bp="'+i+'">'+
-             (b.eraZh==='古代'?'🏛️ ':'🏙️ ')+T(b.zh,b.en)+'</button>';
+      return '<button class="btn bpBtn'+(!bFree&&i===bpIdx?' on':'')+'" data-bp="'+i+'">'+
+             flagSVG(b.near)+T(b.zh,b.en)+'</button>';
     }).join('')+'<button class="btn'+(bFree?' on':'')+'" data-bp="free">✨ '+
     T('自由搭建','Free build')+'</button></div>';
   h+='<div class="bMsg stack" id="bMsg">'+(bFree
@@ -3055,6 +3102,7 @@ function roamBuild(i){
     var dx=Math.cos(a)*r, dz=Math.sin(a)*r;
     if(Math.abs(dx)<off*RS+6 && Math.abs(dz)<off*RS+6) continue;
     if(Math.hypot(dx, dz-spawnZ)<14) continue;   /* never drop scenery on the spawn point */
+    if(Math.abs(dx)<18 && dz>0 && dz<spawnZ+10) continue;  /* keep the approach lane clear */
     if(desert){
       var mh=1.4+rnd(j*2)*1.6;
       addBox(dx,0,dz,3+rnd(j)*3,mh,3+rnd(j*5)*3,'#dcbd72');
@@ -3214,8 +3262,8 @@ function renderRoam(){
   var h='<div class="qHead"><div class="qTitle stack">'+T('🌍 漫游世界','🌍 Explore')+'</div>'+
         '<div class="grow"></div><div id="roamHud"></div></div>';
   h+='<div class="wonSel">'+BP.map(function(b,i){
-      return '<button class="btn'+(i===W3.site?' on':'')+'" data-rs="'+i+'">'+
-             (b.eraZh==='古代'?'🏛️ ':'🏙️ ')+T(b.zh,b.en)+'</button>';
+      return '<button class="btn bpBtn'+(i===W3.site?' on':'')+'" data-rs="'+i+'">'+
+             flagSVG(b.near)+T(b.zh,b.en)+'</button>';
     }).join('')+'</div>';
   h+='<div class="roamWrap"><canvas id="roamCv"></canvas>'+
      '<div class="roamCard" id="roamCard"></div>'+
