@@ -41,9 +41,14 @@
   .btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
   .btn.big{font-size:18px;padding:12px 22px;background:var(--yellow);border-color:#f0b21f}
   .seg{display:flex;gap:6px;background:#f4f8ff;padding:5px;border-radius:999px}
+  /* a sound switch, not a fourth language: green when on, so it never reads as one of them */
+  #spkBtn.on{background:#e8f8ee;border-color:#9ad9b0;color:#1a7038}
 
-  main{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,1fr);gap:16px}
+  main{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(320px,1fr) minmax(320px,1fr);
+    gap:16px;align-items:start}
   @media (max-width:880px){main{grid-template-columns:1fr}}
+  /* the globe follows you down the card instead of leaving a tall empty panel */
+  @media (min-width:881px){ body.m-learn #globeWrap{position:sticky;top:14px} }
   .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
 
   /* ---------- globe ---------- */
@@ -59,7 +64,13 @@
   #journey .veh{font-size:26px;line-height:1.2}
   #journey b{color:#1a6fc4}
   @keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
-  .globeTools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+  .globeTools{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+  .globeTools .btn{font-size:14.5px;padding:6px 12px;border-width:2px}
+  /* on a phone the row of six buttons wrapped four deep — drop to icons only */
+  @media (max-width:620px){
+    .globeTools .btn .zh,.globeTools .btn .en{display:none}
+    .globeTools .btn{font-size:18px;padding:7px 12px}
+  }
 
   /* ---------- country card ---------- */
   .flagBox{width:132px;height:88px;border-radius:10px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.25);flex:none}
@@ -85,8 +96,25 @@
 
   /* ---------- picker ---------- */
   .picker{max-width:1180px;margin:16px auto 0}
+  .pkHead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .pkHead .t{font-size:19px;font-weight:bold}
+  .pkHead .t .en{font-size:15px;color:var(--ink2)}
+  .pkHead .n{font-size:14px;color:var(--ink2)}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .tabs .btn{font-size:15px;padding:6px 13px}
+  /* one swipeable row beats three wrapped rows on a phone */
+  @media (max-width:620px){
+    .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+      padding-bottom:4px;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    .tabs .btn{flex:none}
+  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+  @media (max-width:620px){
+    .grid{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+    .cbtn span{font-size:12.5px}
+    .cbtn .en{font-size:11px}
+  }
   .cbtn{background:#fff;border:3px solid #e6eefb;border-radius:16px;padding:8px;text-align:center;box-shadow:0 3px 0 rgba(31,59,87,.08);transition:transform .12s}
   .cbtn:hover{transform:translateY(-3px);border-color:var(--blue)}
   .cbtn.on{border-color:var(--orange);background:#fff8ec}
@@ -355,8 +383,13 @@
     font-size:11.5px;font-weight:bold;color:var(--ink2);text-align:center;line-height:1.2}
   .civTime .tk.on span{color:#b9761a}
   .civTime .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-top:44px}
-  .navbar{display:flex;gap:6px;flex-wrap:wrap}
+  .navbar{display:flex;gap:14px;flex-wrap:wrap;width:100%;border-top:2px solid #eef3fa;padding-top:11px}
+  .navbar .btn{font-size:15px;padding:6px 13px}
   .navbar .btn.on{background:var(--orange);border-color:#e07f1f;color:#fff}
+  .navGrp{display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+    background:#f7fafe;border-radius:16px;padding:6px 10px}
+  .gLab{font-size:11px;font-weight:bold;color:var(--ink2);letter-spacing:.5px;line-height:1.1;
+    padding-right:2px;text-align:right}
   #ppCount{background:rgba(255,255,255,.7);border-radius:999px;padding:1px 7px;font-size:13px;margin-left:2px}
 
   /* ---------- hunt ---------- */
@@ -430,16 +463,16 @@
   #confetti{position:fixed;inset:0;pointer-events:none;display:none;z-index:65}
   footer{max-width:1180px;margin:18px auto 6px;text-align:center;color:var(--ink2);font-size:14px}
 
-  /* ---------- local time · home · compare ---------- */
-  .infoRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  .chip{flex:1 1 200px;background:#f2f8ff;border-radius:16px;padding:10px 14px;font-size:15px;line-height:1.4;
-    display:flex;gap:9px;align-items:flex-start}
-  .chip .emo{font-size:22px;line-height:1.15;flex:none}
-  .chip b{color:#1a6fc4}
-  .chip.home{background:linear-gradient(90deg,#fff3d6,#eafaf0)}
-  .chip.night{background:linear-gradient(90deg,#e7ecfb,#f3eaff)}
-  .chip .btn{margin-top:6px;font-size:14px;padding:5px 12px;border-width:2px}
-  .cmpLine+.cmpLine{margin-top:4px}
+  /* ---------- little fact file: time · distance · size · people ---------- */
+  .fxGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(188px,1fr));gap:10px;margin-top:12px}
+  .fx{background:#f2f8ff;border-radius:16px;padding:9px 13px;display:flex;gap:10px;align-items:center}
+  .fx .ic{font-size:24px;line-height:1.1;flex:none}
+  .fx .v{font-size:20px;font-weight:bold;color:#1a6fc4;line-height:1.2}
+  .fx .cp{font-size:13px;color:var(--ink2);line-height:1.3;margin-top:1px}
+  .fx.night{background:linear-gradient(90deg,#e7ecfb,#f3eaff)}
+  .fx.home{background:linear-gradient(90deg,#fff3d6,#eafaf0)}
+  .fx.wide{grid-column:1/-1}
+  .fx .btn{margin-top:5px;font-size:14px;padding:5px 12px;border-width:2px}
 
   /* ---------- daily trip ---------- */
   #daily{display:none;background:linear-gradient(90deg,#eaf4ff,#fff0f6);border-radius:18px;padding:10px 14px;
@@ -447,6 +480,11 @@
   body.m-learn #daily{display:flex}
   #daily svg{width:54px;height:36px;border-radius:5px;box-shadow:0 2px 6px rgba(0,0,0,.2);flex:none}
   #daily b{color:#1a6fc4}
+  /* on a phone the text was squeezed into a two-word column between flag and button */
+  @media (max-width:560px){
+    #daily{font-size:15px}
+    #daily .btn{flex:1 0 100%;text-align:center}
+  }
 
   /* ---------- home picker ---------- */
   #homePick{position:fixed;inset:0;background:rgba(20,45,75,.6);display:none;align-items:center;
@@ -494,20 +532,30 @@
     <button class="btn" data-lang="zh">中文</button>
     <button class="btn" data-lang="en">English</button>
   </div>
-  <div class="navbar" id="modeNav">
-    <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
-    <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
-    <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
-    <button class="btn" data-m="place">🧭 <span class="zh">特别的地方</span><span class="en">Places</span></button>
-    <button class="btn" data-m="war">🕊️ <span class="zh">两次大战</span><span class="en">World Wars</span></button>
-    <button class="btn" data-m="build">🧱 <span class="zh">搭建工坊</span><span class="en">Build</span></button>
-    <button class="btn" data-m="roam">🌍 <span class="zh">漫游世界</span><span class="en">Explore</span></button>
-    <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
-    <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
-    <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
-    <button class="btn" data-m="passport">🛂 <span class="zh">护照</span><span class="en">Passport</span><b id="ppCount">0/40</b></button>
-    <button class="btn on" id="spkBtn">🔊 <span class="zh">朗读</span><span class="en">Voice</span></button>
-  </div>
+  <button class="btn on" id="spkBtn">🔊 <span class="zh">朗读</span><span class="en">Voice</span></button>
+  <!-- eleven flat buttons read as a wall; three labelled groups read as a menu -->
+  <nav class="navbar" id="modeNav">
+    <span class="navGrp">
+      <b class="gLab stack"><span class="zh">认识世界</span><span class="en">Discover</span></b>
+      <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
+      <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
+      <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
+      <button class="btn" data-m="place">🧭 <span class="zh">特别的地方</span><span class="en">Places</span></button>
+      <button class="btn" data-m="war">🕊️ <span class="zh">两次大战</span><span class="en">World Wars</span></button>
+    </span>
+    <span class="navGrp">
+      <b class="gLab stack"><span class="zh">动手玩</span><span class="en">Make</span></b>
+      <button class="btn" data-m="build">🧱 <span class="zh">搭建工坊</span><span class="en">Build</span></button>
+      <button class="btn" data-m="roam">🌍 <span class="zh">漫游世界</span><span class="en">Explore</span></button>
+    </span>
+    <span class="navGrp">
+      <b class="gLab stack"><span class="zh">游戏</span><span class="en">Games</span></b>
+      <button class="btn" data-m="hunt">🎯 <span class="zh">寻宝</span><span class="en">Hunt</span></button>
+      <button class="btn" data-m="animal">🐾 <span class="zh">动物找家</span><span class="en">Animals</span></button>
+      <button class="btn" data-m="quiz">🚩 <span class="zh">国旗</span><span class="en">Flags</span></button>
+      <button class="btn" data-m="passport">🛂 <span class="zh">护照</span><span class="en">Passport</span><b id="ppCount">0/40</b></button>
+    </span>
+  </nav>
 </header>
 
 <main id="stage">
@@ -515,13 +563,13 @@
     <canvas id="globe"></canvas>
     <div id="journey"></div>
     <div class="globeTools">
-      <button class="btn" id="spinBtn">⏸ <span class="zh">暂停转动</span><span class="en">Pause</span></button>
-      <button class="btn" id="findBtn">🎯 <span class="zh">飞到这个国家</span><span class="en">Fly there</span></button>
-      <button class="btn on" id="dnBtn">🌗 <span class="zh">昼夜</span><span class="en">Day &amp; night</span></button>
-      <button class="btn on" id="planeBtn">✈️ <span class="zh">飞机</span><span class="en">Planes</span></button>
-      <button class="btn" id="homeBtn">🏠 <span class="zh">回家看看</span><span class="en">Go home</span></button>
+      <button class="btn" id="spinBtn" title="暂停转动 / Pause">⏸ <span class="zh">转动</span><span class="en">Spin</span></button>
+      <button class="btn" id="findBtn" title="飞到这个国家 / Fly there">🎯 <span class="zh">飞过去</span><span class="en">Fly there</span></button>
+      <button class="btn on" id="dnBtn" title="昼夜 / Day &amp; night">🌗 <span class="zh">昼夜</span><span class="en">Day &amp; night</span></button>
+      <button class="btn on" id="planeBtn" title="飞机 / Planes">✈️ <span class="zh">飞机</span><span class="en">Planes</span></button>
+      <button class="btn" id="homeBtn" title="回家看看 / Go home">🏠 <span class="zh">我的家</span><span class="en">Home</span></button>
       <span class="zoomGrp"><button class="btn" id="zOut" disabled>🔍−</button><button class="btn" id="zIn">🔍＋</button>
-      <button class="btn" id="fsBtn">⛶ <span class="zh">全屏</span><span class="en">Full screen</span></button></span>
+      <button class="btn" id="fsBtn" title="全屏 / Full screen">⛶ <span class="zh">全屏</span><span class="en">Full</span></button></span>
     </div>
     <p class="hint stack" id="globeHint">
       <span class="zh">拖动地球转一转！点亮的小圆点就是国家，点一点飞过的小飞机，看看它要飞去哪里。</span>
@@ -545,6 +593,10 @@
 </main>
 
 <section class="picker panel" id="picker">
+  <div class="pkHead">
+    <div class="t stack"><span class="zh">🗺️ 选一个国家</span><span class="en">🗺️ Pick a country</span></div>
+    <div class="grow"></div><div class="n stack" id="pkCount"></div>
+  </div>
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
 </section>
@@ -2741,47 +2793,50 @@ function times(a,b){
   if(r<=0.67) return {k:-1, n:Math.round(b/a).toLocaleString()};
   return {k:0};
 }
-function cmpLine(kind,a,b,hz,he){
-  var t=times(a,b), zh, en;
-  if(kind==='size'){
-    zh = t.k>0 ? '📏 有 <b>'+t.n+'</b> 个'+hz+'那么大'
-       : t.k<0 ? '📏 '+hz+'有 <b>'+t.n+'</b> 个它那么大'
-       : '📏 和'+hz+'差不多大';
-    en = t.k>0 ? '📏 <b>'+t.n+'×</b> the size of '+he
-       : t.k<0 ? '📏 '+he+' is <b>'+t.n+'×</b> its size'
-       : '📏 about the same size as '+he;
+/* one little card per fact, all the same shape: icon · big value · caption.
+   Four chips of different sizes and colours used to sit here and read as clutter. */
+function fxCell(cls,ic,val,capZh,capEn){
+  return '<div class="fx'+(cls?' '+cls:'')+'"><span class="ic">'+ic+'</span><div>'+
+         '<div class="v">'+val+'</div><div class="cp stack">'+T(capZh,capEn)+'</div></div></div>';
+}
+function cmpCell(kind,a,b,hz,he){
+  var t=times(a,b), ic=kind==='size'?'📐':'👨‍👩‍👧', val, zh, en;
+  if(t.k===0){
+    val='≈';
+    zh=kind==='size'?('和'+hz+'差不多大'):('人数和'+hz+'差不多');
+    en=kind==='size'?('about the size of '+he):('about as many people as '+he);
+  } else if(t.k>0){
+    val=t.n+' ×';
+    zh=kind==='size'?('个'+hz+'那么大'):('个'+hz+'那么多人');
+    en=kind==='size'?('the size of '+he):('the people of '+he);
   } else {
-    zh = t.k>0 ? '👨‍👩‍👧 人有 <b>'+t.n+'</b> 个'+hz+'那么多'
-       : t.k<0 ? '👨‍👩‍👧 '+hz+'的人有 <b>'+t.n+'</b> 个它那么多'
-       : '👨‍👩‍👧 人数和'+hz+'差不多';
-    en = t.k>0 ? '👨‍👩‍👧 <b>'+t.n+'×</b> as many people as '+he
-       : t.k<0 ? '👨‍👩‍👧 '+he+' has <b>'+t.n+'×</b> as many people'
-       : '👨‍👩‍👧 about as many people as '+he;
+    val=t.n+' ×';
+    zh=kind==='size'?('你家（'+hz+'）比它大这么多倍'):('你家（'+hz+'）的人比它多这么多倍');
+    en=kind==='size'?('your home ('+he+') is this much bigger'):('your home ('+he+') has this many times more people');
   }
-  return '<div class="cmpLine stack">'+T(zh,en)+'</div>';
+  return fxCell('',ic,val,zh,en);
 }
 function infoRow(c){
-  var lt=localTime(c), dp=dayPart(lt.h), h=homeC(), s='<div class="infoRow">';
-  var atHome = h && h.id===c.id;
-  s+='<div class="chip'+(lt.h<6||lt.h>=19?' night':'')+'"><span class="emo">'+dp[1]+'</span><span class="stack">'+
-     T('现在'+(atHome?'你家':'那边')+'是 <b>'+lt.txt+'</b>，'+dp[2],
-       'It is <b>'+lt.txt+'</b> '+(atHome?'where you live':'there')+' — '+dp[3])+'</span></div>';
+  var lt=localTime(c), dp=dayPart(lt.h), h=homeC(), atHome=h&&h.id===c.id;
+  var s='<div class="fxGrid">';
+  s+=fxCell(lt.h<6||lt.h>=19?'night':'', dp[1], lt.txt,
+            (atHome?'你家现在的时间，':'那边现在的时间，')+dp[2],
+            (atHome?'the time where you live — ':'the time there — ')+dp[3]);
   if(!h){
-    s+='<div class="chip home"><span class="emo">🏠</span><span>'+
-       '<span class="stack">'+T('告诉我你住在哪里，就能算出离家有多远！','Tell me where you live and I can measure the distance!')+'</span>'+
-       '<button class="btn" id="setHomeB">'+T('选我的家','Pick my home')+'</button></span></div>';
-  } else if(h.id===c.id){
-    s+='<div class="chip home"><span class="emo">🏠</span><span class="stack">'+
-       T('这里就是你的家！','This is your home!')+'</span></div>';
+    s+='<div class="fx home wide"><span class="ic">🏠</span><div><div class="cp stack">'+
+       T('告诉我你住在哪里，就能算出离家有多远、有几个你家那么大！',
+         'Tell me where you live and I can work out how far away it is and how many of your home it would take!')+'</div>'+
+       '<button class="btn" id="setHomeB">'+T('选我的家','Pick my home')+'</button></div></div>';
+  } else if(atHome){
+    s+=fxCell('home wide','🏠','🎉',
+       '这里就是你的家！','This is your home!');
   } else {
     var info=routeInfo(h,c), tt=travelTime(info), V=VEHICLES[info.v];
-    s+='<div class="chip home"><span class="emo">'+V.e+'</span><span class="stack">'+
-       T('离你家 <b>'+info.dist.toLocaleString()+'</b> 公里，'+V.zh+tt.zh,
-         '<b>'+info.dist.toLocaleString()+' km</b> from home, '+tt.en+' '+V.en)+'</span></div>';
     var fa=FACTS[c.id], fh=FACTS[h.id];
-    s+='<div class="chip"><span class="emo">⚖️</span><span>'+
-       cmpLine('size',fa.area,fh.area,h.zh,h.en)+
-       cmpLine('pop',fa.pop,fh.pop,h.zh,h.en)+'</span></div>';
+    s+=fxCell('home',V.e,info.dist.toLocaleString()+' '+T('公里','km'),
+       '离你家这么远，'+V.zh+tt.zh, 'from home — '+tt.en+' '+V.en);
+    s+=cmpCell('size',fa.area,fh.area,h.zh,h.en);
+    s+=cmpCell('pop',fa.pop,fh.pop,h.zh,h.en);
   }
   return s+'</div>';
 }
@@ -3980,6 +4035,14 @@ function markGrid(){
   Array.prototype.forEach.call(document.querySelectorAll('#grid .cbtn'),function(b){
     b.classList.toggle('on', b.dataset.id===current.id);
   });
+  pkCount();
+}
+function pkCount(){
+  var el=document.getElementById('pkCount'); if(!el) return;
+  var list=COUNTRIES.filter(function(c){return filter==='all'||c.c===filter;});
+  var got=list.filter(function(c){ return passport && passport[c.id]; }).length;
+  el.innerHTML=T('这一组有 '+list.length+' 个国家 · 已经认识 <b>'+got+'</b> 个',
+                 list.length+' countries here · <b>'+got+'</b> visited');
 }
 Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function(b){
   b.onclick=function(){
@@ -4025,7 +4088,7 @@ document.getElementById('spkBtn').onclick=function(){
 };
 document.getElementById('spinBtn').onclick=function(){
   spinning=!spinning;
-  this.innerHTML=(spinning?'⏸ ':'▶️ ')+(spinning?T('暂停转动','Pause'):T('继续转动','Spin'));
+  this.innerHTML=(spinning?'⏸ ':'▶️ ')+T('转动','Spin');
 };
 document.getElementById('findBtn').onclick=function(){ flyTo(current); };
 document.getElementById('dnBtn').onclick=function(){
@@ -4603,7 +4666,7 @@ function stampCount(){ var n=0; for(var k in passport) if(passport[k]) n++; retu
 function updateBadge(){ document.getElementById('ppCount').textContent=stampCount()+'/'+COUNTRIES.length; }
 function addStamp(id){
   if(passport[id]) return false;
-  passport[id]=1; savePassport(); updateBadge(); showStampFx(id);
+  passport[id]=1; savePassport(); updateBadge(); pkCount(); showStampFx(id);
   if(document.body.classList.contains('m-passport')) renderPassport();
   if(stampCount()===COUNTRIES.length) setTimeout(function(){ burst(180); }, 1000);
   return true;
