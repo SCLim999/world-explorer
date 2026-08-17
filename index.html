@@ -180,6 +180,21 @@
   .roamCard .emo{font-size:22px;flex:none}
   .roamTip{text-align:center;font-size:13.5px;color:var(--ink2);margin-top:8px}
   #roamHud .rFind{font-size:16px;font-weight:bold;background:#fff7e6;border-radius:999px;padding:5px 14px}
+  .roamZoom{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px}
+  .roamZoom .btn{background:rgba(255,255,255,.82);border-color:rgba(31,59,87,.18);padding:6px 12px;font-size:15px}
+
+  /* ---------- zoom & full screen ---------- */
+  .zoomGrp{display:inline-flex;gap:6px}
+  .zoomGrp .btn[disabled]{opacity:.4}
+  body.fs-globe #globeWrap{background:linear-gradient(180deg,#dff0ff,#eaf7ff);justify-content:center;height:100vh}
+  body.fs-globe #globe{max-width:min(94vw,84vh)}
+  body.fs-globe #journey,body.fs-globe #globeWrap .hint{display:none}
+  body.fs-roam .roamWrap{max-width:none;width:100vw;height:100vh;background:#0d1b2a;
+    display:flex;align-items:center;justify-content:center}
+  body.fs-roam #roamCv{border-radius:0;box-shadow:none}
+  body.fs-roam .roamTip{display:none}
+  body.fs-roam .roamPad{left:22px;bottom:22px}
+  body.fs-roam .roamZoom{right:22px;bottom:22px}
 
   /* ---------- CSS 3D models ---------- */
   .m3d{position:relative;width:100%;max-width:260px;height:252px;margin:4px auto 10px;
@@ -376,6 +391,8 @@
       <button class="btn on" id="dnBtn">🌗 <span class="zh">昼夜</span><span class="en">Day &amp; night</span></button>
       <button class="btn on" id="planeBtn">✈️ <span class="zh">飞机</span><span class="en">Planes</span></button>
       <button class="btn" id="homeBtn">🏠 <span class="zh">回家看看</span><span class="en">Go home</span></button>
+      <span class="zoomGrp"><button class="btn" id="zOut" disabled>🔍−</button><button class="btn" id="zIn">🔍＋</button>
+      <button class="btn" id="fsBtn">⛶ <span class="zh">全屏</span><span class="en">Full screen</span></button></span>
     </div>
     <p class="hint stack" id="globeHint">
       <span class="zh">拖动地球转一转！点亮的小圆点就是国家，点一点飞过的小飞机，看看它要飞去哪里。</span>
@@ -1747,14 +1764,55 @@ var rot={lon:100,lat:15}, target=null, spinning=true, dragging=false, last=null;
 var MODE='learn', huntReveal=false;
 var W=0,H=0,CX=0,CY=0,RR=0, dots=[];
 
+var RRbase=0, globeZoom=1;
 function resize(){
   var box=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  var size=Math.max(240, Math.min(box.width, 520));
+  var size=Math.max(240, Math.min(box.width, document.body.classList.contains('fs-globe')?2000:520));
   cv.width=size*dpr; cv.height=size*dpr;
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  W=size;H=size;CX=size/2;CY=size/2;RR=size/2-10;
+  W=size;H=size;CX=size/2;CY=size/2;RRbase=size/2-10;RR=RRbase*globeZoom;
 }
-window.addEventListener('resize',function(){resize();});
+window.addEventListener('resize',function(){resize(); if(MODE==='roam') roamResize();});
+function setGlobeZoom(z){
+  globeZoom=Math.max(1,Math.min(4,z));
+  RR=RRbase*globeZoom;
+  var b=document.getElementById('zOut'); if(b) b.disabled=(globeZoom<=1.001);
+}
+
+/* ---- zoom & fullscreen, shared by the globe and the roam view ---- */
+function addPinch(el,onScale){
+  var pts={}, base=0;
+  el.addEventListener('pointerdown',function(e){ pts[e.pointerId]={x:e.clientX,y:e.clientY}; });
+  el.addEventListener('pointermove',function(e){
+    if(!pts[e.pointerId]) return;
+    pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    var k=Object.keys(pts);
+    el._pinch=(k.length>1);
+    if(k.length===2){
+      var a=pts[k[0]], b=pts[k[1]], d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(base>4) onScale(d/base);
+      base=d;
+    }
+  });
+  function up(e){ delete pts[e.pointerId]; base=0; el._pinch=(Object.keys(pts).length>1); }
+  el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',function(e){ e.preventDefault(); onScale(e.deltaY<0?1.14:1/1.14); },{passive:false});
+}
+function fsEl(){ return document.fullscreenElement||document.webkitFullscreenElement||null; }
+function toggleFS(el,cls){
+  if(fsEl()){ (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document); return; }
+  var req=el.requestFullscreen||el.webkitRequestFullscreen;
+  if(req) try{ req.call(el); }catch(e){}
+  el._fsCls=cls;
+}
+function onFsChange(){
+  var el=fsEl();
+  document.body.classList.remove('fs-globe','fs-roam');
+  if(el && el._fsCls) document.body.classList.add(el._fsCls);
+  setTimeout(function(){ resize(); if(MODE==='roam') roamResize(); }, 60);
+}
+document.addEventListener('fullscreenchange',onFsChange);
+document.addEventListener('webkitfullscreenchange',onFsChange);
 
 function project(lon,lat){
   var p=lat*Math.PI/180, l=lon*Math.PI/180;
@@ -2084,7 +2142,7 @@ cv.addEventListener('pointerdown',function(e){
   cv._moved=0;
 });
 cv.addEventListener('pointermove',function(e){
-  if(!dragging) return;
+  if(!dragging || cv._pinch) return;
   var dx=e.clientX-last.x, dy=e.clientY-last.y;
   cv._moved += Math.abs(dx)+Math.abs(dy);
   rot.lon -= dx*0.4; rot.lat += dy*0.4;
@@ -2966,7 +3024,7 @@ function renderBuild(){
    ============================================================ */
 var RS=4;                                   /* one block, in world units */
 var W3={boxes:[], top:{}, px:0, py:0, pz:0, feet:0, yaw:0, pitch:0,
-        keys:{}, site:0, found:{}, raf:0, last:0, drag:null, move:null, card:null};
+        keys:{}, site:0, found:{}, raf:0, last:0, drag:null, move:null, card:null, fov:0.42};
 var ROAMFACE=[                              /* normal, corner offsets, shade */
  [[0,1,0], [[0,1,0],[1,1,0],[1,1,1],[0,1,1]], 1.10],
  [[0,0,1], [[0,0,1],[1,0,1],[1,1,1],[0,1,1]], 0.90],
@@ -3054,7 +3112,7 @@ function roamDraw(){
   var g=ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,W3.sky[0]); g.addColorStop(1,W3.sky[1]);
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  var f=(W/2)/Math.tan(0.42), ex=W3.px, ey=W3.feet+6, ez=W3.pz;
+  var f=(W/2)/Math.tan(W3.fov), ex=W3.px, ey=W3.feet+6, ez=W3.pz;
   var cy=Math.cos(W3.yaw), sy=Math.sin(W3.yaw), cp=Math.cos(W3.pitch), sp2=Math.sin(W3.pitch);
   function cam(x,y,z){
     var dx=x-ex, dy=y-ey, dz=z-ez;
@@ -3126,11 +3184,16 @@ function roamTick(now){
 }
 function roamResize(){
   var cv=W3.cv; if(!cv) return;
-  var r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  W3.w=Math.max(260,r.width); W3.h=Math.max(220,Math.round(W3.w*0.62));
-  cv.width=W3.w*dpr; cv.height=W3.h*dpr; cv.style.height=W3.h+'px';
+  var full=document.body.classList.contains('fs-roam');
+  var r=cv.parentNode.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  W3.w=Math.max(260,Math.round(r.width));
+  W3.h=full?Math.max(220,Math.round(r.height)):Math.max(220,Math.round(W3.w*0.62));
+  cv.style.width=full?W3.w+'px':'';
+  cv.style.height=W3.h+'px';
+  cv.width=W3.w*dpr; cv.height=W3.h*dpr;
   W3.ctx.setTransform(dpr,0,0,dpr,0,0);
 }
+function setRoamZoom(z){ W3.fov=Math.max(0.16,Math.min(0.62,z)); }
 function roamHud(){
   var el=document.getElementById('roamHud'); if(!el) return;
   var n=Object.keys(W3.found).length;
@@ -3160,7 +3223,11 @@ function renderRoam(){
      '<button data-mv="l">◀</button><div class="col">'+
      '<button data-mv="f">▲</button><button data-mv="b">▼</button></div>'+
      '<button data-mv="r">▶</button></div>'+
-     '<div class="roamTip stack">'+T('拖动画面转头 · 按住方向键走路','drag to look · hold the arrows to walk')+'</div>'+
+     '<div class="roamZoom"><button class="btn" id="rIn">🔍＋</button>'+
+     '<button class="btn" id="rOut">🔍−</button>'+
+     '<button class="btn" id="rFs">⛶</button></div>'+
+     '<div class="roamTip stack">'+T('拖动画面转头 · 按住方向键走路 · 滚轮或两指可以放大',
+       'drag to look · hold the arrows to walk · scroll or pinch to zoom')+'</div>'+
      '</div>';
   h+='<div class="bTools"><button class="btn" id="rBack">↩️ '+T('回到入口','Back to the start')+'</button>'+
      '<button class="btn" id="rGo">🔍 '+T('看看这个国家','See the country')+'</button></div>';
@@ -3185,7 +3252,7 @@ function renderRoam(){
     try{ W3.cv.setPointerCapture(e.pointerId); }catch(err){}
   });
   W3.cv.addEventListener('pointermove',function(e){
-    if(!W3.drag) return;
+    if(!W3.drag || W3.cv._pinch) return;
     W3.yaw+=(e.clientX-W3.drag.x)*0.006;
     W3.pitch=Math.max(-0.9,Math.min(0.9,W3.pitch-(e.clientY-W3.drag.y)*0.004));
     W3.drag={x:e.clientX,y:e.clientY};
@@ -3193,6 +3260,11 @@ function renderRoam(){
   ['pointerup','pointercancel'].forEach(function(ev){
     W3.cv.addEventListener(ev,function(){ W3.drag=null; });
   });
+  document.getElementById('rIn').onclick=function(){ setRoamZoom(W3.fov/1.3); };
+  document.getElementById('rOut').onclick=function(){ setRoamZoom(W3.fov*1.3); };
+  document.getElementById('rFs').onclick=function(){
+    toggleFS(document.querySelector('#roamPanel .roamWrap'),'fs-roam'); };
+  addPinch(W3.cv,function(k){ setRoamZoom(W3.fov/k); });
   document.getElementById('rBack').onclick=function(){
     var off=(BP[W3.site].n-1)/2;
     W3.px=0; W3.pz=off*RS+32; W3.feet=0; W3.yaw=0; W3.pitch=-0.02;
@@ -3400,6 +3472,10 @@ document.getElementById('dnBtn').onclick=function(){
   this.classList.toggle('on',dayNight);
   try{ localStorage.setItem('we_daynight_v1',dayNight?'1':'0'); }catch(e){}
 };
+document.getElementById('zIn').onclick=function(){ setGlobeZoom(globeZoom*1.35); };
+document.getElementById('zOut').onclick=function(){ setGlobeZoom(globeZoom/1.35); };
+document.getElementById('fsBtn').onclick=function(){ toggleFS(document.getElementById('globeWrap'),'fs-globe'); };
+addPinch(cv,function(k){ setGlobeZoom(globeZoom*k); });
 document.getElementById('planeBtn').onclick=function(){
   planesOn=!planesOn;
   this.classList.toggle('on',planesOn);
