@@ -183,6 +183,20 @@
   .roamZoom{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px}
   .roamZoom .btn{background:rgba(255,255,255,.82);border-color:rgba(31,59,87,.18);padding:6px 12px;font-size:15px}
 
+  /* ---------- creative mode ---------- */
+  .cTop{position:absolute;left:14px;top:14px;display:flex;flex-direction:column;gap:8px;max-width:46%}
+  .cTop .btn{background:rgba(255,255,255,.86);border-color:rgba(31,59,87,.18);padding:6px 12px;font-size:15px}
+  .cTop .btn.on{background:var(--yellow);border-color:#e0a93c;color:#5a3c0c}
+  .cPal{display:none;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.62);
+    border-radius:13px;padding:7px}
+  .cPal button{width:32px;height:32px;border-radius:9px;border:3px solid rgba(255,255,255,.9);
+    box-shadow:0 3px 0 rgba(31,59,87,.16);transition:transform .1s}
+  .cPal button.on{border-color:var(--ink);transform:translateY(-3px)}
+  .cAct{position:absolute;right:14px;top:14px;display:none;flex-direction:column;gap:8px}
+  .cAct .btn{background:rgba(255,255,255,.86);border-color:rgba(31,59,87,.18);
+    padding:7px 13px;font-size:16px;text-align:left}
+  .roamWrap.creative .cPal,.roamWrap.creative .cAct{display:flex}
+
   /* ---------- zoom & full screen ---------- */
   .bpBtn svg{width:23px;height:15.3px;border-radius:2px;vertical-align:-2px;margin-right:6px;
     box-shadow:0 1px 3px rgba(0,0,0,.28)}
@@ -197,6 +211,8 @@
   body.fs-roam .roamTip{display:none}
   body.fs-roam .roamPad{left:22px;bottom:22px}
   body.fs-roam .roamZoom{right:22px;bottom:22px}
+  body.fs-roam .cTop{left:22px;top:22px}
+  body.fs-roam .cAct{right:22px;top:22px}
 
   /* ---------- CSS 3D models ---------- */
   .m3d{position:relative;width:100%;max-width:260px;height:252px;margin:4px auto 10px;
@@ -3070,8 +3086,9 @@ function renderBuild(){
    element sorting shows walls through walls.
    ============================================================ */
 var RS=4;                                   /* one block, in world units */
-var W3={boxes:[], top:{}, px:0, py:0, pz:0, feet:0, yaw:0, pitch:0,
-        keys:{}, site:0, found:{}, raf:0, last:0, drag:null, move:null, card:null, fov:0.42};
+var W3={boxes:[], vox:{}, px:0, py:0, pz:0, feet:0, yaw:0, pitch:0,
+        keys:{}, site:0, found:{}, raf:0, last:0, drag:null, move:null, card:null, fov:0.42,
+        creative:0, paint:'stone', aim:null, fly:0};
 var ROAMFACE=[                              /* normal, corner offsets, shade */
  [[0,1,0], [[0,1,0],[1,1,0],[1,1,1],[0,1,1]], 1.10],
  [[0,0,1], [[0,0,1],[1,0,1],[1,1,1],[0,1,1]], 0.90],
@@ -3084,35 +3101,49 @@ function addBox(x,y,z,w,h,d,c){
   W3.boxes.push({x:x,y:y,z:z,w:w,h:h,d:d,
     cols:ROAMFACE.map(function(f){ return mul(c,f[2]); })});
 }
+/* the world is a voxel map: "gx,gy,gz" -> block name. Everything else
+   (what to draw, what you can stand on, what the crosshair is aimed at)
+   is derived from it, so creative edits need no special cases. */
+var RKEY='we_roam_v1', roamSaved={};
+try{ roamSaved=JSON.parse(localStorage.getItem(RKEY)||'{}')||{}; }catch(e){ roamSaved={}; }
+function voxAt(gx,gy,gz){ return W3.vox[gx+','+gy+','+gz]; }
+function voxRebuild(){
+  W3.boxes=[];
+  for(var k in W3.vox){
+    var p=k.split(',');
+    addBox(p[0]*RS-RS/2, p[1]*RS, p[2]*RS-RS/2, RS, RS, RS, BCOL[W3.vox[k]]||BCOL.stone);
+  }
+}
+function roamStore(){
+  roamSaved[BP[W3.site].id]=W3.vox;
+  try{ localStorage.setItem(RKEY,JSON.stringify(roamSaved)); }catch(e){}
+}
 function roamBuild(i){
-  var bp=BP[i], off=(bp.n-1)/2, k, j;
-  W3.boxes=[]; W3.top={}; W3.site=i; W3.found={};
-  bp.gen(function(x,z,y,c){
-    var wx=(x-off)*RS, wz=(z-off)*RS;
-    addBox(wx-RS/2, y*RS, wz-RS/2, RS, RS, RS, BCOL[c]);
-    k=(x-off)+','+(z-off);
-    W3.top[k]=Math.max(W3.top[k]||0, (y+1)*RS);
-  });
+  var bp=BP[i], off=(bp.n-1)/2, j;
+  W3.site=i; W3.found={}; W3.vox={};
+  bp.gen(function(x,z,y,c){ W3.vox[(x-off)+','+y+','+(z-off)]=c; });
   var desert=(bp.near==='eg'||bp.near==='ae');
   W3.ground=desert?'#e6cf8e':'#7fb86a';
   W3.sky=desert?['#bfe4f7','#fdf0cf']:['#a8dcf7','#e8f6ff'];
-  var spawnZ=off*RS+32;
-  for(j=0;j<46;j++){                        /* scenery, so movement is easy to feel */
-    var a=rnd(j*3+i)*Math.PI*2, r=26+rnd(j*7+i)*54;
-    var dx=Math.cos(a)*r, dz=Math.sin(a)*r;
-    if(Math.abs(dx)<off*RS+6 && Math.abs(dz)<off*RS+6) continue;
-    if(Math.hypot(dx, dz-spawnZ)<14) continue;   /* never drop scenery on the spawn point */
-    if(Math.abs(dx)<18 && dz>0 && dz<spawnZ+10) continue;  /* keep the approach lane clear */
+  var spawnG=Math.round((off*RS+32)/RS);
+  for(j=0;j<26;j++){                        /* scenery, so movement is easy to feel */
+    var a=rnd(j*3+i)*Math.PI*2, r=8+Math.floor(rnd(j*7+i)*13);
+    var gx=Math.round(Math.cos(a)*r), gz=Math.round(Math.sin(a)*r);
+    if(Math.abs(gx)<=off+1 && Math.abs(gz)<=off+1) continue;
+    if(Math.hypot(gx, gz-spawnG)<4) continue;            /* keep the spawn point clear */
+    if(Math.abs(gx)<5 && gz>0 && gz<spawnG+3) continue;  /* and the approach lane */
     if(desert){
-      var mh=1.4+rnd(j*2)*1.6;
-      addBox(dx,0,dz,3+rnd(j)*3,mh,3+rnd(j*5)*3,'#dcbd72');
-      markSolid(dx+1.5,dz+1.5,mh);            /* low enough to step onto */
+      W3.vox[gx+',0,'+gz]='sand';
+      if(rnd(j*13+i)>0.6) W3.vox[gx+',1,'+gz]='sand';
     } else {
-      addBox(dx-0.8,0,dz-0.8,1.6,4.5,1.6,'#8a6b4a');
-      addBox(dx-3,4,dz-3,6,3.4,6,rnd(j*11)>0.5?'#4f9a5e':'#63b56a');
-      markSolid(dx,dz,8);                     /* the trunk stops you walking through */
+      W3.vox[gx+',0,'+gz]='wood'; W3.vox[gx+',1,'+gz]='wood';
+      W3.vox[gx+',2,'+gz]='grass'; W3.vox[gx+',3,'+gz]='grass';
+      W3.vox[(gx+1)+',2,'+gz]='grass'; W3.vox[(gx-1)+',2,'+gz]='grass';
+      W3.vox[gx+',2,'+(gz+1)]='grass'; W3.vox[gx+',2,'+(gz-1)]='grass';
     }
   }
+  if(roamSaved[bp.id]) W3.vox=roamSaved[bp.id];   /* your own edits win */
+  voxRebuild();
   var c=byId(bp.near), d=DETAIL[bp.near].lm;
   var q=off*RS+10;
   W3.spots=[                                /* three signposts to walk into and learn from */
@@ -3120,14 +3151,66 @@ function roamBuild(i){
    {x:-q, z:-q, zh:d[1][1], en:d[1][2], e:d[1][0]},
    {x:q,  z:0,  zh:c.f[0][1], en:c.f[0][2], e:c.f[0][0]}
   ];
-  W3.spots.forEach(function(sp){ markSolid(sp.x, sp.z, 0); });
   W3.px=0; W3.pz=off*RS+32; W3.feet=0; W3.yaw=0; W3.pitch=-0.02; W3.card=null;
+  W3.fly=0; W3.aim=null;
 }
-function markSolid(x,z,top){
-  var k=Math.round(x/RS)+','+Math.round(z/RS);
-  W3.top[k]=Math.max(W3.top[k]||0, top);
+/* highest block at or below fromY -> the level you would stand on */
+function groundG(gx,gz,fromY){
+  for(var y=fromY;y>=0;y--) if(voxAt(gx,y,gz)) return y+1;
+  return 0;
 }
-function roamTop(x,z){ return W3.top[Math.round(x/RS)+','+Math.round(z/RS)]||0; }
+function fitsAt(gx,gy,gz){ return !voxAt(gx,gy,gz) && !voxAt(gx,gy+1,gz); }
+/* creative mode: what the crosshair is pointing at.
+   March the view ray a third of a block at a time and remember the last empty
+   cell — that is the one a new block goes into, exactly like Minecraft. */
+var RLIM=30, RHIGH=44;                      /* how far out and how high you may build */
+function rayPick(){
+  var cp=Math.cos(W3.pitch);
+  var dx=Math.sin(W3.yaw)*cp, dy=Math.sin(W3.pitch), dz=-Math.cos(W3.yaw)*cp;
+  var ex=W3.px, ey=W3.feet+6, ez=W3.pz, t, gx, gy, gz, prev=null, cell=null;
+  for(t=1.2;t<34;t+=0.34){
+    gx=Math.round((ex+dx*t)/RS); gy=Math.floor((ey+dy*t)/RS); gz=Math.round((ez+dz*t)/RS);
+    if(gy<0) break;                         /* the ray reached the ground */
+    if(cell && gx===cell[0] && gy===cell[1] && gz===cell[2]) continue;
+    cell=[gx,gy,gz];
+    if(voxAt(gx,gy,gz)) return {hit:cell, put:prev};
+    prev=cell;
+  }
+  return {hit:null, put:prev};
+}
+function inBuildRange(c){
+  return c && Math.abs(c[0])<=RLIM && Math.abs(c[2])<=RLIM && c[1]>=0 && c[1]<=RHIGH;
+}
+/* the two cells the player is standing in — you may not wall yourself in */
+function isPlayerCell(c){
+  var gx=Math.round(W3.px/RS), gz=Math.round(W3.pz/RS), gy=Math.round(W3.feet/RS);
+  return c[0]===gx && c[2]===gz && (c[1]===gy || c[1]===gy+1);
+}
+function roamEdit(put){
+  if(!W3.creative) return;
+  var a=W3.aim||rayPick(), c=put?a.put:a.hit;
+  if(!c || !inBuildRange(c)){
+    say(put?'太远啦，走近一点再放':'对准一个方块才能挖哦',
+        put?'Too far — walk closer to build':'Aim at a block to dig it out');
+    return;
+  }
+  if(put){
+    if(isPlayerCell(c)){ say('不能放在自己身上呀','You cannot build on yourself'); return; }
+    W3.vox[c[0]+','+c[1]+','+c[2]]=W3.paint;
+  } else {
+    delete W3.vox[c[0]+','+c[1]+','+c[2]];
+  }
+  voxRebuild(); roamStore();
+  W3.aim=rayPick();
+}
+/* creative mode lets you rise a block at a time so you can reach a roof */
+function roamFly(d){
+  if(!W3.creative) return;
+  var gx=Math.round(W3.px/RS), gz=Math.round(W3.pz/RS), gy=Math.round(W3.feet/RS)+d;
+  if(gy<0 || gy>RHIGH || !fitsAt(gx,gy,gz)) return;
+  W3.feet=gy*RS;
+  W3.fly=(gy>groundG(gx,gz,Math.max(0,gy-1)))?1:0;
+}
 function roamMove(dt){
   var sp=0, st=0, m=W3.move, K=W3.keys;
   if(K.w||K.ArrowUp||m==='f') sp=1; if(K.s||K.ArrowDown||m==='b') sp=-1;
@@ -3135,11 +3218,18 @@ function roamMove(dt){
   if(!sp&&!st) return;
   var v=17*dt, fx=Math.sin(W3.yaw), fz=-Math.cos(W3.yaw);
   var nx=W3.px+(fx*sp+Math.cos(W3.yaw)*st)*v, nz=W3.pz+(fz*sp+Math.sin(W3.yaw)*st)*v;
-  var t=roamTop(nx,nz);
-  if(t<=W3.feet+RS+0.1){ W3.px=nx; W3.pz=nz; W3.feet=t; }   /* step up one block, like Minecraft */
-  else { var tx=roamTop(nx,W3.pz);
-         if(tx<=W3.feet+RS+0.1){ W3.px=nx; W3.feet=tx; }
-         else { var tz=roamTop(W3.px,nz); if(tz<=W3.feet+RS+0.1){ W3.pz=nz; W3.feet=tz; } } }
+  var fg=Math.round(W3.feet/RS);
+  function tryTo(X,Z){
+    var gx=Math.round(X/RS), gz=Math.round(Z/RS);
+    if(W3.fly){                             /* floating in creative mode: keep the height */
+      if(!fitsAt(gx,fg,gz)) return false;
+      W3.px=X; W3.pz=Z; return true;
+    }
+    var g=groundG(gx,gz,fg+1);              /* +1 so a single block is a step, not a wall */
+    if(g<=fg+1 && fitsAt(gx,g,gz)){ W3.px=X; W3.pz=Z; W3.feet=g*RS; return true; }
+    return false;
+  }
+  if(!tryTo(nx,nz)){ if(!tryTo(nx,W3.pz)) tryTo(W3.px,nz); }
   W3.px=Math.max(-95,Math.min(95,W3.px)); W3.pz=Math.max(-95,Math.min(95,W3.pz));
   var i, s;
   for(i=0;i<W3.spots.length;i++){
@@ -3223,11 +3313,37 @@ function roamDraw(){
     ctx.closePath(); ctx.fillStyle=q.c; ctx.fill();
     if(q.d<4200) ctx.stroke();               /* block edges, but only where they read */
   }
+  if(!W3.creative) return;
+  /* the block under the crosshair, outlined so you know what you are about to
+     change, plus the crosshair itself */
+  var aim=W3.aim, cell=aim&&(aim.hit||aim.put);
+  if(cell && inBuildRange(cell)){
+    var X=cell[0]*RS-RS/2, Y=cell[1]*RS, Z=cell[2]*RS-RS/2;
+    ctx.strokeStyle=aim.hit?'rgba(255,205,40,.95)':'rgba(255,255,255,.85)';
+    ctx.lineWidth=aim.hit?2.4:1.6;
+    for(j=0;j<5;j++){
+      var fa=ROAMFACE[j][1], pp=[];
+      for(k=0;k<4;k++) pp.push(cam(X+fa[k][0]*RS, Y+fa[k][1]*RS, Z+fa[k][2]*RS));
+      var pr2=clipProject(pp); if(!pr2) continue;
+      ctx.beginPath(); ctx.moveTo(pr2[0][0],pr2[0][1]);
+      for(k=1;k<pr2.length;k++) ctx.lineTo(pr2[k][0],pr2[k][1]);
+      ctx.closePath(); ctx.stroke();
+    }
+  }
+  var mx=W/2, my=H/2;
+  ctx.lineWidth=2.2; ctx.strokeStyle='rgba(20,35,50,.55)';
+  ctx.beginPath(); ctx.moveTo(mx-9,my); ctx.lineTo(mx+9,my);
+  ctx.moveTo(mx,my-9); ctx.lineTo(mx,my+9); ctx.stroke();
+  ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,.9)';
+  ctx.beginPath(); ctx.moveTo(mx-9,my); ctx.lineTo(mx+9,my);
+  ctx.moveTo(mx,my-9); ctx.lineTo(mx,my+9); ctx.stroke();
 }
 function roamTick(now){
   if(MODE!=='roam'){ W3.raf=0; return; }
   var dt=Math.min(0.05,(now-W3.last)/1000); W3.last=now;
-  roamMove(dt); roamDraw();
+  roamMove(dt);
+  if(W3.creative) W3.aim=rayPick();
+  roamDraw();
   W3.raf=requestAnimationFrame(roamTick);
 }
 function roamResize(){
@@ -3274,8 +3390,17 @@ function renderRoam(){
      '<div class="roamZoom"><button class="btn" id="rIn">🔍＋</button>'+
      '<button class="btn" id="rOut">🔍−</button>'+
      '<button class="btn" id="rFs">⛶</button></div>'+
-     '<div class="roamTip stack">'+T('拖动画面转头 · 按住方向键走路 · 滚轮或两指可以放大',
-       'drag to look · hold the arrows to walk · scroll or pinch to zoom')+'</div>'+
+     '<div class="cTop"><button class="btn" id="rMode"></button>'+
+     '<div class="cPal">'+Object.keys(BCOL).map(function(k){
+        return '<button class="'+(k===W3.paint?'on':'')+'" data-cc="'+k+'" title="'+
+               BCOLZH[k]+' / '+BCOLEN[k]+'" style="background:'+BCOL[k]+'"></button>';
+      }).join('')+'</div></div>'+
+     '<div class="cAct"><button class="btn" id="cDig">⛏️ '+T('挖掉','Dig')+'</button>'+
+     '<button class="btn" id="cPut">🧱 '+T('放上','Place')+'</button>'+
+     '<button class="btn" id="cUp">⬆️ '+T('升高','Up')+'</button>'+
+     '<button class="btn" id="cDn">⬇️ '+T('降低','Down')+'</button>'+
+     '<button class="btn" id="cReset">♻️ '+T('恢复原样','Reset')+'</button></div>'+
+     '<div class="roamTip stack" id="roamTip"></div>'+
      '</div>';
   h+='<div class="bTools"><button class="btn" id="rBack">↩️ '+T('回到入口','Back to the start')+'</button>'+
      '<button class="btn" id="rGo">🔍 '+T('看看这个国家','See the country')+'</button></div>';
@@ -3318,10 +3443,63 @@ function renderRoam(){
     W3.px=0; W3.pz=off*RS+32; W3.feet=0; W3.yaw=0; W3.pitch=-0.02;
   };
   document.getElementById('rGo').onclick=function(){ setMode('learn'); select(bp.near,true); };
+  document.getElementById('rMode').onclick=function(){ setCreative(!W3.creative); };
+  Array.prototype.forEach.call(panel.querySelectorAll('[data-cc]'),function(b){
+    b.onclick=function(){
+      W3.paint=b.dataset.cc;
+      Array.prototype.forEach.call(panel.querySelectorAll('[data-cc]'),function(o){
+        o.classList.remove('on'); });
+      b.classList.add('on');
+      say('选好了'+BCOLZH[W3.paint], BCOLEN[W3.paint]+' chosen');
+    };
+  });
+  document.getElementById('cDig').onclick=function(){ roamEdit(false); };
+  document.getElementById('cPut').onclick=function(){ roamEdit(true); };
+  document.getElementById('cUp').onclick=function(){ roamFly(1); };
+  document.getElementById('cDn').onclick=function(){ roamFly(-1); };
+  document.getElementById('cReset').onclick=function(){
+    var id=BP[W3.site].id;
+    delete roamSaved[id];
+    try{ localStorage.setItem(RKEY,JSON.stringify(roamSaved)); }catch(e){}
+    roamBuild(W3.site); W3.fly=0; roamHud();
+    say('这里恢复原样啦','Everything is back to how it started');
+  };
+  setCreative(W3.creative);
   if(!W3.raf){ W3.last=performance.now(); W3.raf=requestAnimationFrame(roamTick); }
 }
-document.addEventListener('keydown',function(e){ if(MODE==='roam'){ W3.keys[e.key]=1;
-  if(/^Arrow/.test(e.key)) e.preventDefault(); } });
+function setCreative(on){
+  W3.creative=on?1:0;
+  var w=document.querySelector('#roamPanel .roamWrap'), b=document.getElementById('rMode'),
+      t=document.getElementById('roamTip');
+  if(!w) return;
+  w.classList.toggle('creative',!!W3.creative);
+  if(b){
+    b.className='btn'+(W3.creative?' on':'');
+    b.innerHTML=W3.creative?('🧱 '+T('创意模式','Creative')):('👀 '+T('参观模式','Visit'));
+  }
+  if(t) t.innerHTML=W3.creative
+    ? T('对准方块 · ⛏️ 挖掉 · 🧱 放上（也可以按 Q 和 E）· 你的改动会自动保存',
+        'aim with the crosshair · ⛏️ dig · 🧱 place (or press Q and E) · your changes are saved')
+    : T('拖动画面转头 · 按住方向键走路 · 滚轮或两指可以放大',
+        'drag to look · hold the arrows to walk · scroll or pinch to zoom');
+  if(!W3.creative && W3.fly){                /* stop floating when you go back to visiting */
+    W3.fly=0;
+    var gx=Math.round(W3.px/RS), gz=Math.round(W3.pz/RS);
+    W3.feet=groundG(gx,gz,Math.round(W3.feet/RS))*RS;
+  }
+  W3.aim=W3.creative?rayPick():null;
+}
+document.addEventListener('keydown',function(e){
+  if(MODE!=='roam') return;
+  W3.keys[e.key]=1;
+  if(/^Arrow/.test(e.key)) e.preventDefault();
+  if(!W3.creative || e.repeat) return;
+  var k=e.key.toLowerCase();
+  if(k==='q') roamEdit(false);
+  else if(k==='e') roamEdit(true);
+  else if(k===' '){ roamFly(1); e.preventDefault(); }
+  else if(k==='shift') roamFly(-1);
+});
 document.addEventListener('keyup',function(e){ W3.keys[e.key]=0; });
 window.addEventListener('resize',function(){ if(MODE==='roam') roamResize(); });
 
