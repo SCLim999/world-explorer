@@ -125,30 +125,32 @@
   /* ---------- modes ---------- */
   #stage,#picker,#quiz,#animal,#passport,#build,#roam{display:none}
   body.m-learn #stage,body.m-hunt #stage,body.m-civ #stage,body.m-won #stage,
-  body.m-place #stage,body.m-war #stage{display:grid}
+  body.m-place #stage,body.m-war #stage,body.m-hist #stage{display:grid}
   body.m-learn #picker{display:block}
   body.m-build #build{display:block}
   body.m-roam #roam{display:block}
   body.m-quiz #quiz{display:block}
   body.m-animal #animal{display:block}
   body.m-passport #passport{display:block}
-  #card,#huntPanel,#civPanel,#wonPanel,#placePanel,#warPanel{display:none}
+  #card,#huntPanel,#civPanel,#wonPanel,#placePanel,#warPanel,#histPanel{display:none}
   body.m-learn #card{display:block}
   body.m-hunt #huntPanel{display:block}
   body.m-civ #civPanel{display:block}
   body.m-won #wonPanel{display:block}
   body.m-place #placePanel{display:block}
   body.m-war #warPanel{display:block}
+  body.m-hist #histPanel{display:block}
   body.m-hunt #findBtn,body.m-civ #findBtn,body.m-civ #homeBtn,
   body.m-won #findBtn,body.m-won #homeBtn,
   body.m-place #findBtn,body.m-place #homeBtn,
   body.m-war #findBtn,body.m-war #homeBtn,
-  body.m-war #dnBtn,body.m-war #planeBtn{display:none}
+  body.m-war #dnBtn,body.m-war #planeBtn,
+  body.m-hist #findBtn,body.m-hist #homeBtn,body.m-hist #dnBtn,body.m-hist #planeBtn{display:none}
   #histHint{display:none}
   body.m-civ #globeHint,body.m-won #globeHint,body.m-place #globeHint,
-  body.m-war #globeHint{display:none}
+  body.m-war #globeHint,body.m-hist #globeHint{display:none}
   body.m-civ #histHint,body.m-won #histHint,body.m-place #histHint,
-  body.m-war #histHint{display:block}
+  body.m-war #histHint,body.m-hist #histHint{display:block}
 
   /* ---------- ancient civilisations & the eight wonders ---------- */
   .civIntro,.wonIntro{background:linear-gradient(90deg,#fff3d6,#eaf7ff);border-radius:16px;padding:10px 14px;
@@ -172,6 +174,44 @@
   .wonFate{margin-top:12px;background:#fff5ef;border-radius:16px;padding:10px 14px;font-size:15px;
     line-height:1.4;display:flex;gap:9px;align-items:flex-start}
   .wonFate .emo{font-size:22px;flex:none}
+
+  /* ---------- world history ---------- */
+  .hIntro{background:linear-gradient(90deg,#f3ecff,#eaf7ff);border-radius:16px;padding:11px 15px;
+    font-size:15px;line-height:1.45;display:flex;gap:10px;align-items:flex-start}
+  .hIntro .emo{font-size:23px;flex:none}
+  .hTop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0 6px}
+  .hYear{font-size:30px;font-weight:bold;font-variant-numeric:tabular-nums;line-height:1.1;min-width:120px}
+  .hYear small{display:block;font-size:12.5px;font-weight:normal;color:var(--ink2)}
+  .hEraNow{font-size:15px;font-weight:bold;border-radius:999px;padding:5px 14px;color:#fff}
+  /* the ribbon: one block per era, so the stone age does not squash everything else */
+  .hRail{position:relative;height:56px;margin:6px 0 2px;border-radius:12px;overflow:hidden;background:#eef3fa}
+  .hEra{position:absolute;top:0;bottom:0;opacity:.28;transition:left .8s ease,width .8s ease}
+  .hEra.on{opacity:.6}
+  .hEra span{position:absolute;left:5px;top:4px;font-size:15px}
+  /* 37 stops on a narrow rail: plain dots read, emoji would just collide */
+  .hDot{position:absolute;top:34px;transform:translate(-50%,-50%);width:11px;height:11px;padding:0;
+    font-size:0;border-radius:50%;border:2px solid rgba(255,255,255,.95);
+    background:#b9c6d4;box-shadow:0 1px 2px rgba(20,40,60,.3);transition:left .8s ease,transform .2s}
+  .hDot.done{background:#f0b21f}
+  .hDot.on{transform:translate(-50%,-50%) scale(2.1);border-color:#2c4560;background:var(--yellow);z-index:3}
+  .hEraHead{grid-column:1/-1;font-size:13px;font-weight:bold;color:var(--ink2);
+    margin:6px 0 0;padding-left:2px}
+  .hScaleRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+  .hEvent{margin-top:12px;background:#fff;border:3px solid #e6edf6;border-radius:17px;padding:12px 15px;
+    display:flex;gap:12px;align-items:flex-start;min-height:104px}
+  .hEvent.pop{animation:wEv .45s ease-out}
+  .hEvent .emo{font-size:34px;flex:none;line-height:1.1}
+  .hEvent .dt{font-size:14px;font-weight:bold;color:#8a5a2b}
+  .hEvent .pl{font-size:13.5px;color:var(--ink2)}
+  .hEvent .tx{font-size:15.5px;line-height:1.45;margin-top:4px}
+  .hEvent .btn{margin-top:8px;font-size:14px;padding:5px 13px;border-width:2px}
+  .hList{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:8px;margin-top:12px}
+  .hItem{display:flex;gap:8px;align-items:center;background:#f7fafe;border:2px solid #eaf0f8;
+    border-radius:13px;padding:7px 10px;font-size:13.5px;line-height:1.25;text-align:left}
+  .hItem.on{border-color:var(--orange);background:#fff8ec}
+  .hItem .e{font-size:20px;flex:none}
+  .hItem b{display:block;font-size:12px;color:var(--ink2);font-weight:bold}
+  .hEraCard{border-radius:16px;padding:10px 14px;font-size:15px;line-height:1.4;margin-top:12px;color:#25405c}
 
   /* ---------- the two world wars ---------- */
   .warIntro{background:linear-gradient(90deg,#eef2f8,#f8f1ea);border-radius:16px;padding:11px 15px;
@@ -538,6 +578,7 @@
     <span class="navGrp">
       <b class="gLab stack"><span class="zh">认识世界</span><span class="en">Discover</span></b>
       <button class="btn on" data-m="learn">📚 <span class="zh">学习</span><span class="en">Learn</span></button>
+      <button class="btn" data-m="hist">📜 <span class="zh">世界历史</span><span class="en">History</span></button>
       <button class="btn" data-m="civ">🏺 <span class="zh">古文明</span><span class="en">Ancient</span></button>
       <button class="btn" data-m="won">🏛️ <span class="zh">八大奇迹</span><span class="en">Wonders</span></button>
       <button class="btn" data-m="place">🧭 <span class="zh">特别的地方</span><span class="en">Places</span></button>
@@ -589,6 +630,7 @@
     <div id="wonPanel"></div>
     <div id="placePanel"></div>
     <div id="warPanel"></div>
+    <div id="histPanel"></div>
   </section>
 </main>
 
@@ -1973,6 +2015,152 @@ var WARS=[
        zh:'每年 5 月 8 日、8 月 15 日、9 月 3 日，不同的国家用不同的日子纪念同一件事：<b>不要再有下一次</b>。',
        en:'On 8 May, 15 August and 3 September different countries remember the very same thing: <b>never again</b>.'}}
 ];
+/* ============================================================
+   2g. WORLD HISTORY — one line from the cave paintings to today.
+   The four civilisations, the eight wonders and the two wars already live
+   in their own modes; here they are single stops on the big line, with a
+   button that jumps straight into the mode that tells the whole story.
+   Negative years are BC. `era` indexes ERAS.
+   ============================================================ */
+var ERAS=[
+ {e:'🦣',zh:'很久很久以前',en:'Long, long ago',   y0:-20000,y1:-3500,col:'#a98b6b',
+  dZh:'那时候还没有城市，也没有文字',dEn:'no cities yet, and nobody could write'},
+ {e:'🏺',zh:'最早的文明',  en:'First civilisations',y0:-3500,y1:-1000,col:'#c58b3a',
+  dZh:'人在大河边住下来，盖起城市，学会写字',dEn:'people settled by the great rivers, built cities and learned to write'},
+ {e:'🏛️',zh:'古代大帝国', en:'Ancient empires',  y0:-1000,y1:500,  col:'#4a8fd0',
+  dZh:'希腊、罗马、秦汉 —— 大帝国和大想法的年代',dEn:'Greece, Rome, China — the age of big empires and big ideas'},
+ {e:'🏰',zh:'中世纪',      en:'The Middle Ages',  y0:500,  y1:1400, col:'#7a6bb5',
+  dZh:'城堡、寺庙、清真寺，和一路走过沙漠的商队',dEn:'castles, temples, mosques, and camel caravans crossing the deserts'},
+ {e:'⛵',zh:'大航海时代',  en:'Age of sail',      y0:1400, y1:1750, col:'#2f9e8f',
+  dZh:'船开得越来越远，地球第一次被绕了一圈',dEn:'ships sailed further and further, until one went all the way round'},
+ {e:'🚂',zh:'机器的时代',  en:'Age of machines',  y0:1750, y1:1900, col:'#c96a4a',
+  dZh:'蒸汽、铁路、电灯 —— 机器开始替人干活',dEn:'steam, railways and electric light — machines began to do the work'},
+ {e:'✈️',zh:'一百年前',    en:'A hundred years ago',y0:1900,y1:1945,col:'#6a7f95',
+  dZh:'人类学会了飞，也打了两场最大的仗',dEn:'people learned to fly — and fought the two biggest wars'},
+ {e:'🚀',zh:'我们的时代',  en:'Our own time',     y0:1945, y1:2030, col:'#3d8bfd',
+  dZh:'登上月球，把全世界的电脑连在一起',dEn:'we walked on the Moon and wired the whole world together'}
+];
+var HIST=[
+ {era:0,y:-17000,e:'🎨',lat:45.05,lon:1.17,pZh:'法国 · 拉斯科洞窟',pEn:'Lascaux, France',
+  zh:'洞里的人用石头磨出颜料，在墙上画牛、画马。那是人类最早的画。',
+  en:'People ground stones into paint and drew bulls and horses on a cave wall — the oldest pictures we have.'},
+ {era:0,y:-13000,e:'🐕',lat:52.0,lon:10.0,pZh:'欧洲',pEn:'Europe',
+  zh:'狼慢慢变成了狗，成了人类第一个动物朋友。',
+  en:'Wolves slowly became dogs — the first animal friend people ever had.'},
+ {era:0,y:-10000,e:'🌾',lat:36.2,lon:40.0,pZh:'两河流域',pEn:'the Fertile Crescent',
+  zh:'人第一次把种子种进地里。不用再追着动物跑，就可以住下来了。',
+  en:'People planted seeds for the first time. No more chasing animals — now you could stay in one place.'},
+ {era:1,y:-3200,e:'✍️',lat:31.32,lon:45.64,pZh:'乌鲁克 · 苏美尔',pEn:'Uruk, Sumer',
+  zh:'苏美尔人把话刻在泥板上，人类第一次会写字了。历史就是从这里开始记的。',
+  en:'The Sumerians pressed words into clay. Writing was born — and that is where history starts.',
+  go:{m:'civ',i:1}},
+ {era:1,y:-2560,e:'🔺',lat:29.98,lon:31.13,pZh:'埃及 · 吉萨',pEn:'Giza, Egypt',
+  zh:'埃及人堆起了大金字塔，四千五百年过去了，它还站在那里。',
+  en:'The Egyptians built the Great Pyramid. Four and a half thousand years later it is still standing.',
+  go:{m:'won',i:0}},
+ {era:1,y:-2500,e:'🚿',lat:27.33,lon:68.14,pZh:'摩亨佐达罗 · 印度河',pEn:'Mohenjo-daro, Indus',
+  zh:'印度河边的城市已经有笔直的街道和下水道，比很多现代城市还整齐。',
+  en:'The cities by the Indus had straight streets and drains — tidier than many modern towns.',
+  go:{m:'civ',i:2}},
+ {era:1,y:-1200,e:'🐢',lat:36.1,lon:114.35,pZh:'中国 · 安阳',pEn:'Anyang, China',
+  zh:'中国人把字刻在龟壳和牛骨上问吉凶 —— 这就是最早的汉字。',
+  en:'In China, questions were carved on turtle shells and ox bones — the first Chinese characters.',
+  go:{m:'civ',i:3}},
+ {era:2,y:-776,e:'🏃',lat:37.64,lon:21.63,pZh:'希腊 · 奥林匹亚',pEn:'Olympia, Greece',
+  zh:'第一届奥运会开跑了。比赛的时候，各城邦要停止打仗。',
+  en:'The first Olympic Games. While they were on, the Greek cities had to stop fighting.'},
+ {era:2,y:-551,e:'📖',lat:35.6,lon:116.99,pZh:'中国 · 曲阜',pEn:'Qufu, China',
+  zh:'孔子出生了。他说的「己所不欲，勿施于人」，两千五百年后还在被念。',
+  en:'Confucius was born. "Do not do to others what you would not want done to you" is still quoted 2,500 years later.'},
+ {era:2,y:-508,e:'🗳️',lat:37.98,lon:23.73,pZh:'希腊 · 雅典',pEn:'Athens, Greece',
+  zh:'雅典人想出一个新办法：大事大家一起举手决定。这就是最早的投票。',
+  en:'The Athenians tried something new: everyone raises a hand and the most hands win. The first voting.'},
+ {era:2,y:-221,e:'👑',lat:34.38,lon:109.28,pZh:'中国 · 西安',pEn:'Xi\'an, China',
+  zh:'秦始皇把中国统一成一个国家，还让人做了八千个兵马俑陪着他。',
+  en:'Qin Shi Huang made China one country — and had eight thousand clay soldiers made to guard him.',
+  go:{m:'won',i:7}},
+ {era:2,y:-130,e:'🐫',lat:40.14,lon:94.66,pZh:'中国 · 敦煌',pEn:'Dunhuang, China',
+  zh:'骆驼队沿着丝绸之路走了半个地球，把丝绸、纸和故事都带了出去。',
+  en:'Camel trains walked the Silk Road halfway across the world, carrying silk, paper and stories.'},
+ {era:2,y:79,e:'🌋',lat:40.75,lon:14.49,pZh:'意大利 · 庞贝',pEn:'Pompeii, Italy',
+  zh:'维苏威火山爆发，把整座庞贝城埋在火山灰下面 —— 也因此保存到了今天。',
+  en:'Vesuvius erupted and buried the whole town of Pompeii in ash — which is why it is still there to see.'},
+ {era:2,y:105,e:'📜',lat:34.62,lon:112.45,pZh:'中国 · 洛阳',pEn:'Luoyang, China',
+  zh:'蔡伦把树皮和破布做成纸。从此写字不用刻竹片了。',
+  en:'Cai Lun turned bark and rags into paper. No more carving words into strips of bamboo.'},
+ {era:3,y:618,e:'🏮',lat:34.27,lon:108.95,pZh:'中国 · 长安',pEn:'Chang\'an, China',
+  zh:'唐朝的长安是当时全世界最大的城市，街上走着各个国家的人。',
+  en:'Tang-dynasty Chang\'an was the biggest city on Earth, full of people from everywhere.'},
+ {era:3,y:800,e:'📚',lat:33.31,lon:44.36,pZh:'伊拉克 · 巴格达',pEn:'Baghdad, Iraq',
+  zh:'巴格达的「智慧宫」把全世界的书都翻译过来。今天的数字 1 2 3 就是那时候传开的。',
+  en:'The House of Wisdom in Baghdad translated books from everywhere. Our numbers 1 2 3 spread from there.'},
+ {era:3,y:1040,e:'🖨️',lat:34.8,lon:114.3,pZh:'中国 · 开封',pEn:'Kaifeng, China',
+  zh:'毕昇用泥做出一个个可以拼的字，这是世界上最早的活字印刷。',
+  en:'Bi Sheng made clay letters you could rearrange — the world\'s first movable type.'},
+ {era:3,y:1150,e:'🛕',lat:13.41,lon:103.87,pZh:'柬埔寨 · 吴哥窟',pEn:'Angkor Wat, Cambodia',
+  zh:'吴哥窟建好了，是世界上最大的庙。后来被森林盖住，几百年后才被找回来。',
+  en:'Angkor Wat was finished — the largest temple in the world. The forest swallowed it, and it was found again centuries later.'},
+ {era:3,y:1347,e:'🕯️',lat:43.77,lon:11.25,pZh:'欧洲',pEn:'Europe',
+  zh:'一场很厉害的病顺着商路传遍欧洲，很多人没能挺过来。人们从此开始认真研究怎么治病。',
+  en:'A terrible illness travelled the trade roads across Europe and many people died. Afterwards, people began to study medicine seriously.'},
+ {era:4,y:1405,e:'🚢',lat:32.06,lon:118.8,pZh:'中国 · 南京',pEn:'Nanjing, China',
+  zh:'郑和带着两百多条大船下西洋，最远到了非洲 —— 比哥伦布早了 87 年。',
+  en:'Zheng He sailed with over 200 huge ships, reaching Africa — 87 years before Columbus set out.'},
+ {era:4,y:1450,e:'📕',lat:49.99,lon:8.27,pZh:'德国 · 美因茨',pEn:'Mainz, Germany',
+  zh:'古腾堡造出印刷机，书一下子变便宜了，普通人也读得起书。',
+  en:'Gutenberg built a printing press. Books became cheap, and ordinary people could finally read them.'},
+ {era:4,y:1492,e:'🗺️',lat:24.0,lon:-74.5,pZh:'巴哈马群岛',pEn:'the Bahamas',
+  zh:'哥伦布的船到了美洲。他以为自己到了印度 —— 那里其实早就住着很多人了。',
+  en:'Columbus\' ships reached America. He thought he was in India — and people had been living there all along.'},
+ {era:4,y:1522,e:'🌍',lat:37.39,lon:-6.0,pZh:'西班牙 · 塞维利亚',pEn:'Seville, Spain',
+  zh:'麦哲伦的船队第一次绕地球一整圈，用了三年，回来时只剩一条船。',
+  en:'Magellan\'s fleet sailed all the way around the world — three years, and only one ship came home.'},
+ {era:4,y:1609,e:'🔭',lat:45.41,lon:11.87,pZh:'意大利 · 帕多瓦',pEn:'Padua, Italy',
+  zh:'伽利略用望远镜看月亮，发现月亮上有山，地球也不是宇宙的中心。',
+  en:'Galileo pointed a telescope at the Moon, found mountains on it — and that Earth is not the centre of everything.'},
+ {era:5,y:1769,e:'♨️',lat:55.86,lon:-4.25,pZh:'英国 · 格拉斯哥',pEn:'Glasgow, Britain',
+  zh:'瓦特改良了蒸汽机。烧开水居然能拉动机器，工厂从此不用靠人和马了。',
+  en:'Watt improved the steam engine. Boiling water could pull a machine — factories no longer needed people and horses.'},
+ {era:5,y:1825,e:'🚂',lat:54.57,lon:-1.31,pZh:'英国 · 斯托克顿',pEn:'Stockton, Britain',
+  zh:'第一条载客铁路开通了。以前走三天的路，现在几个小时就到。',
+  en:'The first passenger railway opened. A three-day journey now took a few hours.'},
+ {era:5,y:1879,e:'💡',lat:40.55,lon:-74.33,pZh:'美国 · 门洛帕克',pEn:'Menlo Park, USA',
+  zh:'爱迪生做出了能用很久的电灯泡。天黑以后，世界第一次亮了起来。',
+  en:'Edison made a light bulb that lasted. For the first time, the world stayed bright after dark.'},
+ {era:5,y:1886,e:'🚗',lat:48.78,lon:9.18,pZh:'德国 · 斯图加特',pEn:'Stuttgart, Germany',
+  zh:'第一辆汽车上路了，跑得比人走路快一点点，喇叭声吓坏了路边的马。',
+  en:'The first car took to the road — barely faster than walking, and it frightened all the horses.'},
+ {era:6,y:1903,e:'✈️',lat:36.02,lon:-75.67,pZh:'美国 · 小鹰镇',pEn:'Kitty Hawk, USA',
+  zh:'莱特兄弟飞了 12 秒、37 米。66 年以后，人就登上月球了。',
+  en:'The Wright brothers flew for 12 seconds and 37 metres. Sixty-six years later, people landed on the Moon.'},
+ {era:6,y:1914,e:'🎩',lat:43.85,lon:18.38,pZh:'萨拉热窝',pEn:'Sarajevo',
+  zh:'第一次世界大战开始了，三十多个国家被卷进来。',
+  en:'The First World War began, pulling in more than thirty countries.',
+  go:{m:'war',i:0}},
+ {era:6,y:1928,e:'💊',lat:51.52,lon:-0.13,pZh:'英国 · 伦敦',pEn:'London, Britain',
+  zh:'弗莱明忘了洗培养皿，发霉了 —— 结果发现了青霉素，救了几千万人。',
+  en:'Fleming forgot to wash a dish and it went mouldy — that mould was penicillin, and it has saved tens of millions of lives.'},
+ {era:6,y:1939,e:'⚡',lat:52.2,lon:21.0,pZh:'波兰 · 华沙',pEn:'Warsaw, Poland',
+  zh:'第二次世界大战开始了，这是人类历史上最大的一场战争。',
+  en:'The Second World War began — the biggest war in human history.',
+  go:{m:'war',i:1}},
+ {era:7,y:1945,e:'🕊️',lat:40.75,lon:-73.97,pZh:'美国 · 纽约',pEn:'New York, USA',
+  zh:'51 个国家一起成立联合国，约好有事先坐下来说话。',
+  en:'Fifty-one countries founded the United Nations, promising to talk before they fight.',
+  go:{m:'war',i:1}},
+ {era:7,y:1969,e:'🌕',lat:28.57,lon:-80.65,pZh:'美国 · 卡纳维拉尔角',pEn:'Cape Canaveral, USA',
+  zh:'阿波罗 11 号把人送上了月球。全世界大约六亿人守在电视机前看。',
+  en:'Apollo 11 put people on the Moon. About 600 million people watched it on television.'},
+ {era:7,y:1989,e:'🌐',lat:46.23,lon:6.05,pZh:'瑞士 · 日内瓦',pEn:'Geneva, Switzerland',
+  zh:'在瑞士的一间实验室里，万维网被发明出来 —— 从此全世界的电脑连在了一起。',
+  en:'In a lab in Switzerland the World Wide Web was invented, and the world\'s computers were joined together.'},
+ {era:7,y:2007,e:'📱',lat:37.33,lon:-122.03,pZh:'美国 · 加州',pEn:'California, USA',
+  zh:'智能手机出现了。一块小玻璃里，装下了全世界的地图、书和朋友。',
+  en:'The smartphone arrived — a slab of glass holding all the world\'s maps, books and friends.'},
+ {era:7,y:0,me:true,e:'🧒',lat:0,lon:0,pZh:'你在的地方',pEn:'where you are',
+  zh:'今天 —— 轮到你了。你现在做的事，也会变成以后的历史。',
+  en:'Today — your turn. What you do now becomes history too.'}
+];
 /* what a child can actually do — the point of the whole lesson */
 var PEACE=[
  ['🗣️','有话好好说，不动手','Use your words, not your hands'],
@@ -2277,6 +2465,7 @@ function draw(){
   if(MODE==='won'){ drawWonLayer(); return; }
   if(MODE==='place'){ drawPlaceLayer(); return; }
   if(MODE==='war'){ drawWarLayer(); return; }
+  if(MODE==='hist'){ drawHistLayer(); return; }
   COUNTRIES.forEach(function(c){
     var p=project(c.lon,c.lat);
     if(!p.vis) return;
@@ -2428,6 +2617,52 @@ function drawWonLayer(){
     ctx.textAlign='start';
   }
 }
+/* world history: every stop is a dot, and the ones already visited are joined
+   by a thread, so you watch history travel around the globe */
+var histDots=[], histIdx=0;
+function histLL(i){
+  var h=HIST[i];
+  if(h.me){ var c=homeC()||current; return {lat:c.lat, lon:c.lon}; }
+  return {lat:h.lat, lon:h.lon};
+}
+function drawHistLayer(){
+  histDots=[];
+  var i, a, b, t, p, q, st;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  for(i=1;i<=histIdx;i++){                    /* the thread through what you have seen */
+    a=toVec(histLL(i-1).lon,histLL(i-1).lat); b=toVec(histLL(i).lon,histLL(i).lat);
+    ctx.beginPath(); st=false;
+    for(t=0;t<=20;t++){
+      var ll=gcPoint(a,b,t/20); p=project(ll[0],ll[1]);
+      if(p.vis){ st?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); st=true; } else st=false;
+    }
+    ctx.lineWidth=2.4; ctx.strokeStyle=ERAS[HIST[i].era].col+'cc'; ctx.stroke();
+  }
+  ctx.lineCap='butt';
+  for(i=0;i<HIST.length;i++){
+    var ll2=histLL(i); q=project(ll2.lon,ll2.lat); if(!q.vis) continue;
+    histDots.push({x:q.x,y:q.y,i:i});
+    var seen=i<=histIdx, sel=i===histIdx;
+    if(sel){
+      ctx.beginPath(); ctx.arc(q.x,q.y,10+Math.sin(Date.now()/300)*1.8,0,7);
+      ctx.fillStyle='rgba(255,213,74,.32)'; ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(q.x,q.y,sel?6.6:(seen?4.4:3),0,7);
+    ctx.fillStyle=sel?'#ffd54a':(seen?ERAS[HIST[i].era].col:'rgba(255,255,255,.45)');
+    ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle=sel?'rgba(120,72,20,.9)':'rgba(255,255,255,.9)'; ctx.stroke();
+  }
+  var e=HIST[histIdx], sp=project(histLL(histIdx).lon,histLL(histIdx).lat);
+  if(sp.vis){
+    var label=e.e+' '+(document.body.classList.contains('only-en')?e.pEn:e.pZh);
+    ctx.font='bold 14px "Segoe UI","PingFang SC",sans-serif';
+    var tw=ctx.measureText(label).width;
+    ctx.fillStyle='rgba(255,255,255,.95)';
+    roundRect(sp.x-tw/2-8, sp.y-42, tw+16, 24, 12); ctx.fill();
+    ctx.fillStyle='#2c4560'; ctx.textAlign='center'; ctx.fillText(label, sp.x, sp.y-25);
+    ctx.textAlign='start';
+  }
+}
 /* the world wars: every country that was pulled in lights up on the year it
    joined, so you watch the war spread across the globe instead of reading it */
 var warDots=[], warIdx=0;
@@ -2573,6 +2808,12 @@ cv.addEventListener('pointerup',function(e){
       if(bwr) warTellCountry(bwr);
       return;
     }
+    if(MODE==='hist'){
+      var bh=null, bhd=24;
+      histDots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bhd){bhd=dd;bh=d.i;} });
+      if(bh!==null){ histPlay(false); histGo(bh,true); }
+      return;
+    }
     var best=null,bd=24;
     dots.forEach(function(d){ var dd=Math.hypot(d.x-mx,d.y-my); if(dd<bd){bd=dd;best=d.c;} });
     if(best){ if(MODE==='hunt') huntPick(best); else select(best.id,true); return; }
@@ -2610,7 +2851,7 @@ try{ dayNight=localStorage.getItem('we_daynight_v1')!=='0'; }catch(e){}
 var NN=100, nightCv=null, nightImg=null;
 function drawNight(){
   if(!dayNight) return;
-  if(MODE==='war') return;   /* the whole point is watching the war spread — no half-dark globe */
+  if(MODE==='war'||MODE==='hist') return;  /* watching it spread beats a half-dark globe */
   if(!nightCv){
     nightCv=document.createElement('canvas'); nightCv.width=NN; nightCv.height=NN;
     nightImg=nightCv.getContext('2d').createImageData(NN,NN);
@@ -2707,7 +2948,7 @@ function stepPlanes(dt){
 function drawPlanes(){
   planeLights.length=0; planeHits.length=0;
   /* civ mode keeps the globe clean — amber night-lights would read as civilisation markers */
-  if(!planesOn || MODE==='civ' || MODE==='won' || MODE==='place' || MODE==='war') return;
+  if(!planesOn || MODE==='civ' || MODE==='won' || MODE==='place' || MODE==='war' || MODE==='hist') return;
   var N=12;
   for(var k=0;k<PLANES.length;k++){
     var pl=PLANES[k], head=Math.min(1,pl.t), tail=Math.max(0,pl.t-pl.tail);
@@ -4053,7 +4294,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#langSeg .btn'),function
     cl.add(m==='both'?'both':(m==='zh'?'only-zh':'only-en'));
   };
 });
-var MODES=['learn','civ','won','place','war','build','roam','hunt','animal','quiz','passport'];
+var MODES=['learn','hist','civ','won','place','war','build','roam','hunt','animal','quiz','passport'];
 function setMode(m){
   MODES.forEach(function(x){ document.body.classList.remove('m-'+x); });
   document.body.classList.add('m-'+m);
@@ -4068,7 +4309,9 @@ function setMode(m){
   if(m==='won'){ renderWon(); flyTo(WONDERS[wonIdx]); sayWon(); }
   if(m==='place'){ renderPlace(); flyTo(PLACES[placeIdx]); sayPlace(); }
   if(m==='war'){ renderWar(); sayWar(); }
+  if(m==='hist'){ renderHist(); sayHist(); }
   if(m!=='war') warPlay(false);
+  if(m!=='hist') histPlay(false);
   if(m==='build'){ bLoad(); renderBuild(); }
   if(m==='roam') renderRoam();
   if(m==='hunt') startHunt();
@@ -4341,6 +4584,190 @@ function pickPlace(i,user){
   placeIdx=i; renderPlace();
   flyTo(PLACES[i]);
   if(user) sayPlace();
+}
+
+/* ============================================================
+   6c2. WORLD HISTORY — the big line everything else hangs on
+   The ribbon gives every era the same width, otherwise the stone age would
+   squeeze the last 500 years into a hair. 「按真实比例」 slides the same dots
+   onto a true linear scale, which is the whole lesson: nearly everything a
+   child has heard of happened in the last sliver.
+   ============================================================ */
+var HT={playing:false, raf:0, last:0, scale:0, want:0};
+var HY0=-20000, HY1=2030;
+function histNow(){ return new Date().getFullYear(); }
+function eqPos(y){                            /* equal width per era */
+  var i, e, n=ERAS.length;
+  for(i=0;i<n;i++){
+    e=ERAS[i];
+    if(y<=e.y1 || i===n-1){
+      var f=Math.max(0,Math.min(1,(y-e.y0)/(e.y1-e.y0)));
+      return (i+f)/n*100;
+    }
+  }
+  return 100;
+}
+function realPos(y){ return (y-HY0)/(HY1-HY0)*100; }
+function histPos(y){                          /* clamped, so a dot at either end is not half cut off */
+  return Math.max(1.2, Math.min(98.8, eqPos(y)+(realPos(y)-eqPos(y))*HT.scale));
+}
+function histY(i){ return HIST[i].me?histNow():HIST[i].y; }
+function yearTxt(y){
+  if(y<0) return {zh:'公元前 '+(-y).toLocaleString()+' 年', en:(-y).toLocaleString()+' BC'};
+  if(y>=histNow()) return {zh:'今天', en:'today'};
+  return {zh:'公元 '+y+' 年', en:'AD '+y};
+}
+function agoTxt(y){
+  var a=histNow()-y;
+  if(a<1) return {zh:'就是现在', en:'right now'};
+  if(a<1000) return {zh:'距今 '+a+' 年', en:a+' years ago'};
+  var r=Math.round(a/100)*100;                /* nobody needs the exact year this far back */
+  if(a<10000) return {zh:'距今大约 '+r.toLocaleString()+' 年', en:'about '+r.toLocaleString()+' years ago'};
+  return {zh:'距今大约 '+(Math.round(a/1000)/10)+' 万年', en:'about '+r.toLocaleString()+' years ago'};
+}
+function eraSpan(e){
+  var a=yearTxt(e.y0), b=yearTxt(Math.min(e.y1,histNow()));
+  return {zh:a.zh+' – '+b.zh, en:a.en+' – '+b.en};
+}
+function renderHist(){
+  var h='<div class="hIntro"><span class="emo">📜</span><span class="stack">'+
+    T('从在山洞里画画的人，一直到今天的你 —— 这是一条长长的时间线。'+
+      '按 ▶️ 就能从头走一遍，地球上会画出历史走过的路。',
+      'From the people painting in caves all the way to you — one long line of time. '+
+      'Press ▶️ to walk it from the start and watch the path travel across the globe.')+'</span></div>';
+  h+='<div class="hTop"><div class="hYear" id="hYear"></div>'+
+     '<div class="hEraNow" id="hEraNow"></div><div class="grow"></div>'+
+     '<button class="btn big" id="hPlayB">▶️ '+T('播放','Play')+'</button>'+
+     '<button class="btn" id="hPrevB">⬅️</button><button class="btn" id="hNextB">➡️</button></div>';
+  h+='<div class="hRail" id="hRail">'+ERAS.map(function(e,i){
+      return '<div class="hEra" data-era="'+i+'" style="background:'+e.col+'"><span>'+e.e+'</span></div>';
+    }).join('')+HIST.map(function(x,i){
+      return '<button class="hDot" data-hi="'+i+'" title="'+x.pZh+'">'+x.e+'</button>';
+    }).join('')+'</div>';
+  h+='<div class="hScaleRow"><span class="stack">'+
+     T('这条线上每个时代一样宽，早期其实被压缩了','every era gets the same width here — the early ones are squeezed')+
+     '</span><div class="grow"></div><button class="btn" id="hScaleB">📏 '+
+     T('按真实比例看看','Show the real scale')+'</button></div>';
+  h+='<div class="hEvent" id="hEv"></div>';
+  h+='<div class="hEraCard" id="hEraCard"></div>';
+  h+='<div class="hList" id="hList">'+HIST.map(function(x,i){
+      var y=yearTxt(histY(i)), head='';
+      if(i===0 || HIST[i-1].era!==x.era){
+        var er=ERAS[x.era];
+        head='<div class="hEraHead stack">'+T(er.e+' '+er.zh,er.e+' '+er.en)+'</div>';
+      }
+      return head+'<button class="hItem" data-hi="'+i+'"><span class="e">'+x.e+'</span><span>'+
+             '<b class="stack">'+T(y.zh,y.en)+'</b><span class="stack">'+T(x.pZh,x.pEn)+'</span></span></button>';
+    }).join('')+'</div>';
+  h+='<div class="navRow"><button class="btn" id="hSay">🔊 '+T('读给我听','Say it')+'</button>'+
+     '<button class="btn" id="hStart">⏮️ '+T('回到最开始','Back to the start')+'</button></div>';
+  var panel=document.getElementById('histPanel');
+  panel.innerHTML=h;
+  histGo(histIdx,false);
+  Array.prototype.forEach.call(panel.querySelectorAll('[data-hi]'),function(b){
+    b.onclick=function(){ histPlay(false); histGo(+b.dataset.hi,true); };
+  });
+  document.getElementById('hPlayB').onclick=function(){ histPlay(!HT.playing); };
+  document.getElementById('hPrevB').onclick=function(){ histPlay(false); histGo(histIdx-1,true); };
+  document.getElementById('hNextB').onclick=function(){ histPlay(false); histGo(histIdx+1,true); };
+  document.getElementById('hStart').onclick=function(){ histPlay(false); histGo(0,true); };
+  document.getElementById('hSay').onclick=function(){ sayHist(true); };
+  document.getElementById('hScaleB').onclick=histToggleScale;
+}
+/* put the era blocks and the dots where the current scale says they go */
+function histLayout(){
+  var panel=document.getElementById('histPanel'); if(!panel) return;
+  Array.prototype.forEach.call(panel.querySelectorAll('.hEra'),function(el){
+    var e=ERAS[+el.dataset.era], a=histPos(e.y0), b=histPos(e.y1);
+    el.style.left=a+'%'; el.style.width=Math.max(0.4,b-a)+'%';
+    el.classList.toggle('on', +el.dataset.era===HIST[histIdx].era);
+  });
+  Array.prototype.forEach.call(panel.querySelectorAll('.hDot'),function(el){
+    var i=+el.dataset.hi;
+    el.style.left=histPos(histY(i))+'%';
+    el.classList.toggle('done', i<histIdx);
+    el.classList.toggle('on', i===histIdx);
+  });
+}
+function histToggleScale(){
+  HT.want=HT.want?0:1;
+  var b=document.getElementById('hScaleB');
+  if(b) b.innerHTML='📏 '+(HT.want?T('回到一样宽','Even eras again'):T('按真实比例看看','Show the real scale'));
+  var t0=null, from=HT.scale, to=HT.want;
+  requestAnimationFrame(function step(ts){
+    if(MODE!=='hist') return;
+    if(t0===null) t0=ts;
+    var p=Math.min(1,(ts-t0)/900), e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    HT.scale=from+(to-from)*e;
+    histLayout();
+    if(p<1) requestAnimationFrame(step);
+    else if(HT.want) say('看到了吗？你听说过的事情，几乎全挤在最右边那一点点里面。',
+                         'See that? Almost everything you have heard of is squeezed into that last little sliver.');
+  });
+}
+function histGo(i,speak){
+  var n=HIST.length;
+  histIdx=Math.max(0,Math.min(n-1,i));
+  var x=HIST[histIdx], era=ERAS[x.era], y=histY(histIdx), yt=yearTxt(y), at=agoTxt(y), el;
+  el=document.getElementById('hYear');
+  if(el) el.innerHTML='<span class="stack">'+T(yt.zh,yt.en)+'</span><small class="stack">'+T(at.zh,at.en)+'</small>';
+  el=document.getElementById('hEraNow');
+  if(el){ el.style.background=era.col; el.innerHTML=era.e+' '+T(era.zh,era.en); }
+  el=document.getElementById('hEraCard');
+  if(el){
+    var sp=eraSpan(era);
+    el.style.background=era.col+'22';
+    el.innerHTML='<span class="stack">'+T('<b>'+era.e+' '+era.zh+'</b>（'+sp.zh+'）：'+era.dZh,
+                                          '<b>'+era.e+' '+era.en+'</b> ('+sp.en+'): '+era.dEn)+'</span>';
+  }
+  el=document.getElementById('hEv');
+  if(el){
+    el.className='hEvent pop';
+    el.innerHTML='<span class="emo">'+x.e+'</span><div class="grow">'+
+      '<div class="dt stack">'+T(yt.zh,yt.en)+'</div>'+
+      '<div class="pl stack">'+T('📍 '+x.pZh,'📍 '+x.pEn)+'</div>'+
+      '<div class="tx stack">'+T(x.zh,x.en)+'</div>'+
+      (x.go?'<button class="btn" id="hGoB">'+T('去看这一段 ➜','See the whole story ➜')+'</button>':'')+'</div>';
+    var gb=document.getElementById('hGoB');
+    if(gb) gb.onclick=function(){ histPlay(false); histJump(x.go); };
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#hList .hItem'),function(b){
+    b.classList.toggle('on', +b.dataset.hi===histIdx);
+  });
+  histLayout();
+  flyTo(histLL(histIdx));
+  if(speak) say(x.zh.replace(/<[^>]+>/g,''), x.en.replace(/<[^>]+>/g,''));
+  if(histIdx===n-1 && speak) burst(90);
+}
+function histJump(go){
+  if(go.m==='civ'){ civIdx=go.i; setMode('civ'); }
+  else if(go.m==='won'){ wonIdx=go.i; setMode('won'); }
+  else if(go.m==='war'){ warIdx=go.i; WT.t=0; WT.i=0; WT.lit=null; setMode('war'); }
+  else if(go.m==='learn'){ setMode('learn'); select(go.c,true); }
+}
+function histPlay(on){
+  HT.playing=on;
+  var b=document.getElementById('hPlayB');
+  if(b) b.innerHTML=(on?'⏸ ':'▶️ ')+T(on?'暂停':'播放', on?'Pause':'Play');
+  if(on){
+    if(histIdx>=HIST.length-1) histGo(0,false);
+    HT.last=performance.now();
+    if(!HT.raf) HT.raf=requestAnimationFrame(histTick);
+  }
+}
+function histTick(now){
+  if(MODE!=='hist' || !HT.playing){ HT.raf=0; return; }
+  if(now-HT.last>3000){                       /* 3 s per stop — long enough to read it */
+    HT.last=now;
+    if(histIdx>=HIST.length-1){ histPlay(false); HT.raf=0; return; }
+    histGo(histIdx+1,true);
+  }
+  HT.raf=requestAnimationFrame(histTick);
+}
+function sayHist(force){
+  var x=HIST[histIdx], era=ERAS[x.era], yt=yearTxt(histY(histIdx));
+  sayList([[era.zh+'，'+yt.zh, era.en+', '+yt.en],
+           [x.zh.replace(/<[^>]+>/g,''), x.en.replace(/<[^>]+>/g,'')]], force);
 }
 
 /* ============================================================
