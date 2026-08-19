@@ -93,6 +93,15 @@
   .trio .lbl{font-size:11px;color:var(--ink2);font-weight:bold;text-align:center}
   .trio .nm{font-size:14px;font-weight:bold;line-height:1.2;margin-top:3px;text-align:center}
   .trio .nm .en{font-size:11.5px;color:var(--ink2)}
+  .people{display:block;width:100%;text-align:left;background:linear-gradient(100deg,#fff4e6,#eef6ff);
+    border:3px solid #ecdcc4;border-radius:18px;padding:11px 14px;margin-top:12px;transition:transform .12s}
+  .people:hover{transform:translateY(-2px);border-color:var(--blue)}
+  .people .lbl{font-size:11px;font-weight:bold;color:var(--ink2);letter-spacing:1.2px}
+  .people .row{display:flex;align-items:center;gap:12px;margin-top:5px}
+  .people .ico{font-size:38px;line-height:1;flex:none}
+  .people .grp{font-size:15px;font-weight:bold;line-height:1.3}
+  .people .grp .en{font-size:12.5px;color:var(--ink2);font-weight:normal}
+  .people .more{font-size:12.5px;color:var(--blue);font-weight:bold;margin-top:4px}
 
   /* ---------- picker ---------- */
   .picker{max-width:1180px;margin:16px auto 0}
@@ -2172,6 +2181,254 @@ var PEACE=[
 /* ============================================================
    3. SIMPLE WORLD MAP (coarse outlines, lon/lat)
    ============================================================ */
+/* ============================================================
+   2d. PEOPLES & CUSTOMS — who lives there and how they do things
+   groups = main peoples, note = one line on diversity,
+   dress = traditional clothing, customs = [emoji, 中文, English]
+   ============================================================ */
+var PEOPLE={
+ cn:{icon:'🏮',groups:[['汉族','Han'],['壮族','Zhuang'],['维吾尔族','Uyghur'],['藏族','Tibetan']],
+  note:['一共有 56 个民族住在一起','56 different peoples live together'],
+  dress:['汉服和旗袍','Hanfu and qipao'],
+  customs:[['🧧','过年长辈会给小朋友红包','Elders give children red envelopes at New Year'],
+           ['🥢','用筷子吃饭，筷子不可以插在饭上','They eat with chopsticks — never stand them up in the rice'],
+           ['🥮','中秋节一家人一起吃月饼、看月亮','At Mid-Autumn the family shares mooncakes under the moon']]},
+ jp:{icon:'👘',groups:[['大和族','Yamato'],['阿伊努人','Ainu'],['琉球人','Ryukyuan']],
+  note:['北海道的阿伊努人有自己的语言','The Ainu of Hokkaido have their own language'],
+  dress:['和服和浴衣','Kimono and yukata'],
+  customs:[['🙇','见面互相鞠躬问好','People bow to each other to say hello'],
+           ['🥿','进屋一定要脱鞋','Shoes always come off at the door'],
+           ['🌸','春天全家坐在樱花树下野餐','In spring families picnic under the cherry blossom']]},
+ my:{icon:'🪔',groups:[['马来人','Malay'],['华人','Chinese'],['印度人','Indian'],['原住民','Indigenous peoples']],
+  note:['三大族群和许多原住民住在一起','Three big communities and many indigenous peoples share one country'],
+  dress:['马来传统服 Baju Kurung','Baju Kurung and Baju Melayu'],
+  customs:[['🤝','握手后把手轻轻放在胸口','After a handshake they touch their heart'],
+           ['🍛','有些菜用右手抓着吃才香','Some dishes taste best eaten with the right hand'],
+           ['🎉','开斋节、春节、屠妖节都开门请邻居来吃','At Hari Raya, Chinese New Year and Deepavali, homes open to all the neighbours']]},
+ sg:{icon:'🏙️',groups:[['华人','Chinese'],['马来人','Malay'],['印度人','Indian'],['欧亚裔','Eurasian']],
+  note:['四个族群，四种官方语言','Four communities and four official languages'],
+  dress:['每个族群的传统服装都看得到','You see the traditional dress of every community'],
+  customs:[['🍜','大家在「小贩中心」坐一起吃饭','Everyone eats side by side at the hawker centre'],
+           ['🧹','街道很干净，乱丢垃圾要罚钱','Streets are spotless — littering brings a fine'],
+           ['🎊','各族的节日全国一起放假','Every community\'s festival is a holiday for everyone']]},
+ in:{icon:'🥻',groups:[['印度斯坦人','Hindustani'],['泰卢固人','Telugu'],['泰米尔人','Tamil'],['孟加拉人','Bengali']],
+  note:['有一千多种语言','More than a thousand languages are spoken'],
+  dress:['纱丽和库尔塔','Sari and kurta'],
+  customs:[['🙏','双手合十说「Namaste」','Palms pressed together and a Namaste'],
+           ['🪔','排灯节点满一排排小油灯','At Diwali rows of little lamps are lit'],
+           ['🎨','洒红节互相泼五颜六色的粉','At Holi everyone throws coloured powder']]},
+ kr:{icon:'🎎',groups:[['韩民族','Korean']],
+  note:['几乎全国都是同一个民族','Almost everyone shares one heritage'],
+  dress:['韩服 Hanbok','Hanbok'],
+  customs:[['🙇','见到长辈要弯腰问好','Children bow to their elders'],
+           ['🙌','用两只手接东西才有礼貌','Take things with both hands to be polite'],
+           ['🥬','入冬前全家一起腌泡菜','Before winter the family makes kimchi together']]},
+ th:{icon:'🙏',groups:[['泰族','Thai'],['华裔泰人','Thai Chinese'],['马来人','Malay'],['山地民族','hill peoples']],
+  note:['北部山上还住着许多山地民族','Many hill peoples live in the northern mountains'],
+  dress:['泰丝做的传统服装','Traditional clothes woven from Thai silk'],
+  customs:[['🙏','双手合十行「wai」礼','They greet with a wai — palms together'],
+           ['🚫','不可以摸别人的头','Never touch anyone on the head'],
+           ['💦','泼水节互相泼水，过泰国新年','At Songkran everyone splashes water for New Year']]},
+ id:{icon:'🎭',groups:[['爪哇族','Javanese'],['巽他族','Sundanese'],['巴塔克族','Batak'],['巴厘人','Balinese']],
+  note:['有三百多个民族','More than 300 different peoples'],
+  dress:['蜡染花布「巴迪」','Batik cloth'],
+  customs:[['🖐️','递东西一定要用右手','Always pass things with the right hand'],
+           ['🎭','皮影戏可以演一整个晚上','Shadow puppet plays can last all night'],
+           ['🤝','邻居互相帮忙叫「gotong royong」','Helping each other has a name: gotong royong']]},
+ vn:{icon:'👒',groups:[['京族','Kinh'],['岱依族','Tay'],['泰族','Thai'],['苗族','Hmong']],
+  note:['一共有 54 个民族','54 peoples in all'],
+  dress:['奥黛 Áo dài','The áo dài'],
+  customs:[['🧧','春节给小朋友压岁钱','Children get lucky money at Tet'],
+           ['🥢','长辈先动筷子，小朋友才吃','Elders lift their chopsticks first'],
+           ['👒','戴尖尖的斗笠遮太阳挡雨','Cone-shaped hats keep off sun and rain']]},
+ ph:{icon:'🎉',groups:[['他加禄人','Tagalog'],['宿务人','Cebuano'],['伊洛卡诺人','Ilocano']],
+  note:['有一百多个民族和语言','Over a hundred peoples and languages'],
+  dress:['巴隆衬衫 Barong','The Barong shirt'],
+  customs:[['🤚','把长辈的手贴在自己额头上问好','Children press an elder\'s hand to their forehead'],
+           ['🏠','全村一起帮忙，叫「bayanihan」','Neighbours pitching in has a name: bayanihan'],
+           ['🎄','九月就开始唱圣诞歌','Christmas songs start playing in September']]},
+ np:{icon:'🏔️',groups:[['切特里人','Chhetri'],['婆罗门','Bahun'],['马嘉尔人','Magar'],['夏尔巴人','Sherpa']],
+  note:['有一百多个民族','More than a hundred peoples'],
+  dress:['达乌拉苏鲁瓦','Daura-Suruwal'],
+  customs:[['🙏','双手合十说「Namaste」','Palms together and Namaste'],
+           ['🧗','夏尔巴人是登山队最厉害的向导','Sherpas are the finest mountain guides'],
+           ['🐄','提哈节给牛和狗戴上花环','At Tihar even cows and dogs wear flower garlands']]},
+ ae:{icon:'🕌',groups:[['阿联酋本地人','Emirati'],['来自世界各地的人','people from all over the world']],
+  note:['十个人里有八九个来自别的国家','Most people here came from another country'],
+  dress:['白袍 kandura 和黑袍 abaya','The white kandura and black abaya'],
+  customs:[['☕','用很小的杯子倒阿拉伯咖啡请客','Guests are served Arabic coffee in tiny cups'],
+           ['🤝','见面要先问候对方一家人好不好','A greeting asks after your whole family'],
+           ['🌙','斋月太阳下山后全家一起吃大餐','In Ramadan the family feasts after sunset']]},
+ tr:{icon:'🫖',groups:[['土耳其人','Turkish'],['库尔德人','Kurdish']],
+  note:['一半在亚洲一半在欧洲，两边的习惯混在一起','Asian and European ways mix here'],
+  dress:['传统的上衣和头巾','Traditional shirts and headscarves'],
+  customs:[['🫖','一天要喝好几小杯红茶','People drink many little glasses of tea a day'],
+           ['🥿','进屋脱鞋，客人先吃','Shoes off indoors, and guests eat first'],
+           ['🧿','挂一颗蓝眼睛的护身符保平安','A blue eye charm is hung up for luck']]},
+ ru:{icon:'🪆',groups:[['俄罗斯族','Russian'],['鞑靼人','Tatar'],['巴什基尔人','Bashkir']],
+  note:['有一百多个民族','Over a hundred peoples'],
+  dress:['萨拉凡长裙和毡靴','Sarafan dresses and felt boots'],
+  customs:[['🪆','套娃一个套一个，拆开还有一个','Nesting dolls hide one inside another'],
+           ['🥿','进屋要换上拖鞋','You change into slippers indoors'],
+           ['🥞','谢肉节吃薄饼，送走冬天','Pancakes send the winter away at Maslenitsa']]},
+ gb:{icon:'🫖',groups:[['英格兰人','English'],['苏格兰人','Scottish'],['威尔士人','Welsh'],['北爱尔兰人','Northern Irish']],
+  note:['由四个地方合起来组成','Four nations joined in one country'],
+  dress:['苏格兰方格裙 kilt','The Scottish kilt'],
+  customs:[['🫖','下午三四点要喝下午茶','Afternoon tea at three or four'],
+           ['🚶','排队要好好排，绝对不可以插队','Queue properly — never push in'],
+           ['🙏','一天要说很多次「请」和「谢谢」','Please and thank you, over and over']]},
+ fr:{icon:'🥖',groups:[['法兰西人','French'],['布列塔尼人','Breton'],['科西嘉人','Corsican']],
+  note:['各地有自己的方言和拿手菜','Each region has its own dialect and dishes'],
+  dress:['各地方的传统服饰','Regional folk costumes'],
+  customs:[['😘','见面亲一下左右脸颊','Friends kiss once on each cheek'],
+           ['🥖','每天去面包店买新鲜长棍面包','A fresh baguette is bought every single day'],
+           ['🍽️','吃饭慢慢吃，边吃边聊很久','Meals are slow and full of talk']]},
+ de:{icon:'🥨',groups:[['德意志人','German'],['索布人','Sorbian']],
+  note:['每个州都有自己的方言','Every state has its own dialect'],
+  dress:['皮短裤和迪恩德尔裙','Lederhosen and dirndl'],
+  customs:[['⏰','约好几点就几点，迟到很不礼貌','Being on time really matters'],
+           ['🤝','见面握手，看着对方眼睛','A handshake, looking you in the eye'],
+           ['🎄','圣诞市集喝热热的香料果汁','Christmas markets serve warm spiced juice']]},
+ it:{icon:'🍝',groups:[['意大利人','Italian'],['撒丁人','Sardinian'],['南蒂罗尔人','South Tyrolean']],
+  note:['南边和北边的话和菜很不一样','North and south sound and taste quite different'],
+  dress:['各地方的传统服饰','Regional costumes'],
+  customs:[['🤌','说话的时候手也一直在说话','Their hands talk as much as their mouths'],
+           ['☕','站在吧台前几口喝完咖啡','Coffee is drunk standing at the bar'],
+           ['👨‍👩‍👧','星期天全家一起吃很长的午饭','Sunday lunch gathers the whole family']]},
+ es:{icon:'💃',groups:[['卡斯蒂利亚人','Castilian'],['加泰罗尼亚人','Catalan'],['巴斯克人','Basque'],['加利西亚人','Galician']],
+  note:['有好几种官方语言','Several languages are official here'],
+  dress:['弗拉门戈的荷叶边舞裙','Ruffled flamenco dresses'],
+  customs:[['🌙','晚饭很晚才吃，九点以后','Dinner does not start until after nine'],
+           ['😴','中午商店关门休息一下','Shops close for a rest at midday'],
+           ['🍤','一小盘一小盘地吃「tapas」','Food comes in little plates called tapas']]},
+ nl:{icon:'🚲',groups:[['荷兰人','Dutch'],['弗里斯兰人','Frisian']],
+  note:['北边的弗里斯兰有自己的语言','Frisian in the north is its own language'],
+  dress:['木鞋和蕾丝帽','Wooden clogs and lace caps'],
+  customs:[['🚲','不管大人小孩都骑自行车','Everyone cycles, young and old'],
+           ['🎂','过生日的人自己带蛋糕请大家','The birthday person brings the cake'],
+           ['🧡','国王节全国上下穿橙色','On King\'s Day the whole country wears orange']]},
+ ch:{icon:'🐄',groups:[['德语区的人','German-speaking'],['法语区的人','French-speaking'],['意语区的人','Italian-speaking'],['罗曼什人','Romansh']],
+  note:['有四种官方语言','Four official languages'],
+  dress:['阿尔卑斯山的传统服装','Alpine folk dress'],
+  customs:[['🐄','夏天赶牛上山，秋天戴着花下山','Cows go up in summer and come down wearing flowers'],
+           ['⏰','火车准点到分钟','Trains arrive to the exact minute'],
+           ['🎺','吹很长很长的阿尔卑斯号角','Very long alphorns echo across the valleys']]},
+ gr:{icon:'🏺',groups:[['希腊人','Greek']],
+  note:['几乎都是希腊人，每座岛口音都不同','Nearly everyone is Greek, and every island has its own accent'],
+  dress:['福斯塔内拉褶裙','The pleated fustanella'],
+  customs:[['🍽️','菜放在中间，大家一起夹着吃','Dishes go in the middle and everyone shares'],
+           ['💃','手拉着手围成一个圈跳舞','People dance in a circle holding hands'],
+           ['🧿','也挂蓝眼睛的护身符','A blue eye charm keeps bad luck away here too']]},
+ no:{icon:'🎿',groups:[['挪威人','Norwegian'],['萨米人','Sámi']],
+  note:['北边的萨米人养驯鹿','The Sámi in the far north herd reindeer'],
+  dress:['布纳德 Bunad','The bunad'],
+  customs:[['🎿','小朋友很小很小就学会滑雪','Children ski almost before they can walk'],
+           ['🌲','周末全家一起去山里走路','Weekends are for walking in the hills'],
+           ['🇳🇴','5 月 17 日小朋友游行庆祝国庆','On 17 May it is the children who parade']]},
+ eg:{icon:'🐫',groups:[['埃及人','Egyptian'],['努比亚人','Nubian'],['贝都因人','Bedouin']],
+  note:['南边的努比亚人有自己的语言','The Nubians in the south have their own language'],
+  dress:['长袍 galabeya','The long galabeya'],
+  customs:[['☕','客人一进门就要请喝茶或咖啡','A guest is offered tea or coffee straight away'],
+           ['🍽️','用右手拿面包蘸着菜吃','Bread is scooped with the right hand'],
+           ['👨‍👩‍👧‍👦','一大家人常常住在一起','Big families often live under one roof']]},
+ ke:{icon:'🪘',groups:[['基库尤人','Kikuyu'],['卢希亚人','Luhya'],['卢奥人','Luo'],['马赛人','Maasai']],
+  note:['有四十多个民族','More than 40 peoples'],
+  dress:['马赛人的红色披布「shuka」','The red Maasai shuka'],
+  customs:[['🤝','先跟长辈握手，小朋友要低头','Elders are greeted first; children bow their heads'],
+           ['🦘','马赛人跳起来比谁跳得高','The Maasai dance by leaping as high as they can'],
+           ['🍲','大家围着一盘玉米糕一起吃','Everyone shares from one plate of ugali']]},
+ za:{icon:'🪘',groups:[['祖鲁人','Zulu'],['科萨人','Xhosa'],['阿非利卡人','Afrikaner'],['英裔南非人','English-speaking']],
+  note:['有 11 种官方语言，被叫做「彩虹之国」','11 official languages — they call it the Rainbow Nation'],
+  dress:['祖鲁人五颜六色的珠子饰品','Zulu beadwork in bright colours'],
+  customs:[['🔥','周末在院子里烤肉，叫「braai」','Weekends mean a backyard braai'],
+           ['🤝','握手要握久一点才够热情','A handshake lasts a good long while'],
+           ['🎶','唱歌跳舞就是打招呼的一部分','Singing and dancing are part of saying hello']]},
+ ma:{icon:'🫖',groups:[['阿拉伯人','Arab'],['柏柏尔人（阿马齐格人）','Amazigh (Berber)']],
+  note:['柏柏尔人是最早住在这里的人','The Amazigh were here first'],
+  dress:['带帽子的长袍 djellaba','The hooded djellaba'],
+  customs:[['🫖','把薄荷茶举得高高地倒下来','Mint tea is poured from high above the glass'],
+           ['🥿','进屋脱鞋，坐在地毯上','Shoes off, and you sit on the carpet'],
+           ['🤝','在市集买东西要慢慢地讲价','In the market you bargain slowly and kindly']]},
+ tz:{icon:'🪘',groups:[['苏库马人','Sukuma'],['查加人','Chagga'],['哈亚人','Haya'],['马赛人','Maasai']],
+  note:['一百多个民族，靠斯瓦希里语聊天','Over a hundred peoples, joined by the Swahili language'],
+  dress:['印花布「康加」','Kanga cloth'],
+  customs:[['🗣️','见面要先好好问候，不能直接说事','Greet properly before you say anything else'],
+           ['🖐️','用右手吃饭、用右手递东西','Eat and pass things with the right hand'],
+           ['🧵','康加布上印着一句谚语','Every kanga carries a printed proverb']]},
+ mg:{icon:'🪘',groups:[['梅里纳人','Merina'],['贝齐米萨拉卡人','Betsimisaraka'],['萨卡拉瓦人','Sakalava']],
+  note:['十八个民族，祖先来自非洲和东南亚','18 peoples, with roots in both Africa and Southeast Asia'],
+  dress:['披肩「lamba」','The lamba shawl'],
+  customs:[['👨‍👩‍👧','很重视祖先，常常回老家聚一聚','Ancestors matter, and families gather often'],
+           ['🍚','一天三顿都吃米饭','Rice is eaten at all three meals'],
+           ['🎵','用竹子做的琴「valiha」弹曲子','Music is played on a bamboo tube zither, the valiha']]},
+ us:{icon:'🗽',groups:[['来自世界各地的人','people from all over the world'],['美洲原住民','Native Americans']],
+  note:['几乎每个国家的人都有；原住民最早住在这里','People from nearly every country — and Native Americans were here first'],
+  dress:['牛仔裤和牛仔帽','Jeans and cowboy hats'],
+  customs:[['🦃','感恩节全家一起吃火鸡','Families eat turkey at Thanksgiving'],
+           ['👋','见面握手，笑着说「Hi」','A handshake and a smiling hi'],
+           ['🎃','万圣节小朋友装扮起来要糖','At Halloween children dress up for sweets']]},
+ ca:{icon:'🍁',groups:[['英语区的人','English-speaking'],['法语区的人','French-speaking'],['原住民','First Nations'],['因纽特人','Inuit']],
+  note:['英语法语都说；原住民最早住在这里','Both English and French are spoken; First Nations were here first'],
+  dress:['因纽特人的毛皮大衣','Inuit fur parkas'],
+  customs:[['🙏','一天到晚都在说「对不起」','People say sorry all day long'],
+           ['🏒','全家一起看冰球比赛','Families watch ice hockey together'],
+           ['🍁','春天把枫糖浆浇在雪上做糖吃','In spring they pour maple syrup on snow to make sweets']]},
+ mx:{icon:'🪅',groups:[['梅斯蒂索人','Mestizo'],['纳瓦人','Nahua'],['玛雅人','Maya']],
+  note:['玛雅人和纳瓦人是这里的原住民','The Maya and Nahua are indigenous peoples'],
+  dress:['绣花上衣和披风 serape','Embroidered blouses and serapes'],
+  customs:[['🪅','过生日蒙上眼睛打彩罐','At birthdays children hit a piñata blindfolded'],
+           ['💀','亡灵节摆上花和照片想念家人','On Day of the Dead they set out flowers and photos'],
+           ['🌮','玉米饼直接用手拿着吃','Tacos are picked up with your hands']]},
+ cu:{icon:'🥁',groups:[['古巴人','Cuban'],['非洲和西班牙血统','of African and Spanish descent']],
+  note:['音乐里同时听得出非洲和西班牙','You can hear both Africa and Spain in the music'],
+  dress:['瓜亚贝拉衬衫','The guayabera shirt'],
+  customs:[['💃','街上随时可能跳起萨尔萨','Salsa can break out on any street corner'],
+           ['🤝','见面亲一下脸颊','Friends greet with a kiss on the cheek'],
+           ['⚾','棒球是全国最爱的运动','Baseball is the country\'s favourite game']]},
+ br:{icon:'🥁',groups:[['葡萄牙裔','of Portuguese descent'],['非洲裔','of African descent'],['原住民','indigenous peoples'],['各国移民','immigrants from everywhere']],
+  note:['各种血统混在一起，成了一个大家庭','Many roots mixed into one people'],
+  dress:['狂欢节的羽毛华服','Carnival feathers and sequins'],
+  customs:[['🥁','二月狂欢节整座城跳桑巴','In February whole cities samba at Carnival'],
+           ['⚽','小朋友在街上和沙滩上踢球','Children play football on streets and beaches'],
+           ['🤗','见面给一个大大的拥抱','Greetings come with a big hug']]},
+ ar:{icon:'🧉',groups:[['意大利裔','of Italian descent'],['西班牙裔','of Spanish descent'],['原住民','indigenous peoples']],
+  note:['很多人的曾祖父母来自意大利和西班牙','Many great-grandparents came from Italy and Spain'],
+  dress:['高乔牛仔的宽裤和帽子','Gaucho trousers and hats'],
+  customs:[['🧉','一个杯子轮流传着喝马黛茶','One cup of mate is passed around and shared'],
+           ['💃','探戈要两个人贴得很近一起跳','Tango is danced by two, very close'],
+           ['🍖','周末全家一起烤肉「asado」','Weekends are for a family asado']]},
+ pe:{icon:'🦙',groups:[['克丘亚人','Quechua'],['艾马拉人','Aymara'],['梅斯蒂索人','Mestizo']],
+  note:['克丘亚语是印加人传下来的话','Quechua comes down from the Inca'],
+  dress:['彩色的披肩和圆顶帽','Bright shawls and bowler hats'],
+  customs:[['🧶','用手一线一线织出彩色的布','Cloth is woven by hand in brilliant colours'],
+           ['🥔','有三千多种土豆，各有各的名字','More than 3,000 kinds of potato, each with a name'],
+           ['🎶','用排箫吹山里的歌','Pan pipes play the songs of the mountains']]},
+ cl:{icon:'⛰️',groups:[['智利人','Chilean'],['马普切人','Mapuche']],
+  note:['马普切人是最早住在这里的人','The Mapuche were here first'],
+  dress:['牧人的披风和宽边草帽','The huaso\'s manta and wide straw hat'],
+  customs:[['💃','国庆节挥着手帕跳「奎卡」','On the national holiday they dance the cueca waving handkerchiefs'],
+           ['🥟','大家都爱吃大大的肉馅饺 empanada','Everyone loves a big empanada'],
+           ['🤗','见面亲一下右边脸颊','Greet with a kiss on the right cheek']]},
+ au:{icon:'🪃',groups:[['澳大利亚原住民','Aboriginal Australians'],['托雷斯海峡岛民','Torres Strait Islanders'],['各国移民','people from many countries']],
+  note:['原住民在这里住了六万年','Aboriginal peoples have lived here for 60,000 years'],
+  dress:['宽边帽挡大太阳','Wide-brimmed hats against the sun'],
+  customs:[['🔥','周末去公园烤肉','Weekend barbecues in the park'],
+           ['🎨','原住民用一个个小圆点画画讲故事','Aboriginal artists tell stories in dots'],
+           ['👋','大家直接叫名字，不叫头衔','People use first names, not titles']]},
+ nz:{icon:'🥝',groups:[['毛利人','Māori'],['欧洲裔','of European descent'],['太平洋岛民','Pacific peoples']],
+  note:['毛利人是最早划船到这里的人','Māori arrived here first, by canoe'],
+  dress:['毛利人用亚麻编的斗篷','Māori cloaks woven from flax'],
+  customs:[['👃','毛利人碰一碰鼻子问好，叫「hongi」','Māori greet by pressing noses — the hongi'],
+           ['😛','跳哈卡舞跺脚吐舌头，给自己打气','The haka is stamped and shouted to find courage'],
+           ['🥾','全家一起去山里走路','Families walk the hills together']]},
+ fj:{icon:'🌺',groups:[['斐济原住民','iTaukei'],['印度裔斐济人','Indo-Fijian']],
+  note:['两个族群一起生活在这些小岛上','Two communities share these islands'],
+  dress:['男生女生都穿的裙子「sulu」','The sulu, worn by everyone'],
+  customs:[['👋','见面大声说一句「Bula!」','People call out Bula! to say hello'],
+           ['🥥','大家围着一个碗喝「卡瓦」','A drink called kava is shared from one bowl'],
+           ['🎁','送东西要用两只手捧着给','Gifts are offered with both hands']]}
+};
+
 var LAND=[
  [[-17,15],[-16,22],[-10,27],[-9.8,31],[-8,33],[-6,35.9],[-5,36],[10,37],[20,33],[32,31],[35,23],[39,15],[43,11],[51,12],[42,-1],[40,-10],[35,-20],[33,-26],[27,-34],[18,-34],[12,-18],[9,-1],[8,4],[-4,5],[-8,4],[-13,9],[-17,15]],
  [[-10,36],[-9,43],[-2,48],[2,51],[4,54],[8,57],[11,59],[18,60],[25,60],[30,60],[30,55],[28,50],[30,46],[28,44],[24,42],[20,40],[16,41],[12,38],[15,37],[13,45],[8,44],[3,42],[-2,43],[-9,39],[-10,36]],
@@ -4179,6 +4436,16 @@ function renderCard(){
       '<div class="nm stack">'+T(x.fl[1],x.fl[2])+'</div></button>'+
     '</div>'+
     '<p class="hint stack">'+T('👆 点一点图片，看大图和小知识','👆 Tap a picture for a close-up and fun facts')+'</p>';
+  var pp=PEOPLE[c.id];
+  if(pp){
+    html+='<button class="people" id="peopleB">'+
+      '<div class="lbl stack">'+T('👘 民族与风俗','👘 PEOPLE & CUSTOMS')+'</div>'+
+      '<div class="row"><div class="ico">'+pp.icon+'</div><div>'+
+      '<div class="grp stack">'+T(pp.groups.map(function(g){return g[0];}).join('、'),
+                                 pp.groups.map(function(g){return g[1];}).join(', '))+'</div>'+
+      '<div class="more stack">'+T('点开看看他们怎么过日子 ➜','Tap to see how they live ➜')+'</div>'+
+      '</div></div></button>';
+  }
   html+='<div class="hello stack">'+T('打招呼要说：<b>'+c.hi+'</b>（'+c.hiR+'）','Say hello: <b>'+c.hi+'</b> ('+c.hiR+')')+'</div>';
   html+='<div class="navRow">'+
     '<button class="btn" id="prevB">⬅️ '+T('上一个','Back')+'</button>'+
@@ -4193,6 +4460,8 @@ function renderCard(){
   Array.prototype.forEach.call(document.querySelectorAll('.trio button'),function(b){
     b.onclick=function(){ openDetail(b.dataset.s); };
   });
+  var pb=document.getElementById('peopleB');
+  if(pb) pb.onclick=openPeople;
 }
 function step(d){
   var i=COUNTRIES.indexOf(current);
@@ -4242,6 +4511,31 @@ function openDetail(kind){
   box.innerHTML=html; box.classList.add('show');
   mount3D(box);
   var lines=[[item[1],item[2]]].concat(facts.map(function(f){ return [f[1],f[2]]; }));
+  sayList(lines,true);
+  document.getElementById('dSay').onclick=function(){ sayList(lines,true); };
+  document.getElementById('dClose').onclick=closeDetail;
+  box.onclick=function(e){ if(e.target===box) closeDetail(); };
+}
+function openPeople(){
+  var c=current, p=PEOPLE[c.id];
+  var gz=p.groups.map(function(g){return g[0];}).join('、'),
+      ge=p.groups.map(function(g){return g[1];}).join(', ');
+  var rows=[['👥','主要民族：'+gz,'Main peoples: '+ge],
+            ['🌏',p.note[0],p.note[1]],
+            ['👗','传统服装：'+p.dress[0],'Traditional dress: '+p.dress[1]]].concat(p.customs);
+  var html='<div class="dcard">'+
+    '<div class="kind stack">'+T('👘 民族与风俗','👘 PEOPLE & CUSTOMS')+'</div>'+
+    '<div class="bigEmo">'+p.icon+'</div>'+
+    '<h3 class="stack">'+T(c.zh+'的人们','The people of '+c.en)+'</h3>'+
+    '<div class="where stack">'+T('📍 在 '+c.zh,'📍 in '+c.en)+'</div>'+
+    '<ul class="facts">'+rows.map(function(f){
+      return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
+    }).join('')+'</ul>'+
+    '<div class="drow"><button class="btn" id="dSay">🔊 '+T('再读一次','Read again')+'</button>'+
+    '<button class="btn big" id="dClose">👍 '+T('知道啦','Got it')+'</button></div></div>';
+  var box=document.getElementById('detail');
+  box.innerHTML=html; box.classList.add('show');
+  var lines=rows.map(function(f){ return [f[1],f[2]]; });
   sayList(lines,true);
   document.getElementById('dSay').onclick=function(){ sayList(lines,true); };
   document.getElementById('dClose').onclick=closeDetail;
