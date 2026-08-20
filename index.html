@@ -93,8 +93,8 @@
   .trio .lbl{font-size:11px;color:var(--ink2);font-weight:bold;text-align:center}
   .trio .nm{font-size:14px;font-weight:bold;line-height:1.2;margin-top:3px;text-align:center}
   .trio .nm .en{font-size:11.5px;color:var(--ink2)}
-  .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-  @media (max-width:620px){.duo{grid-template-columns:1fr}}
+  .duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(186px,1fr));gap:10px;margin-top:12px}
+  .people.trav{background:linear-gradient(100deg,#eef4ff,#f2fbff);border-color:#cfdff0}
   .people{display:block;width:100%;text-align:left;background:linear-gradient(100deg,#fff4e6,#eef6ff);
     border:3px solid #ecdcc4;border-radius:18px;padding:11px 14px;transition:transform .12s}
   .people.money{background:linear-gradient(100deg,#fffae6,#f2fbee);border-color:#ecdfae}
@@ -2960,6 +2960,119 @@ var MONEY={
                'They once showed the British monarch, and now show Fiji\'s own wildlife']]}
 };
 
+/* ============================================================
+   2f. GETTING AROUND — the national airline, the ride you see on
+   the street, and what floats. air = [中文, English, 一条小知识 ×2]
+   ============================================================ */
+var TRANSPORT={
+ cn:{air:['中国国际航空','Air China','标志是一只凤凰','Its badge is a phoenix'],
+   ride:['🚄','高铁','High-speed rail'], boat:['🛳️','长江上的游船','River cruisers on the Yangtze']},
+ jp:{air:['日本航空','Japan Airlines','尾巴上画着一只红色的鹤','A red crane is painted on the tail'],
+   ride:['🚅','新干线','The Shinkansen bullet train'], boat:['⛴️','岛与岛之间的渡轮','Ferries between the islands']},
+ my:{air:['马来西亚航空','Malaysia Airlines','标志是传统的月亮风筝','Its badge is the traditional moon kite'],
+   ride:['🛺','三轮车','The trishaw'], boat:['⛴️','开往海岛的渡轮','Ferries out to the islands']},
+ sg:{air:['新加坡航空','Singapore Airlines','空乘的制服是马来传统服装改的','The crew uniform is based on Malay traditional dress'],
+   ride:['🚇','地铁','The MRT'], boat:['🚢','世界上最忙的港口之一，巨型货柜船','Giant container ships — one of the busiest ports on Earth']},
+ in:{air:['印度航空','Air India','吉祥物是一位戴头巾的「王公」','Its mascot is a turbaned Maharajah'],
+   ride:['🛺','三轮嘟嘟车','The auto rickshaw'], boat:['🛶','喀拉拉的船屋','Houseboats in Kerala']},
+ kr:{air:['大韩航空','Korean Air','尾巴上是国旗中间的太极图案','The taegeuk from the flag is on the tail'],
+   ride:['🚄','KTX 高铁','The KTX high-speed train'], boat:['⛴️','开往济州岛的渡轮','Ferries to Jeju Island']},
+ th:{air:['泰国国际航空','Thai Airways','紫色的兰花是它的标志','A purple orchid is its emblem'],
+   ride:['🛺','嘟嘟车','The tuk-tuk'], boat:['🛶','长尾船','The long-tail boat']},
+ id:{air:['印尼鹰航','Garuda Indonesia','名字来自神话里的大鸟「迦楼罗」','Named after Garuda, the giant bird of legend'],
+   ride:['🛵','摩托出租「ojek」','The ojek motorbike taxi'], boat:['⛴️','岛与岛之间的渡轮','Ferries hopping between islands']},
+ vn:{air:['越南航空','Vietnam Airlines','标志是一朵金色的莲花','Its badge is a golden lotus'],
+   ride:['🛵','摩托车，满街都是','Scooters, everywhere you look'], boat:['⛵','下龙湾的红帆船','Red-sailed junks in Ha Long Bay']},
+ ph:{air:['菲律宾航空','Philippine Airlines','是亚洲最早的航空公司之一','One of the oldest airlines in Asia'],
+   ride:['🚐','彩绘吉普尼','The painted jeepney'], boat:['🛶','两边有支架的螃蟹船','The bangka, with outriggers on both sides']},
+ np:{air:['尼泊尔航空','Nepal Airlines','飞机要在山谷里降落，非常考验飞行员','Its planes land between mountains — a real test for pilots'],
+   ride:['✈️','山里的小飞机','Tiny planes into the mountains'], boat:['🛶','山谷里的漂流船','Rafts down the mountain rivers']},
+ ae:{air:['阿联酋航空','Emirates','拥有全世界最多的双层巨无霸客机','It flies more double-decker jumbos than anyone else'],
+   ride:['🚝','没有司机的地铁','A metro with no driver'], boat:['🛶','小木船「阿布拉」','The little abra water taxi']},
+ tr:{air:['土耳其航空','Turkish Airlines','飞到的国家比任何一家航空公司都多','It flies to more countries than any other airline'],
+   ride:['🚋','伊斯坦布尔的老电车','Istanbul\'s old red trams'], boat:['⛴️','跨博斯普鲁斯海峡的渡轮','Ferries across the Bosphorus']},
+ ru:{air:['俄罗斯航空','Aeroflot','标志是一把有翅膀的锤子，一直没换过','Its winged hammer badge has never changed'],
+   ride:['🚂','西伯利亚大铁路，坐一趟要七天','The Trans-Siberian — seven days end to end'], boat:['🛳️','伏尔加河上的游船','River boats on the Volga']},
+ gb:{air:['英国航空','British Airways','尾巴上是国旗的一角','A corner of the flag is on the tail'],
+   ride:['🚌','红色双层巴士','The red double-decker bus'], boat:['🛳️','从南安普顿开往纽约的大邮轮','Ocean liners from Southampton to New York']},
+ fr:{air:['法国航空','Air France','最早的标志是一只有翅膀的海马','Its first badge was a winged seahorse'],
+   ride:['🚄','TGV 高速列车','The TGV']  , boat:['🛳️','世界上最大的邮轮就在法国造','The biggest cruise ships in the world are built in France']},
+ de:{air:['汉莎航空','Lufthansa','标志是一只飞翔的鹤','Its badge is a flying crane'],
+   ride:['🚗','高速公路有的路段不限速','On parts of the autobahn there is no speed limit'], boat:['🛳️','莱茵河上的游船','River cruisers on the Rhine']},
+ it:{air:['意大利航空','ITA Airways','飞机涂成天蓝色，和国家队一个颜色','Its planes are sky blue, like the national team'],
+   ride:['🛵','小摩托「韦士柏」','The Vespa scooter'], boat:['🛶','威尼斯的贡多拉','Venice\'s gondolas']},
+ es:{air:['伊比利亚航空','Iberia','尾巴上是红黄红，就是国旗的颜色','Red, yellow, red on the tail — the colours of the flag'],
+   ride:['🚄','AVE 高铁','The AVE high-speed train'], boat:['⛴️','开往海岛的渡轮','Ferries out to the islands']},
+ nl:{air:['荷兰皇家航空','KLM','是世界上还用原来名字飞的最老航空公司','The oldest airline still flying under its original name'],
+   ride:['🚲','自行车，比人还多','Bicycles — more of them than people'], boat:['🛥️','运河上的游船','Boats along the canals']},
+ ch:{air:['瑞士国际航空','SWISS','尾巴上就是国旗的白十字','The flag\'s white cross is right on the tail'],
+   ride:['🚞','爬山的齿轨小火车','Cogwheel trains that climb the mountains'], boat:['⛴️','湖上的老式明轮船','Old paddle steamers on the lakes']},
+ gr:{air:['爱琴海航空','Aegean Airlines','名字就来自旁边的爱琴海','Named after the sea beside it'],
+   ride:['🛵','小摩托','Scooters'], boat:['⛴️','一座岛一座岛跳过去的渡轮','Ferries hopping from island to island']},
+ no:{air:['挪威航空','Norwegian','每架飞机的尾巴上画着一位名人','Each plane has a famous face on its tail'],
+   ride:['🚂','穿过雪山的铁路','Railways through the snowy mountains'], boat:['🛳️','沿着峡湾一路开的邮轮','Coastal ships all the way up the fjords']},
+ eg:{air:['埃及航空','EgyptAir','标志是古埃及的天空之神荷鲁斯','Its badge is Horus, the ancient sky god'],
+   ride:['🐫','沙漠里的骆驼','Camels across the desert'], boat:['⛵','尼罗河上的三角帆船','Feluccas on the Nile']},
+ ke:{air:['肯尼亚航空','Kenya Airways','外号叫「非洲的骄傲」','It calls itself the Pride of Africa'],
+   ride:['🚐','花花绿绿、放着音乐的小巴「马塔图」','The matatu — painted, and playing music'], boat:['⛵','海岸边的三角帆船','Dhows along the coast']},
+ za:{air:['南非航空','South African Airways','尾巴上是南非国旗','The South African flag is on the tail'],
+   ride:['🚂','豪华的「蓝色列车」','The luxurious Blue Train'], boat:['🚢','开普敦港的大船','Big ships in Cape Town harbour']},
+ ma:{air:['皇家摩洛哥航空','Royal Air Maroc','尾巴上是国旗中间的绿色星星','The flag\'s green star is on the tail'],
+   ride:['🐫','沙漠里的骆驼队','Camel trains across the sand'], boat:['⛴️','跨过海峡开往西班牙的渡轮','Ferries across the strait to Spain']},
+ tz:{air:['坦桑尼亚航空','Air Tanzania','尾巴上画着长颈鹿的花纹','A giraffe pattern is painted on the tail'],
+   ride:['🚐','小巴「达拉达拉」','The dala dala minibus'], boat:['⛵','开往桑给巴尔的三角帆船','Dhows sailing to Zanzibar']},
+ mg:{air:['马达加斯加航空','Madagascar Airlines','从首都飞到一个个海边小城','It hops from the capital to the little coastal towns'],
+   ride:['🛺','人力车「pousse-pousse」','The pousse-pousse rickshaw'], boat:['⛵','独桅的小帆船','Small single-masted sailing boats']},
+ us:{air:['美国航空','American Airlines','是世界上飞机最多的航空公司','It has more planes than any other airline'],
+   ride:['🚕','黄色出租车','The yellow taxi'], boat:['🛳️','从佛罗里达出发的加勒比海邮轮','Caribbean cruise ships leaving Florida']},
+ ca:{air:['加拿大航空','Air Canada','尾巴上是一片红枫叶','A red maple leaf is on the tail'],
+   ride:['🛶','独木舟，原住民几千年前就在用','The canoe, paddled here for thousands of years'], boat:['🛳️','从温哥华开往阿拉斯加的邮轮','Cruise ships from Vancouver up to Alaska']},
+ mx:{air:['墨西哥航空','Aeroméxico','尾巴上画着一位古代武士的头像','An ancient warrior\'s head is on the tail'],
+   ride:['🚌','彩绘的巴士','Brightly painted buses'], boat:['🛶','运河上的彩色平底船','Colourful flat boats on the canals']},
+ cu:{air:['古巴航空','Cubana','是拉丁美洲最老的航空公司之一','One of the oldest airlines in Latin America'],
+   ride:['🚗','开了六七十年的老爷车','Cars still going after 60 or 70 years'], boat:['🛳️','停在哈瓦那的加勒比邮轮','Caribbean cruise ships calling at Havana']},
+ br:{air:['巴西拉塔姆航空','LATAM Brasil','是南美洲最大的航空公司','The largest airline in South America'],
+   ride:['🚡','里约的面包山缆车','The cable car up Rio\'s Sugarloaf'], boat:['🛶','亚马逊河上的双层木船','Two-deck wooden boats on the Amazon']},
+ ar:{air:['阿根廷航空','Aerolíneas Argentinas','尾巴上是一只展开翅膀的神鹫','A condor with open wings is on the tail'],
+   ride:['🚇','南美洲最早的地铁','The first underground railway in South America'], boat:['🚢','从最南端的港口开往南极的船','Ships to Antarctica from the southernmost port']},
+ pe:{air:['秘鲁拉塔姆航空','LATAM Perú','属于南美最大的航空公司','Part of South America\'s biggest airline'],
+   ride:['🚂','开往马丘比丘的小火车','The little train up to Machu Picchu'], boat:['🛶','的的喀喀湖上的芦苇船','Reed boats on Lake Titicaca']},
+ cl:{air:['拉塔姆航空','LATAM Airlines','总部就在首都圣地亚哥','Its head office is in Santiago'],
+   ride:['🚌','双层长途巴士，国家太长了','Double-decker coaches — the country is very long'], boat:['🛳️','开去看冰川的船','Boats out to the glaciers']},
+ au:{air:['澳洲航空','Qantas','尾巴上画着一只袋鼠，大家叫它「飞翔的袋鼠」','A kangaroo on the tail — the Flying Kangaroo'],
+   ride:['🚚','公路列车：一个车头拖好几节车厢','Road trains — one truck pulling several trailers'], boat:['🛳️','开去大堡礁的游船','Boats out to the Great Barrier Reef']},
+ nz:{air:['新西兰航空','Air New Zealand','机身上画着毛利人的银蕨叶','A Māori silver fern is painted on the side'],
+   ride:['🚐','开着房车到处走','Campervans, going wherever they like'], boat:['⛴️','连接南北两岛的渡轮','The ferry joining the two islands']},
+ fj:{air:['斐济航空','Fiji Airways','机身上是斐济传统的树皮布图案','Traditional Fijian barkcloth patterns cover the plane'],
+   ride:['🚌','没有窗户的敞篷巴士','Buses with no windows, just open sides'], boat:['🛥️','岛与岛之间的小快艇','Little speedboats between the islands']},
+ mn:{air:['蒙古民用航空','MIAT Mongolian Airlines','尾巴上是国旗上的「索永布」图案','The soyombo from the flag is on the tail'],
+   ride:['🐎','骑马，草原上没有路','On horseback — the grassland has no roads'], boat:['🛶','库苏古尔湖上的小船','Small boats on Lake Khövsgöl']},
+ kh:{air:['柬埔寨吴哥航空','Cambodia Angkor Air','名字里就有「吴哥」两个字','Angkor is right there in its name'],
+   ride:['🛺','后面挂着车斗的嘟嘟车','A tuk-tuk pulling a little carriage'], boat:['🛶','洞里萨湖上的水上村庄','Floating villages on the Tonlé Sap']},
+ se:{air:['北欧航空','SAS','瑞典、丹麦、挪威三个国家合开的','Sweden, Denmark and Norway run it together'],
+   ride:['🚂','坐卧铺火车一路开到北极圈','A sleeper train all the way to the Arctic Circle'], boat:['⛴️','群岛之间的渡轮','Ferries through the archipelago']},
+ is:{air:['冰岛航空','Icelandair','中途在冰岛停几天不用加钱，可以顺便玩','You can stop over in Iceland for days at no extra cost'],
+   ride:['🚙','走碎石路的大轮子越野车','Big-wheeled jeeps for the gravel roads'], boat:['🛥️','出海看鲸鱼的船','Boats out to watch the whales']},
+ pl:{air:['波兰航空','LOT','标志也是一只飞翔的鹤','Its badge is a flying crane too'],
+   ride:['🚋','老城里的电车','Trams through the old towns'], boat:['🛥️','波罗的海边的小船','Boats along the Baltic shore']},
+ ng:{air:['和平航空','Air Peace','名字的意思就是「和平」','Its name simply means peace'],
+   ride:['🛵','摩托出租「okada」','The okada motorbike taxi'], boat:['🛶','尼日尔河上的长独木舟','Long canoes on the Niger River']},
+ et:{air:['埃塞俄比亚航空','Ethiopian Airlines','是整个非洲最大的航空公司','The largest airline in all of Africa'],
+   ride:['🚂','非洲第一条电气化跨国铁路','Africa\'s first electric railway between two countries'], boat:['🛶','塔纳湖上的纸莎草船','Papyrus boats on Lake Tana']},
+ bw:{air:['博茨瓦纳航空','Air Botswana','飞机不多，但飞到每一个国家公园','Only a few planes, but they reach every national park'],
+   ride:['🛩️','小飞机，直接降在草地上','Bush planes that land straight onto the grass'], boat:['🛶','用竿子撑的独木舟「mokoro」','The mokoro, pushed along with a pole']},
+ cr:{air:['阿维安卡哥斯达黎加','Avianca Costa Rica','飞机小小的，专门飞中美洲','Small planes, hopping around Central America'],
+   ride:['🚡','从树冠上滑过去的滑索','Zip lines that slide you over the treetops'], boat:['🛥️','在运河上找野生动物的小船','Little boats spotting wildlife along the canals']},
+ co:{air:['哥伦比亚航空','Avianca','是世界上最老的航空公司之一，1919 年就开始飞','One of the oldest airlines in the world — flying since 1919'],
+   ride:['🚡','麦德林把缆车当公共交通用','In Medellín the cable car is part of the bus system'], boat:['⛵','加勒比海上的帆船','Sailing boats on the Caribbean']},
+ bo:{air:['玻利维亚国家航空','Boliviana de Aviación','名字的意思就是「玻利维亚的航空」','Its name simply means Bolivian Aviation'],
+   ride:['🚡','拉巴斯的空中缆车，是世界最长的城市索道','La Paz has the longest city cable-car network in the world'],
+   boat:['🛶','的的喀喀湖上的船','Boats on Lake Titicaca']},
+ pg:{air:['新几内亚航空','Air Niugini','「Niugini」就是「新几内亚」','Niugini is simply New Guinea'],
+   ride:['🛩️','很多地方没有路，只能坐小飞机','Many places have no road at all — only a small plane'],
+   boat:['🛶','河上的独木舟','Dugout canoes on the rivers']}
+};
+
 var LAND=[
  [[-17,15],[-16,22],[-10,27],[-9.8,31],[-8,33],[-6,35.9],[-5,36],[10,37],[20,33],[32,31],[35,23],[39,15],[43,11],[51,12],[42,-1],[40,-10],[35,-20],[33,-26],[27,-34],[18,-34],[12,-18],[9,-1],[8,4],[-4,5],[-8,4],[-13,9],[-17,15]],
  [[-10,36],[-9,43],[-2,48],[2,51],[4,54],[8,57],[11,59],[18,60],[25,60],[30,60],[30,55],[28,50],[30,46],[28,44],[24,42],[20,40],[16,41],[12,38],[15,37],[13,45],[8,44],[3,42],[-2,43],[-9,39],[-10,36]],
@@ -4980,6 +5093,13 @@ function renderCard(){
                                  pp.groups.map(function(g){return g[1];}).join(', '))+'</div>'+
       '<div class="more stack">'+T('看看他们怎么过日子 ➜','How they live ➜')+'</div>'+
       '</div></div></button>';
+    var tp=TRANSPORT[c.id];
+    if(tp) html+='<button class="people trav" id="travB">'+
+      '<div class="lbl stack">'+T('✈️ 怎么去、怎么走','✈️ GETTING AROUND')+'</div>'+
+      '<div class="row"><div class="ico">'+tp.ride[0]+'</div><div>'+
+      '<div class="grp stack">'+T(tp.air[0],tp.air[1])+'</div>'+
+      '<div class="more stack">'+T('飞机、船和路上的车 ➜','Planes, boats and rides ➜')+'</div>'+
+      '</div></div></button>';
     if(mn) html+='<button class="people money" id="moneyB">'+
       '<div class="lbl stack">'+T('💰 他们用什么钱','💰 MONEY')+'</div>'+
       '<div class="row">'+coinSVG(mn.sym)+'<div>'+
@@ -5006,6 +5126,8 @@ function renderCard(){
   if(pb) pb.onclick=openPeople;
   var mb=document.getElementById('moneyB');
   if(mb) mb.onclick=openMoney;
+  var tb=document.getElementById('travB');
+  if(tb) tb.onclick=openTransport;
 }
 function step(d){
   var i=COUNTRIES.indexOf(current);
@@ -5093,6 +5215,30 @@ function openMoney(){
     '<div class="kind stack">'+T('💰 他们用什么钱','💰 MONEY')+'</div>'+
     coinSVG(m.sym).replace('class="pic"','class="big"')+
     '<h3 class="stack">'+T(m.zh,m.en)+'</h3>'+
+    '<div class="where stack">'+T('📍 在 '+c.zh,'📍 in '+c.en)+'</div>'+
+    '<ul class="facts">'+rows.map(function(f){
+      return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
+    }).join('')+'</ul>'+
+    '<div class="drow"><button class="btn" id="dSay">🔊 '+T('再读一次','Read again')+'</button>'+
+    '<button class="btn big" id="dClose">👍 '+T('知道啦','Got it')+'</button></div></div>';
+  var box=document.getElementById('detail');
+  box.innerHTML=html; box.classList.add('show');
+  var lines=rows.map(function(f){ return [f[1],f[2]]; });
+  sayList(lines,true);
+  document.getElementById('dSay').onclick=function(){ sayList(lines,true); };
+  document.getElementById('dClose').onclick=closeDetail;
+  box.onclick=function(e){ if(e.target===box) closeDetail(); };
+}
+function openTransport(){
+  var c=current, t=TRANSPORT[c.id];
+  var rows=[['✈️','国家航空公司是「'+t.air[0]+'」','Its national airline is '+t.air[1]],
+            ['💡',t.air[2],t.air[3]],
+            [t.ride[0],'路上最常看到：'+t.ride[1],'On the ground: '+t.ride[2]],
+            [t.boat[0],'水上：'+t.boat[1],'On the water: '+t.boat[2]]];
+  var html='<div class="dcard">'+
+    '<div class="kind stack">'+T('✈️ 怎么去、怎么走','✈️ GETTING AROUND')+'</div>'+
+    '<div class="bigEmo">'+t.ride[0]+'</div>'+
+    '<h3 class="stack">'+T('去'+c.zh+'怎么走','Getting around '+c.en)+'</h3>'+
     '<div class="where stack">'+T('📍 在 '+c.zh,'📍 in '+c.en)+'</div>'+
     '<ul class="facts">'+rows.map(function(f){
       return '<li><span class="emo">'+f[0]+'</span><span class="stack">'+T(f[1],f[2])+'</span></li>';
